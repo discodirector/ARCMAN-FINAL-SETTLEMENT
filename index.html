@@ -1,0 +1,3596 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <title>ARCMAN: Final Settlement - Arcade Game</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+            -webkit-touch-callout: none;
+        }
+
+        html, body {
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            position: fixed;
+            touch-action: none;
+            -webkit-overflow-scrolling: touch;
+            user-select: none;
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+        }
+
+        body {
+            background: #000;
+            font-family: 'Courier New', monospace;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        #gameContainer {
+            position: relative;
+            width: 100vw;
+            height: 100vh;
+            border: 2px solid #0ff;
+            box-shadow: 0 0 20px #0ff, inset 0 0 20px #0ff;
+            overflow: hidden;
+        }
+
+        #gameCanvas {
+            display: block;
+            width: 100%;
+            height: 100%;
+            image-rendering: pixelated;
+            image-rendering: crisp-edges;
+            image-rendering: -moz-crisp-edges;
+            image-rendering: -webkit-crisp-edges;
+            touch-action: none;
+            -webkit-touch-callout: none;
+        }
+
+        #ui {
+            position: absolute;
+            top: clamp(8px, 1.5vw, 15px);
+            left: clamp(8px, 1.5vw, 15px);
+            color: #0ff;
+            font-size: clamp(12px, 2.5vw, 16px);
+            text-shadow: 0 0 10px #0ff;
+            z-index: 100;
+            pointer-events: none;
+        }
+
+
+        /* Level Editor Styles */
+        #levelEditor {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.95);
+            z-index: 500;
+            display: none;
+            overflow-y: auto;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+
+        #editorPanel {
+            max-width: 600px;
+            margin: 0 auto;
+            color: #0ff;
+            font-family: 'Courier New', monospace;
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        .editor-section {
+            margin-bottom: 20px;
+            padding: 15px;
+            border: 2px solid #0ff;
+            box-shadow: 0 0 10px #0ff;
+        }
+
+        .editor-section h3 {
+            margin-top: 0;
+            color: #ff0;
+            text-shadow: 0 0 10px #ff0;
+        }
+
+        .editor-button {
+            padding: 10px 15px;
+            margin: 5px;
+            background: #0ff;
+            color: #000;
+            border: none;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            font-weight: bold;
+            cursor: pointer;
+            box-shadow: 0 0 10px #0ff;
+        }
+
+        .editor-button:hover {
+            background: #fff;
+            box-shadow: 0 0 20px #fff;
+        }
+
+        .editor-button.danger {
+            background: #f0f;
+            box-shadow: 0 0 10px #f0f;
+        }
+
+        .editor-button.danger:hover {
+            background: #fff;
+            box-shadow: 0 0 20px #fff;
+        }
+
+        .object-list {
+            list-style: none;
+            padding: 0;
+            margin: 10px 0;
+        }
+
+        .object-item {
+            padding: 8px;
+            margin: 5px 0;
+            background: rgba(0, 255, 255, 0.1);
+            border: 1px solid #0ff;
+            cursor: pointer;
+        }
+
+        .object-item:hover {
+            background: rgba(0, 255, 255, 0.3);
+        }
+
+        .object-item.selected {
+            background: rgba(255, 255, 0, 0.3);
+            border-color: #ff0;
+        }
+
+        input[type="text"], input[type="number"] {
+            background: #000;
+            border: 1px solid #0ff;
+            color: #0ff;
+            padding: 5px;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            width: 100%;
+            margin: 5px 0;
+            box-sizing: border-box;
+        }
+
+        input[type="text"]:focus, input[type="number"]:focus {
+            outline: none;
+            box-shadow: 0 0 10px #0ff;
+        }
+
+        #editorCanvas {
+            position: relative;
+            border: 2px solid #0ff;
+            box-shadow: 0 0 20px #0ff;
+            margin: 10px 0;
+            cursor: crosshair;
+            max-width: 100%;
+            width: 100%;
+            height: auto;
+            display: block;
+            box-sizing: border-box;
+        }
+
+        #editorToolbar {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin: 10px 0;
+        }
+
+        .tool-button {
+            padding: 8px 12px;
+            background: #000;
+            color: #0ff;
+            border: 2px solid #0ff;
+            font-family: 'Courier New', monospace;
+            cursor: pointer;
+        }
+
+        .tool-button.active {
+            background: #0ff;
+            color: #000;
+            box-shadow: 0 0 15px #0ff;
+        }
+
+        #score {
+            margin-bottom: clamp(3px, 0.8vw, 5px);
+        }
+
+        #levelCounter {
+            margin-top: clamp(3px, 0.8vw, 5px);
+        }
+
+
+        /* Level Summary Screen */
+        #levelSummary {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.9);
+            z-index: 200;
+            display: flex;
+            align-items: flex-start;
+            justify-content: center;
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
+            touch-action: auto;
+        }
+
+        .summary-content {
+            background: linear-gradient(135deg, rgba(0, 255, 255, 0.1), rgba(255, 0, 255, 0.1));
+            border: 3px solid #0ff;
+            box-shadow: 0 0 30px #0ff, inset 0 0 20px rgba(0, 255, 255, 0.2);
+            padding: clamp(20px, 5vw, 40px);
+            border-radius: 10px;
+            text-align: center;
+            max-width: 90%;
+            min-width: 300px;
+            margin: auto;
+        }
+
+        .summary-content h2 {
+            color: #0ff;
+            font-size: clamp(20px, 4vw, 32px);
+            text-shadow: 0 0 15px #0ff;
+            margin-bottom: clamp(20px, 4vw, 30px);
+            font-family: 'Courier New', monospace;
+        }
+
+        .summary-stats {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: clamp(15px, 3vw, 25px);
+            margin-bottom: clamp(20px, 4vw, 30px);
+        }
+
+        .summary-stat {
+            background: rgba(0, 255, 255, 0.1);
+            border: 2px solid #0ff;
+            padding: clamp(10px, 2vw, 15px);
+            border-radius: 5px;
+        }
+
+        .stat-label {
+            color: #0ff;
+            font-size: clamp(10px, 2vw, 14px);
+            text-shadow: 0 0 8px #0ff;
+            margin-bottom: 8px;
+            font-family: 'Courier New', monospace;
+        }
+
+        .stat-value {
+            color: #ff0;
+            font-size: clamp(18px, 3.5vw, 28px);
+            text-shadow: 0 0 12px #ff0;
+            font-weight: bold;
+            font-family: 'Courier New', monospace;
+        }
+
+        .summary-button {
+            background: #0ff;
+            color: #000;
+            border: none;
+            padding: clamp(12px, 2.5vw, 18px) clamp(24px, 5vw, 36px);
+            font-size: clamp(14px, 2.5vw, 18px);
+            font-weight: bold;
+            font-family: 'Courier New', monospace;
+            cursor: pointer;
+            box-shadow: 0 0 20px #0ff;
+            border-radius: 5px;
+            transition: all 0.3s;
+        }
+
+        .summary-button:hover {
+            background: #fff;
+            box-shadow: 0 0 30px #fff;
+            transform: scale(1.05);
+        }
+
+        .summary-button:active {
+            transform: scale(0.95);
+        }
+
+        /* Quiz Screen */
+        #quizScreen {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.95);
+            z-index: 250;
+            display: none;
+            align-items: flex-start;
+            justify-content: center;
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
+            touch-action: auto;
+        }
+
+        .quiz-content {
+            background: linear-gradient(135deg, rgba(0, 255, 255, 0.1), rgba(255, 0, 255, 0.1));
+            border: 3px solid #0ff;
+            box-shadow: 0 0 30px #0ff, inset 0 0 20px rgba(0, 255, 255, 0.2);
+            padding: clamp(20px, 5vw, 40px);
+            border-radius: 10px;
+            text-align: center;
+            max-width: 600px;
+            min-width: 300px;
+            margin: auto;
+        }
+
+        .quiz-content h2 {
+            color: #0ff;
+            font-size: clamp(20px, 4vw, 28px);
+            text-shadow: 0 0 15px #0ff;
+            margin-bottom: clamp(15px, 3vw, 25px);
+            font-family: 'Courier New', monospace;
+        }
+
+        #quizQuestion {
+            color: #ff0;
+            font-size: clamp(16px, 3vw, 22px);
+            text-shadow: 0 0 12px #ff0;
+            margin-bottom: clamp(20px, 4vw, 30px);
+            font-family: 'Courier New', monospace;
+            line-height: 1.5;
+            padding: clamp(10px, 2vw, 15px);
+            background: rgba(255, 255, 0, 0.1);
+            border: 2px solid #ff0;
+            border-radius: 5px;
+        }
+
+        .quiz-answers {
+            display: flex;
+            flex-direction: column;
+            gap: clamp(12px, 2.5vw, 18px);
+            margin-bottom: clamp(20px, 4vw, 30px);
+        }
+
+        .quiz-answer-button {
+            background: rgba(0, 255, 255, 0.2);
+            color: #0ff;
+            border: 2px solid #0ff;
+            padding: clamp(12px, 2.5vw, 18px) clamp(20px, 4vw, 30px);
+            font-size: clamp(14px, 2.5vw, 18px);
+            font-weight: bold;
+            font-family: 'Courier New', monospace;
+            cursor: pointer;
+            box-shadow: 0 0 15px rgba(0, 255, 255, 0.5);
+            border-radius: 5px;
+            transition: all 0.3s;
+            text-align: left;
+            position: relative;
+        }
+
+        .quiz-answer-button:hover:not(.disabled) {
+            background: rgba(0, 255, 255, 0.4);
+            box-shadow: 0 0 25px #0ff;
+            transform: translateX(5px);
+        }
+
+        .quiz-answer-button:active:not(.disabled) {
+            transform: translateX(2px) scale(0.98);
+        }
+
+        .quiz-answer-button.disabled {
+            cursor: not-allowed;
+            opacity: 0.6;
+        }
+
+        .quiz-answer-button.correct {
+            background: rgba(0, 255, 0, 0.3);
+            border-color: #0f0;
+            color: #0f0;
+            box-shadow: 0 0 25px #0f0;
+        }
+
+        .quiz-answer-button.incorrect {
+            background: rgba(255, 0, 0, 0.3);
+            border-color: #f00;
+            color: #f00;
+            box-shadow: 0 0 25px #f00;
+        }
+
+        #quizResultMessage {
+            display: none;
+            padding: clamp(10px, 2vw, 15px);
+            margin-bottom: clamp(15px, 3vw, 20px);
+            border-radius: 5px;
+            font-family: 'Courier New', monospace;
+            font-size: clamp(14px, 2.5vw, 18px);
+            font-weight: bold;
+        }
+
+        .quiz-result.correct-result {
+            background: rgba(0, 255, 0, 0.2);
+            border: 2px solid #0f0;
+            color: #0f0;
+            text-shadow: 0 0 10px #0f0;
+        }
+
+        .quiz-result.incorrect-result {
+            background: rgba(255, 0, 0, 0.2);
+            border: 2px solid #f00;
+            color: #f00;
+            text-shadow: 0 0 10px #f00;
+        }
+
+        #quizSkip, #quizContinue {
+            background: rgba(255, 255, 0, 0.2);
+            color: #ff0;
+            border: 2px solid #ff0;
+            padding: clamp(10px, 2vw, 14px) clamp(20px, 4vw, 30px);
+            font-size: clamp(12px, 2vw, 16px);
+            font-weight: bold;
+            font-family: 'Courier New', monospace;
+            cursor: pointer;
+            box-shadow: 0 0 15px rgba(255, 255, 0, 0.5);
+            border-radius: 5px;
+            transition: all 0.3s;
+            margin: 0 clamp(5px, 1vw, 10px);
+        }
+
+        #quizSkip:hover, #quizContinue:hover {
+            background: rgba(255, 255, 0, 0.4);
+            box-shadow: 0 0 25px #ff0;
+            transform: scale(1.05);
+        }
+
+        #quizSkip:active, #quizContinue:active {
+            transform: scale(0.95);
+        }
+
+        #quizContinue {
+            display: none;
+            background: rgba(0, 255, 255, 0.2);
+            color: #0ff;
+            border-color: #0ff;
+            box-shadow: 0 0 15px rgba(0, 255, 255, 0.5);
+        }
+
+        #quizContinue:hover {
+            background: rgba(0, 255, 255, 0.4);
+            box-shadow: 0 0 25px #0ff;
+        }
+
+        /* Info Screen */
+        #infoScreen {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.95);
+            z-index: 250;
+            display: none;
+            align-items: flex-start;
+            justify-content: center;
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
+            touch-action: auto;
+        }
+
+        .info-content {
+            background: linear-gradient(135deg, rgba(0, 255, 255, 0.1), rgba(255, 0, 255, 0.1));
+            border: 3px solid #0ff;
+            box-shadow: 0 0 30px #0ff, inset 0 0 20px rgba(0, 255, 255, 0.2);
+            padding: clamp(20px, 5vw, 40px);
+            border-radius: 10px;
+            text-align: center;
+            max-width: 600px;
+            min-width: 300px;
+            margin: auto;
+        }
+
+        .info-content h2 {
+            color: #0ff;
+            font-size: clamp(20px, 4vw, 28px);
+            text-shadow: 0 0 15px #0ff;
+            margin-bottom: clamp(15px, 3vw, 25px);
+            font-family: 'Courier New', monospace;
+        }
+
+        #infoText {
+            color: #ff0;
+            font-size: clamp(16px, 3vw, 22px);
+            text-shadow: 0 0 12px #ff0;
+            margin-bottom: clamp(20px, 4vw, 30px);
+            font-family: 'Courier New', monospace;
+            line-height: 1.5;
+            padding: clamp(10px, 2vw, 15px);
+            background: rgba(255, 255, 0, 0.1);
+            border: 2px solid #ff0;
+            border-radius: 5px;
+            text-align: left;
+        }
+
+        #infoContinue {
+            background: rgba(0, 255, 255, 0.2);
+            color: #0ff;
+            border: 2px solid #0ff;
+            padding: clamp(10px, 2vw, 14px) clamp(20px, 4vw, 30px);
+            font-size: clamp(12px, 2vw, 16px);
+            font-weight: bold;
+            font-family: 'Courier New', monospace;
+            cursor: pointer;
+            box-shadow: 0 0 15px rgba(0, 255, 255, 0.5);
+            border-radius: 5px;
+            transition: all 0.3s;
+        }
+
+        #infoContinue:hover {
+            background: rgba(0, 255, 255, 0.4);
+            box-shadow: 0 0 25px #0ff;
+            transform: scale(1.05);
+        }
+
+        #infoContinue:active {
+            transform: scale(0.95);
+        }
+
+        /* Game Completion Screen */
+        #gameCompletionScreen {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.95);
+            z-index: 300;
+            display: flex;
+            align-items: flex-start;
+            justify-content: center;
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
+            touch-action: auto;
+        }
+
+        .completion-content {
+            background: linear-gradient(135deg, rgba(0, 255, 255, 0.15), rgba(255, 0, 255, 0.15));
+            border: 4px solid #0ff;
+            box-shadow: 0 0 40px #0ff, inset 0 0 30px rgba(0, 255, 255, 0.3);
+            padding: clamp(30px, 6vw, 50px);
+            border-radius: 15px;
+            text-align: center;
+            max-width: 90%;
+            min-width: 320px;
+            margin: auto;
+        }
+
+        .completion-content h2 {
+            color: #ff0;
+            font-size: clamp(24px, 5vw, 40px);
+            text-shadow: 0 0 20px #ff0, 0 0 40px #ff0;
+            margin-bottom: clamp(25px, 5vw, 35px);
+            font-family: 'Courier New', monospace;
+            font-weight: bold;
+        }
+
+        .completion-main-stat {
+            background: rgba(255, 255, 0, 0.15);
+            border: 3px solid #ff0;
+            box-shadow: 0 0 25px #ff0, inset 0 0 15px rgba(255, 255, 0, 0.2);
+            padding: clamp(20px, 4vw, 30px);
+            border-radius: 10px;
+            margin-bottom: clamp(25px, 5vw, 35px);
+        }
+
+        .completion-main-label {
+            color: #ff0;
+            font-size: clamp(14px, 2.5vw, 18px);
+            text-shadow: 0 0 10px #ff0;
+            margin-bottom: 12px;
+            font-family: 'Courier New', monospace;
+        }
+
+        .completion-main-value {
+            color: #fff;
+            font-size: clamp(32px, 6vw, 56px);
+            text-shadow: 0 0 20px #fff, 0 0 40px #ff0;
+            font-weight: bold;
+            font-family: 'Courier New', monospace;
+        }
+
+        .completion-stats {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: clamp(15px, 3vw, 20px);
+            margin-bottom: clamp(25px, 5vw, 35px);
+        }
+
+        .completion-stat {
+            background: rgba(0, 255, 255, 0.1);
+            border: 2px solid #0ff;
+            padding: clamp(12px, 2.5vw, 18px);
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 255, 255, 0.3);
+        }
+
+        .completion-stat-label {
+            color: #0ff;
+            font-size: clamp(11px, 2vw, 14px);
+            text-shadow: 0 0 8px #0ff;
+            margin-bottom: 8px;
+            font-family: 'Courier New', monospace;
+        }
+
+        .completion-stat-value {
+            color: #ff0;
+            font-size: clamp(16px, 3vw, 24px);
+            text-shadow: 0 0 12px #ff0;
+            font-weight: bold;
+            font-family: 'Courier New', monospace;
+        }
+
+        .completion-buttons {
+            display: flex;
+            gap: clamp(15px, 3vw, 20px);
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .completion-button {
+            border: none;
+            padding: clamp(12px, 2.5vw, 18px) clamp(24px, 5vw, 36px);
+            font-size: clamp(14px, 2.5vw, 18px);
+            font-weight: bold;
+            font-family: 'Courier New', monospace;
+            cursor: pointer;
+            border-radius: 8px;
+            transition: all 0.3s;
+            min-width: 140px;
+        }
+
+        .completion-button.primary {
+            background: #0ff;
+            color: #000;
+            box-shadow: 0 0 20px #0ff;
+        }
+
+        .completion-button.primary:hover {
+            background: #fff;
+            box-shadow: 0 0 30px #fff;
+            transform: scale(1.05);
+        }
+
+        .completion-button.secondary {
+            background: rgba(0, 255, 255, 0.2);
+            color: #0ff;
+            border: 2px solid #0ff;
+            box-shadow: 0 0 15px rgba(0, 255, 255, 0.5);
+        }
+
+        .completion-button.secondary:hover {
+            background: rgba(0, 255, 255, 0.3);
+            box-shadow: 0 0 25px #0ff;
+            transform: scale(1.05);
+        }
+
+        .completion-button:active {
+            transform: scale(0.95);
+        }
+
+        /* Statistics Screen */
+        #statisticsScreen {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.95);
+            z-index: 400;
+            display: flex;
+            align-items: flex-start;
+            justify-content: center;
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
+            touch-action: auto;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+
+        .statistics-content {
+            background: linear-gradient(135deg, rgba(0, 255, 255, 0.15), rgba(255, 0, 255, 0.15));
+            border: 4px solid #0ff;
+            box-shadow: 0 0 40px #0ff, inset 0 0 30px rgba(0, 255, 255, 0.3);
+            padding: clamp(25px, 5vw, 40px);
+            border-radius: 15px;
+            text-align: center;
+            max-width: 90%;
+            min-width: 320px;
+            margin: auto;
+        }
+
+        .statistics-content h2 {
+            color: #0ff;
+            font-size: clamp(24px, 5vw, 36px);
+            text-shadow: 0 0 20px #0ff;
+            margin-bottom: clamp(20px, 4vw, 30px);
+            font-family: 'Courier New', monospace;
+            font-weight: bold;
+        }
+
+        .statistics-section {
+            margin-bottom: clamp(20px, 4vw, 30px);
+            text-align: left;
+        }
+
+        .statistics-section h3 {
+            color: #ff0;
+            font-size: clamp(16px, 3vw, 22px);
+            text-shadow: 0 0 12px #ff0;
+            margin-bottom: clamp(12px, 2.5vw, 18px);
+            font-family: 'Courier New', monospace;
+            border-bottom: 2px solid #0ff;
+            padding-bottom: 8px;
+        }
+
+        .statistics-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: clamp(12px, 2.5vw, 18px);
+        }
+
+        .stat-item {
+            background: rgba(0, 255, 255, 0.1);
+            border: 2px solid #0ff;
+            padding: clamp(10px, 2vw, 15px);
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 255, 255, 0.3);
+        }
+
+        .stat-item-label {
+            color: #0ff;
+            font-size: clamp(10px, 1.8vw, 13px);
+            text-shadow: 0 0 8px #0ff;
+            margin-bottom: 6px;
+            font-family: 'Courier New', monospace;
+        }
+
+        .stat-item-value {
+            color: #ff0;
+            font-size: clamp(16px, 3vw, 22px);
+            text-shadow: 0 0 12px #ff0;
+            font-weight: bold;
+            font-family: 'Courier New', monospace;
+        }
+
+        .statistics-buttons {
+            display: flex;
+            gap: clamp(15px, 3vw, 20px);
+            justify-content: center;
+            flex-wrap: wrap;
+            margin-top: clamp(20px, 4vw, 30px);
+        }
+
+        .statistics-button {
+            border: none;
+            padding: clamp(12px, 2.5vw, 18px) clamp(24px, 5vw, 36px);
+            font-size: clamp(14px, 2.5vw, 18px);
+            font-weight: bold;
+            font-family: 'Courier New', monospace;
+            cursor: pointer;
+            border-radius: 8px;
+            transition: all 0.3s;
+            min-width: 140px;
+        }
+
+        .statistics-button.primary {
+            background: #0ff;
+            color: #000;
+            box-shadow: 0 0 20px #0ff;
+        }
+
+        .statistics-button.primary:hover {
+            background: #fff;
+            box-shadow: 0 0 30px #fff;
+            transform: scale(1.05);
+        }
+
+        .statistics-button.danger {
+            background: rgba(255, 0, 0, 0.2);
+            color: #f00;
+            border: 2px solid #f00;
+            box-shadow: 0 0 15px rgba(255, 0, 0, 0.5);
+        }
+
+        .statistics-button.danger:hover {
+            background: rgba(255, 0, 0, 0.3);
+            box-shadow: 0 0 25px #f00;
+            transform: scale(1.05);
+        }
+
+        .statistics-button:active {
+            transform: scale(0.95);
+        }
+
+
+        /* Leaderboard Screen */
+        #leaderboardScreen {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.95);
+            z-index: 400;
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-start;
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
+            touch-action: auto;
+            padding: clamp(20px, 4vw, 40px);
+            box-sizing: border-box;
+        }
+
+        .leaderboard-content {
+            background: linear-gradient(135deg, rgba(255, 255, 0, 0.15), rgba(255, 165, 0, 0.15));
+            border: 4px solid #ff0;
+            box-shadow: 0 0 40px #ff0, inset 0 0 30px rgba(255, 255, 0, 0.3);
+            padding: clamp(25px, 5vw, 40px);
+            border-radius: 15px;
+            text-align: center;
+            max-width: 90%;
+            min-width: 320px;
+            margin: auto;
+        }
+
+        .leaderboard-content h2 {
+            color: #ff0;
+            font-size: clamp(24px, 5vw, 36px);
+            text-shadow: 0 0 20px #ff0;
+            margin-bottom: clamp(20px, 4vw, 30px);
+            font-family: 'Courier New', monospace;
+            font-weight: bold;
+        }
+
+        .leaderboard-mode-selector {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .leaderboard-mode-btn {
+            padding: 10px 20px;
+            background: rgba(0, 255, 255, 0.2);
+            border: 2px solid #0ff;
+            color: #0ff;
+            font-family: 'Courier New', monospace;
+            font-size: clamp(14px, 3vw, 18px);
+            font-weight: bold;
+            cursor: pointer;
+            border-radius: 5px;
+            transition: all 0.3s;
+        }
+
+        .leaderboard-mode-btn:hover {
+            background: rgba(0, 255, 255, 0.3);
+            box-shadow: 0 0 15px #0ff;
+        }
+
+        .leaderboard-mode-btn.active {
+            background: #0ff;
+            color: #000;
+            box-shadow: 0 0 20px #0ff;
+        }
+
+        .leaderboard-filters {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .leaderboard-filter-btn {
+            padding: 8px 16px;
+            background: rgba(255, 255, 0, 0.2);
+            border: 2px solid #ff0;
+            color: #ff0;
+            font-family: 'Courier New', monospace;
+            font-size: clamp(12px, 2.5vw, 16px);
+            font-weight: bold;
+            cursor: pointer;
+            border-radius: 5px;
+            transition: all 0.3s;
+        }
+
+        .leaderboard-filter-btn:hover {
+            background: rgba(255, 255, 0, 0.3);
+            box-shadow: 0 0 15px #ff0;
+        }
+
+        .leaderboard-filter-btn.active {
+            background: #ff0;
+            color: #000;
+            box-shadow: 0 0 20px #ff0;
+        }
+
+        .leaderboard-loading {
+            color: #ff0;
+            font-size: clamp(14px, 3vw, 18px);
+            padding: 20px;
+        }
+
+        .leaderboard-error {
+            color: #f00;
+            font-size: clamp(14px, 3vw, 18px);
+            padding: 20px;
+        }
+
+        .leaderboard-list {
+            margin: 20px 0;
+            text-align: left;
+        }
+
+        .leaderboard-entry {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: clamp(12px, 2.5vw, 18px);
+            margin: 8px 0;
+            background: rgba(255, 255, 0, 0.1);
+            border: 2px solid rgba(255, 255, 0, 0.3);
+            border-radius: 8px;
+            transition: all 0.3s;
+        }
+
+        .leaderboard-entry:hover {
+            background: rgba(255, 255, 0, 0.2);
+            border-color: #ff0;
+            box-shadow: 0 0 15px rgba(255, 255, 0, 0.5);
+        }
+
+        .leaderboard-entry.current-player {
+            background: rgba(255, 255, 0, 0.3);
+            border-color: #ff0;
+            box-shadow: 0 0 20px #ff0;
+            font-weight: bold;
+        }
+
+        .leaderboard-rank {
+            font-size: clamp(16px, 3.5vw, 24px);
+            font-weight: bold;
+            color: #ff0;
+            min-width: 50px;
+            text-align: center;
+        }
+
+        .leaderboard-rank.top-3 {
+            font-size: clamp(20px, 4vw, 28px);
+        }
+
+        .leaderboard-rank.top-1 {
+            color: #ffd700;
+            text-shadow: 0 0 10px #ffd700;
+        }
+
+        .leaderboard-rank.top-2 {
+            color: #c0c0c0;
+            text-shadow: 0 0 10px #c0c0c0;
+        }
+
+        .leaderboard-rank.top-3 {
+            color: #cd7f32;
+            text-shadow: 0 0 10px #cd7f32;
+        }
+
+        .leaderboard-info {
+            flex: 1;
+            margin: 0 15px;
+        }
+
+        .leaderboard-address {
+            font-size: clamp(12px, 2.5vw, 16px);
+            color: #ff0;
+            font-family: 'Courier New', monospace;
+            margin-bottom: 4px;
+        }
+
+        .leaderboard-address.current-player {
+            color: #fff;
+        }
+
+        .leaderboard-score {
+            font-size: clamp(14px, 3vw, 18px);
+            color: #fff;
+            font-weight: bold;
+        }
+
+        .leaderboard-player-rank {
+            margin: 15px 0;
+            padding: 15px;
+            background: rgba(255, 255, 0, 0.2);
+            border: 2px solid #ff0;
+            border-radius: 8px;
+            color: #ff0;
+            font-size: clamp(14px, 3vw, 18px);
+        }
+
+        .leaderboard-buttons {
+            display: flex;
+            gap: clamp(15px, 3vw, 20px);
+            justify-content: center;
+            margin-top: 20px;
+        }
+
+        .leaderboard-button {
+            border: none;
+            padding: clamp(12px, 2.5vw, 18px) clamp(24px, 5vw, 36px);
+            font-size: clamp(14px, 2.5vw, 18px);
+            font-family: 'Courier New', monospace;
+            font-weight: bold;
+            cursor: pointer;
+            border-radius: 8px;
+            transition: all 0.3s;
+        }
+
+        .leaderboard-button.primary {
+            background: #ff0;
+            color: #000;
+            box-shadow: 0 0 20px #ff0;
+        }
+
+        .leaderboard-button.primary:hover {
+            background: #fff;
+            box-shadow: 0 0 30px #fff;
+            transform: scale(1.05);
+        }
+
+        .leaderboard-button.secondary {
+            background: rgba(255, 255, 0, 0.2);
+            color: #ff0;
+            border: 2px solid #ff0;
+        }
+
+        .leaderboard-button.secondary:hover {
+            background: rgba(255, 255, 0, 0.3);
+            box-shadow: 0 0 25px #ff0;
+            transform: scale(1.05);
+        }
+
+        .leaderboard-button:active {
+            transform: scale(0.95);
+        }
+
+        /* On-Chain Finalization Screen */
+        #onchainFinalizationScreen {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.95);
+            z-index: 500;
+            display: flex;
+            align-items: flex-start;
+            justify-content: center;
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
+            touch-action: auto;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+
+        .onchain-content {
+            background: linear-gradient(135deg, rgba(0, 255, 255, 0.15), rgba(255, 0, 255, 0.15));
+            border: 4px solid #0ff;
+            box-shadow: 0 0 40px #0ff, inset 0 0 30px rgba(0, 255, 255, 0.3);
+            padding: clamp(25px, 5vw, 40px);
+            border-radius: 15px;
+            text-align: center;
+            max-width: 90%;
+            min-width: 320px;
+            margin: auto;
+        }
+
+        .onchain-content h2 {
+            color: #0ff;
+            font-size: clamp(24px, 5vw, 36px);
+            text-shadow: 0 0 20px #0ff;
+            margin-bottom: clamp(20px, 4vw, 30px);
+            font-family: 'Courier New', monospace;
+            font-weight: bold;
+        }
+
+        .onchain-section {
+            margin-bottom: clamp(20px, 4vw, 30px);
+        }
+
+        .onchain-info {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: clamp(15px, 3vw, 20px);
+        }
+
+        .onchain-info-item {
+            background: rgba(0, 255, 255, 0.1);
+            border: 2px solid #0ff;
+            padding: clamp(12px, 2.5vw, 18px);
+            border-radius: 8px;
+        }
+
+        .onchain-info-label {
+            color: #0ff;
+            font-size: clamp(11px, 2vw, 14px);
+            text-shadow: 0 0 8px #0ff;
+            margin-bottom: 8px;
+            font-family: 'Courier New', monospace;
+        }
+
+        .onchain-info-value {
+            color: #ff0;
+            font-size: clamp(16px, 3vw, 24px);
+            text-shadow: 0 0 12px #ff0;
+            font-weight: bold;
+            font-family: 'Courier New', monospace;
+        }
+
+        .onchain-status {
+            background: rgba(0, 255, 255, 0.1);
+            border: 2px solid #0ff;
+            padding: clamp(15px, 3vw, 20px);
+            border-radius: 8px;
+        }
+
+        .onchain-status p {
+            color: #0ff;
+            font-size: clamp(12px, 2.2vw, 16px);
+            margin-bottom: 15px;
+            font-family: 'Courier New', monospace;
+        }
+
+        .onchain-button {
+            border: none;
+            padding: clamp(12px, 2.5vw, 18px) clamp(24px, 5vw, 36px);
+            font-size: clamp(14px, 2.5vw, 18px);
+            font-weight: bold;
+            font-family: 'Courier New', monospace;
+            cursor: pointer;
+            border-radius: 8px;
+            transition: all 0.3s;
+            min-width: 140px;
+            margin: 5px;
+        }
+
+        .onchain-button.primary {
+            background: #0ff;
+            color: #000;
+            box-shadow: 0 0 20px #0ff;
+        }
+
+        .onchain-button.primary:hover {
+            background: #fff;
+            box-shadow: 0 0 30px #fff;
+            transform: scale(1.05);
+        }
+
+        .onchain-button.primary.large {
+            font-size: clamp(16px, 3vw, 22px);
+            padding: clamp(15px, 3vw, 22px) clamp(30px, 6vw, 50px);
+            min-width: 200px;
+        }
+
+        .onchain-button.secondary {
+            background: rgba(0, 255, 255, 0.2);
+            color: #0ff;
+            border: 2px solid #0ff;
+            box-shadow: 0 0 15px rgba(0, 255, 255, 0.5);
+        }
+
+        .onchain-button.secondary:hover {
+            background: rgba(0, 255, 255, 0.3);
+            box-shadow: 0 0 25px #0ff;
+            transform: scale(1.05);
+        }
+
+        .onchain-button:active {
+            transform: scale(0.95);
+        }
+
+        .onchain-button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .onchain-success {
+            background: rgba(0, 255, 0, 0.1);
+            border: 2px solid #0f0;
+            padding: clamp(20px, 4vw, 30px);
+            border-radius: 8px;
+        }
+
+        .onchain-success h3 {
+            color: #0f0;
+            font-size: clamp(20px, 4vw, 28px);
+            text-shadow: 0 0 15px #0f0;
+            margin-bottom: 15px;
+            font-family: 'Courier New', monospace;
+        }
+
+        .onchain-success p {
+            color: #0ff;
+            font-size: clamp(14px, 2.5vw, 18px);
+            margin-bottom: 15px;
+        }
+
+        .onchain-tx-link {
+            margin-top: 15px;
+        }
+
+        .onchain-tx-link a {
+            color: #0ff;
+            text-decoration: none;
+            font-size: clamp(12px, 2.2vw, 16px);
+            text-shadow: 0 0 8px #0ff;
+            border-bottom: 1px solid #0ff;
+        }
+
+        .onchain-tx-link a:hover {
+            color: #fff;
+            text-shadow: 0 0 12px #fff;
+        }
+
+        .onchain-error {
+            background: rgba(255, 0, 0, 0.1);
+            border: 2px solid #f00;
+            padding: clamp(20px, 4vw, 30px);
+            border-radius: 8px;
+        }
+
+        .onchain-error h3 {
+            color: #f00;
+            font-size: clamp(20px, 4vw, 28px);
+            text-shadow: 0 0 15px #f00;
+            margin-bottom: 15px;
+            font-family: 'Courier New', monospace;
+        }
+
+        .onchain-error p {
+            color: #f00;
+            font-size: clamp(14px, 2.5vw, 18px);
+        }
+
+        .onchain-buttons {
+            display: flex;
+            gap: clamp(15px, 3vw, 20px);
+            justify-content: center;
+            flex-wrap: wrap;
+            margin-top: clamp(20px, 4vw, 30px);
+        }
+
+        /* NFT Minting Screen */
+        #nftMintingScreen {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.95);
+            z-index: 600;
+            display: flex;
+            align-items: flex-start;
+            justify-content: center;
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
+            touch-action: auto;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+
+        .nft-content {
+            background: linear-gradient(135deg, rgba(255, 255, 0, 0.15), rgba(0, 255, 255, 0.15));
+            border: 4px solid #ff0;
+            box-shadow: 0 0 40px #ff0, inset 0 0 30px rgba(255, 255, 0, 0.3);
+            padding: clamp(25px, 5vw, 40px);
+            border-radius: 15px;
+            text-align: center;
+            max-width: 90%;
+            min-width: 320px;
+            margin: auto;
+        }
+
+        .nft-content h2 {
+            color: #ff0;
+            font-size: clamp(24px, 5vw, 36px);
+            text-shadow: 0 0 20px #ff0;
+            margin-bottom: clamp(20px, 4vw, 30px);
+            font-family: 'Courier New', monospace;
+            font-weight: bold;
+        }
+
+        .nft-section {
+            margin-bottom: clamp(20px, 4vw, 30px);
+        }
+
+        .nft-preview {
+            display: flex;
+            flex-direction: column;
+            gap: clamp(15px, 3vw, 20px);
+            align-items: center;
+        }
+
+        .nft-preview-image {
+            width: 200px;
+            height: 200px;
+            border: 3px solid #ff0;
+            border-radius: 10px;
+            background: rgba(255, 255, 0, 0.1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 0 20px #ff0;
+        }
+
+        .nft-preview-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 7px;
+        }
+
+        .nft-placeholder {
+            color: #ff0;
+            font-size: clamp(14px, 2.5vw, 18px);
+            font-family: 'Courier New', monospace;
+        }
+
+        .nft-preview-info {
+            text-align: left;
+            width: 100%;
+            max-width: 400px;
+        }
+
+        .nft-preview-info h3 {
+            color: #ff0;
+            font-size: clamp(16px, 3vw, 22px);
+            margin-bottom: 15px;
+            font-family: 'Courier New', monospace;
+        }
+
+        .nft-attributes {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .nft-attribute {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 12px;
+            background: rgba(255, 255, 0, 0.1);
+            border: 1px solid #ff0;
+            border-radius: 5px;
+        }
+
+        .nft-attribute-label {
+            color: #0ff;
+            font-size: clamp(12px, 2vw, 14px);
+        }
+
+        .nft-attribute-value {
+            color: #ff0;
+            font-size: clamp(12px, 2vw, 14px);
+            font-weight: bold;
+        }
+
+        .nft-status {
+            text-align: center;
+        }
+
+        .nft-status p {
+            color: #0ff;
+            font-size: clamp(14px, 2.5vw, 18px);
+            margin-bottom: 15px;
+        }
+
+        .nft-status-text {
+            color: #ff0;
+            font-size: clamp(16px, 3vw, 20px);
+            margin-bottom: 15px;
+            font-weight: bold;
+        }
+
+        .nft-gas-info {
+            color: #0ff;
+            font-size: clamp(12px, 2vw, 14px);
+            margin-bottom: 15px;
+        }
+
+        .nft-button {
+            border: none;
+            padding: clamp(12px, 2.5vw, 18px) clamp(24px, 5vw, 36px);
+            font-size: clamp(14px, 2.5vw, 18px);
+            font-family: 'Courier New', monospace;
+            font-weight: bold;
+            cursor: pointer;
+            border-radius: 8px;
+            transition: all 0.3s;
+        }
+
+        .nft-button.primary {
+            background: #ff0;
+            color: #000;
+            box-shadow: 0 0 20px #ff0;
+        }
+
+        .nft-button.primary:hover {
+            background: #fff;
+            box-shadow: 0 0 30px #fff;
+            transform: scale(1.05);
+        }
+
+        .nft-button.secondary {
+            background: rgba(255, 255, 0, 0.2);
+            color: #ff0;
+            border: 2px solid #ff0;
+        }
+
+        .nft-button.secondary:hover {
+            background: rgba(255, 255, 0, 0.3);
+            box-shadow: 0 0 25px #ff0;
+            transform: scale(1.05);
+        }
+
+        .nft-button:active {
+            transform: scale(0.95);
+        }
+
+        .nft-button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .nft-success {
+            background: rgba(0, 255, 0, 0.1);
+            border: 2px solid #0f0;
+            padding: clamp(20px, 4vw, 30px);
+            border-radius: 8px;
+        }
+
+        .nft-success h3 {
+            color: #0f0;
+            font-size: clamp(20px, 4vw, 28px);
+            text-shadow: 0 0 15px #0f0;
+            margin-bottom: 15px;
+            font-family: 'Courier New', monospace;
+        }
+
+        .nft-success p {
+            color: #0f0;
+            font-size: clamp(14px, 2.5vw, 18px);
+            margin-bottom: 10px;
+        }
+
+        .nft-success-info {
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px solid rgba(0, 255, 0, 0.3);
+        }
+
+        .nft-success-info p {
+            color: #0ff;
+            font-size: clamp(12px, 2vw, 14px);
+            margin-bottom: 8px;
+        }
+
+        .nft-success-info a {
+            color: #0ff;
+            text-decoration: none;
+            border-bottom: 1px solid #0ff;
+        }
+
+        .nft-success-info a:hover {
+            color: #fff;
+            text-shadow: 0 0 8px #fff;
+        }
+
+        .nft-error {
+            background: rgba(255, 0, 0, 0.1);
+            border: 2px solid #f00;
+            padding: clamp(20px, 4vw, 30px);
+            border-radius: 8px;
+        }
+
+        .nft-error h3 {
+            color: #f00;
+            font-size: clamp(20px, 4vw, 28px);
+            text-shadow: 0 0 15px #f00;
+            margin-bottom: 15px;
+            font-family: 'Courier New', monospace;
+        }
+
+        .nft-error p {
+            color: #f00;
+            font-size: clamp(14px, 2.5vw, 18px);
+        }
+
+        .nft-buttons {
+            display: flex;
+            gap: clamp(15px, 3vw, 20px);
+            justify-content: center;
+            flex-wrap: wrap;
+            margin-top: clamp(20px, 4vw, 30px);
+        }
+
+        #finalizedFlash {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #fff;
+            display: none;
+            justify-content: center;
+            align-items: center;
+            font-size: clamp(32px, 8vw, 64px);
+            font-weight: bold;
+            color: #000;
+            z-index: 200;
+            animation: flash 3s;
+        }
+
+        @keyframes flash {
+            0%, 100% { opacity: 0; }
+            50% { opacity: 1; }
+        }
+
+        /* Landscape orientation preference for game canvas */
+        @media screen and (orientation: portrait) and (max-width: 768px) {
+            #gameContainer::before {
+                content: 'Rotate your device to landscape for better experience';
+                position: absolute;
+                top: 50%;
+                left: 50%;
+                transform: translate(-50%, -50%);
+                color: #0ff;
+                font-size: clamp(14px, 4vw, 20px);
+                text-align: center;
+                z-index: 150;
+                text-shadow: 0 0 20px #0ff;
+                pointer-events: none;
+                background: rgba(0, 0, 0, 0.85);
+                padding: 15px 20px;
+                border: 2px solid #0ff;
+                box-shadow: 0 0 30px #0ff;
+                border-radius: 8px;
+                max-width: 80%;
+                line-height: 1.4;
+            }
+        }
+        
+        /* Prevent pull-to-refresh on mobile */
+        body {
+            overscroll-behavior-y: none;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        /* Click to Start Screen Styles */
+        #startScreen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            /* Placeholder for start screen background image */
+            background-image: url('images/start-background.jpg'); 
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            /* Fallback background color */
+            background-color: rgba(0, 0, 0, 0.98);
+            z-index: 500;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            cursor: pointer;
+            /* Subtle flicker effect for retro TV feel */
+            animation: tvFlicker 0.1s ease-in-out infinite;
+        }
+        
+        #startScreenContent {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            align-items: center;
+            padding: clamp(20px, 5vw, 40px);
+            box-sizing: border-box;
+            z-index: 2;
+        }
+        
+        #startScreenTitle {
+            font-size: clamp(32px, 8vw, 72px);
+            font-weight: bold;
+            color: #0ff;
+            text-shadow: 
+                0 0 10px #0ff,
+                0 0 20px #0ff,
+                0 0 30px #0ff;
+            letter-spacing: 4px;
+            animation: pulseGlow 2s ease-in-out infinite;
+            margin-top: clamp(20px, 5vw, 40px);
+        }
+        
+        #startScreenSubtitle {
+            font-size: clamp(18px, 4vw, 36px);
+            color: #ff0;
+            text-shadow: 
+                0 0 10px #ff0,
+                0 0 20px #ff0;
+            letter-spacing: 2px;
+            animation: pulseGlow 2s ease-in-out infinite;
+            animation-delay: 0.5s;
+            margin-bottom: clamp(20px, 5vw, 40px);
+        }
+        
+        @keyframes pulseGlow {
+            0%, 100% {
+                opacity: 1;
+                text-shadow: 
+                    0 0 10px currentColor,
+                    0 0 20px currentColor,
+                    0 0 30px currentColor;
+            }
+            50% {
+                opacity: 0.8;
+                text-shadow: 
+                    0 0 15px currentColor,
+                    0 0 30px currentColor,
+                    0 0 45px currentColor;
+            }
+        }
+        
+        @keyframes fadeInOut {
+            0%, 100% {
+                opacity: 0.7;
+            }
+            50% {
+                opacity: 1;
+            }
+        }
+        
+        /* Dark overlay for start screen */
+        #startScreen::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.3);
+            z-index: 1;
+            pointer-events: none;
+        }
+        
+        /* Retro TV scanline effect for start screen */
+        #startScreen::after {
+            content: '';
+            position: absolute;
+            top: -20px;
+            left: 0;
+            width: 100%;
+            height: 20px;
+            background: linear-gradient(
+                to bottom,
+                rgba(0, 255, 255, 0.15) 0%,
+                rgba(0, 255, 255, 0.25) 50%,
+                rgba(0, 255, 255, 0.15) 100%
+            );
+            box-shadow: 0 0 30px rgba(0, 255, 255, 0.3);
+            z-index: 1;
+            pointer-events: none;
+            animation: scanlinePass 4s ease-in-out infinite;
+            animation-delay: 0s;
+        }
+        
+        #startScreen.hidden {
+            display: none;
+        }
+
+        /* Main Menu Styles */
+        #mainMenu {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            /* To add a background image, uncomment the line below and set your image path */
+            background-image: url('images/menu-background.jpg'); 
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            /* Fallback background color */
+            background-color: rgba(0, 0, 0, 0.95);
+            z-index: 400;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            /* Subtle flicker effect for retro TV feel */
+            animation: tvFlicker 0.1s ease-in-out infinite;
+        }
+        
+        /* Container for menu content - positioned in right half */
+        #mainMenuContent {
+            position: absolute;
+            left: 67.5%;
+            top: 0;
+            width: 25%;
+            height: 100%;
+            max-width: 500px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: clamp(15px, 2vw, 20px);
+            box-sizing: border-box;
+        }
+        
+        /* Dark overlay for text readability when background image is used */
+        /* This overlay ensures menu text remains readable over any background image */
+        /* Adjust the opacity value (0.4-0.7 recommended) to balance image visibility and text readability */
+        #mainMenu::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            /* When no background-image is set, this will be barely visible due to the fallback background-color */
+            /* When background-image is set, adjust this opacity to control overlay darkness */
+            background: rgba(0, 0, 0, 0.171);
+            z-index: -1;
+            pointer-events: none;
+        }
+        
+        /* Retro TV scanline effect - fat horizontal scanlines occasionally passing */
+        #mainMenu::after {
+            content: '';
+            position: absolute;
+            top: -20px;
+            left: 0;
+            width: 100%;
+            height: 20px;
+            background: linear-gradient(
+                to bottom,
+                rgba(0, 255, 255, 0.15) 0%,
+                rgba(0, 255, 255, 0.25) 50%,
+                rgba(0, 255, 255, 0.15) 100%
+            );
+            box-shadow: 0 0 30px rgba(0, 255, 255, 0.3);
+            z-index: 1;
+            pointer-events: none;
+            animation: scanlinePass 4s ease-in-out infinite;
+            animation-delay: 0s;
+        }
+        
+        @keyframes scanlinePass {
+            0% {
+                top: -20px;
+                opacity: 0;
+            }
+            1% {
+                opacity: 1;
+            }
+            12% {
+                top: 100%;
+                opacity: 1;
+            }
+            13% {
+                opacity: 0;
+            }
+            100% {
+                top: -20px;
+                opacity: 0;
+            }
+        }
+        
+        /* Create a second scanline with different timing */
+        #mainMenu .scanline-overlay {
+            position: absolute;
+            top: -25px;
+            left: 0;
+            width: 100%;
+            height: 25px;
+            background: linear-gradient(
+                to bottom,
+                rgba(255, 0, 255, 0.12) 0%,
+                rgba(255, 0, 255, 0.22) 50%,
+                rgba(255, 0, 255, 0.12) 100%
+            );
+            box-shadow: 0 0 35px rgba(255, 0, 255, 0.25);
+            z-index: 1;
+            pointer-events: none;
+            animation: scanlinePass2 6s ease-in-out infinite;
+            animation-delay: 1.5s;
+        }
+        
+        @keyframes scanlinePass2 {
+            0% {
+                top: -25px;
+                opacity: 0;
+            }
+            1% {
+                opacity: 1;
+            }
+            10.5% {
+                top: 100%;
+                opacity: 1;
+            }
+            11.5% {
+                opacity: 0;
+            }
+            100% {
+                top: -25px;
+                opacity: 0;
+            }
+        }
+        
+        /* Subtle flicker effect for retro TV feel */
+        @keyframes tvFlicker {
+            0%, 100% {
+                opacity: 1;
+            }
+            50% {
+                opacity: 1;
+            }
+        }
+
+        #mainMenu.hidden {
+            display: none;
+        }
+        
+        /* Audio Options Panel */
+        #audioOptionsPanel {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: url('images/menu-background.jpg');
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            background-color: rgba(0, 0, 0, 0.95);
+            z-index: 500;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            animation: tvFlicker 0.1s ease-in-out infinite;
+        }
+        
+        #audioOptionsPanel::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.171);
+            z-index: -1;
+            pointer-events: none;
+        }
+        
+        #audioOptionsPanel.hidden {
+            display: none;
+        }
+        
+        #audioOptionsContent {
+            position: relative;
+            width: 90%;
+            max-width: 500px;
+            padding: clamp(20px, 4vw, 40px);
+            background: rgba(0, 0, 0, 0.8);
+            border: 2px solid #0ff;
+            box-shadow: 0 0 30px rgba(0, 255, 255, 0.5);
+            text-align: center;
+        }
+        
+        #audioOptionsContent h2 {
+            color: #0ff;
+            font-size: clamp(18px, 3vw, 24px);
+            margin-bottom: 20px;
+            text-shadow: 0 0 10px #0ff;
+            font-family: 'Courier New', monospace;
+        }
+        
+        #audioOptionsContent .menu-button {
+            margin-left: auto;
+            margin-right: auto;
+        }
+        
+        #volumeControls {
+            margin: 20px auto;
+            width: 100%;
+        }
+
+        /* Wallet Button in Main Menu (Top Left) */
+        .menu-wallet-button {
+            position: absolute;
+            top: clamp(15px, 3vw, 25px);
+            left: clamp(15px, 3vw, 25px);
+            width: 140px;
+            height: 40px;
+            padding: 0;
+            background: rgba(0, 255, 255, 0.2);
+            border: 2px solid #0ff;
+            color: #0ff;
+            font-family: 'Courier New', monospace;
+            font-size: clamp(11px, 2vw, 14px);
+            font-weight: bold;
+            cursor: pointer;
+            box-shadow: 0 0 15px rgba(0, 255, 255, 0.5);
+            border-radius: 5px;
+            z-index: 200;
+            transition: all 0.3s;
+            text-align: center;
+            white-space: nowrap;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-sizing: border-box;
+        }
+
+        .menu-wallet-button:hover {
+            background: rgba(0, 255, 255, 0.3);
+            box-shadow: 0 0 25px #0ff;
+            transform: scale(1.05);
+        }
+
+        .menu-wallet-button:active {
+            transform: scale(0.95);
+        }
+
+        .menu-wallet-button.connected {
+            background: rgba(0, 255, 0, 0.2);
+            border-color: #0f0;
+            color: #0f0;
+            box-shadow: 0 0 15px rgba(0, 255, 0, 0.5);
+        }
+
+        .menu-wallet-button.connected:hover {
+            background: rgba(0, 255, 0, 0.3);
+            box-shadow: 0 0 25px #0f0;
+        }
+
+        .menu-wallet-button #menuWalletButtonText {
+            display: block;
+        }
+
+        .menu-wallet-button.connected #menuWalletButtonText {
+            display: none;
+        }
+
+        .menu-wallet-button #menuWalletButtonAddress {
+            display: block;
+            font-size: clamp(9px, 1.5vw, 11px);
+            word-break: break-all;
+        }
+
+        .menu-wallet-button:not(.connected) #menuWalletButtonAddress {
+            display: none;
+        }
+
+        .menu-wallet-button.file-protocol-warning {
+            background: rgba(255, 165, 0, 0.2);
+            border-color: #ff8c00;
+            color: #ff8c00;
+            box-shadow: 0 0 15px rgba(255, 140, 0, 0.5);
+        }
+
+        .menu-wallet-button.file-protocol-warning:hover {
+            background: rgba(255, 165, 0, 0.3);
+            box-shadow: 0 0 25px #ff8c00;
+        }
+
+        /* USDC Faucet Button in Main Menu (Below Wallet Button) */
+        .menu-faucet-button {
+            position: absolute;
+            top: clamp(65px, 8vw, 75px); /* Positioned below wallet button */
+            left: clamp(15px, 3vw, 25px);
+            width: 140px;
+            height: 40px;
+            padding: 0;
+            background: rgba(39, 117, 202, 0.2); /* USDC blue */
+            border: 2px solid #2775CA;
+            color: #2775CA;
+            font-family: 'Courier New', monospace;
+            font-size: clamp(11px, 2vw, 14px);
+            font-weight: bold;
+            cursor: pointer;
+            box-shadow: 0 0 15px rgba(39, 117, 202, 0.5);
+            border-radius: 5px;
+            z-index: 200;
+            transition: all 0.3s;
+            text-align: center;
+            white-space: nowrap;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-sizing: border-box;
+        }
+
+        .menu-faucet-button:hover {
+            background: rgba(39, 117, 202, 0.3);
+            box-shadow: 0 0 25px #2775CA;
+            transform: scale(1.05);
+        }
+
+        .menu-faucet-button:active {
+            transform: scale(0.95);
+        }
+
+        #menuTitle {
+            color: #0ff;
+            font-size: clamp(32px, 8vw, 64px);
+            font-weight: bold;
+            text-align: center;
+            text-shadow: 0 0 20px #0ff;
+            margin-bottom: 40px;
+            font-family: 'Courier New', monospace;
+        }
+
+        #menuSubtitle {
+            color: #ff0;
+            font-size: clamp(16px, 3vw, 24px);
+            text-align: center;
+            text-shadow: 0 0 10px #ff0;
+            margin-bottom: 60px;
+            font-family: 'Courier New', monospace;
+        }
+
+        #menuButtons {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            align-items: center;
+            width: 100%;
+            max-width: 350px;
+        }
+
+        /* BUTTON DESIGN OPTION 2: Neon Terminal Style (Currently Active) */
+        .menu-button {
+            width: 100%;
+            max-width: 280px;
+            padding: clamp(10px, 2.5vw, 14px);
+            background: rgba(0, 0, 0, 0.9);
+            color: #0ff;
+            border: 2px solid #0ff;
+            font-family: 'Courier New', monospace;
+            font-size: clamp(13px, 2.5vw, 18px);
+            font-weight: bold;
+            cursor: pointer;
+            box-shadow: 0 0 10px rgba(0, 255, 255, 0.5);
+            transition: all 0.3s;
+            text-align: center;
+            min-height: 50px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            text-shadow: 0 0 8px #0ff;
+            border-radius: 4px;
+        }
+
+        .menu-button:hover, .menu-button:active {
+            background: rgba(0, 255, 255, 0.15);
+            box-shadow: 0 0 20px rgba(0, 255, 255, 0.8), inset 0 0 10px rgba(0, 255, 255, 0.1);
+        }
+
+        .menu-button.tournament {
+            color: #f0f;
+            border-color: #f0f;
+            box-shadow: 0 0 10px rgba(255, 0, 255, 0.5);
+            text-shadow: 0 0 8px #f0f;
+        }
+
+        .menu-button.tournament:hover, .menu-button.tournament:active {
+            background: rgba(255, 0, 255, 0.15);
+            box-shadow: 0 0 20px rgba(255, 0, 255, 0.8), inset 0 0 10px rgba(255, 0, 255, 0.1);
+        }
+        
+        .menu-button.community {
+            color: #0ff;
+            border-color: #0ff;
+            box-shadow: 0 0 10px rgba(0, 255, 255, 0.5);
+            text-shadow: 0 0 8px #0ff;
+        }
+        
+        .menu-button.community:hover, .menu-button.community:active {
+            background: rgba(0, 255, 255, 0.15);
+            box-shadow: 0 0 20px rgba(0, 255, 255, 0.8), inset 0 0 10px rgba(0, 255, 255, 0.1);
+        }
+        
+        .menu-button.editor {
+            color: #ff0;
+            border-color: #ff0;
+            box-shadow: 0 0 10px rgba(255, 255, 0, 0.5);
+            text-shadow: 0 0 8px #ff0;
+        }
+
+        .menu-button.editor:hover, .menu-button.editor:active {
+            background: rgba(255, 255, 0, 0.15);
+            box-shadow: 0 0 20px rgba(255, 255, 0, 0.8), inset 0 0 10px rgba(255, 255, 0, 0.1);
+        }
+        
+        .menu-button.audio {
+            color: #f0f;
+            border-color: #f0f;
+            box-shadow: 0 0 10px rgba(255, 0, 255, 0.5);
+            text-shadow: 0 0 8px #f0f;
+        }
+        
+        .menu-button.audio:hover, .menu-button.audio:active {
+            background: rgba(255, 0, 255, 0.15);
+            box-shadow: 0 0 20px rgba(255, 0, 255, 0.8), inset 0 0 10px rgba(255, 0, 255, 0.1);
+        }
+        
+        .menu-button.statistics {
+            color: #0f0;
+            border-color: #0f0;
+            box-shadow: 0 0 10px rgba(0, 255, 0, 0.5);
+            text-shadow: 0 0 8px #0f0;
+        }
+
+        .menu-button.statistics:hover, .menu-button.statistics:active {
+            background: rgba(0, 255, 0, 0.15);
+            box-shadow: 0 0 20px rgba(0, 255, 0, 0.8), inset 0 0 10px rgba(0, 255, 0, 0.1);
+        }
+
+        .menu-button.leaderboard {
+            color: #0ff;
+            border-color: #0ff;
+            box-shadow: 0 0 10px rgba(0, 255, 255, 0.5);
+            text-shadow: 0 0 8px #0ff;
+        }
+
+        .menu-button.leaderboard:hover, .menu-button.leaderboard:active {
+            background: rgba(0, 255, 255, 0.15);
+            box-shadow: 0 0 20px rgba(0, 255, 255, 0.8), inset 0 0 10px rgba(0, 255, 255, 0.1);
+        }
+        
+        /* ALTERNATIVE DESIGN OPTIONS (Comment out Option 1 and uncomment one of these):
+        
+        OPTION 2: Neon Terminal Style
+        .menu-button {
+            width: 100%;
+            max-width: 280px;
+            padding: clamp(10px, 2.5vw, 14px);
+            background: rgba(0, 0, 0, 0.8);
+            color: #0ff;
+            border: 1px solid #0ff;
+            border-left: 4px solid #0ff;
+            font-family: 'Courier New', monospace;
+            font-size: clamp(13px, 2.5vw, 18px);
+            font-weight: bold;
+            cursor: pointer;
+            box-shadow: 0 0 5px rgba(0, 255, 255, 0.3);
+            transition: all 0.3s;
+            text-align: left;
+            padding-left: 15px;
+            min-height: 50px;
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            justify-content: center;
+            position: relative;
+            text-shadow: 0 0 5px #0ff;
+        }
+        .menu-button:hover, .menu-button:active {
+            background: rgba(0, 255, 255, 0.1);
+            box-shadow: 0 0 15px rgba(0, 255, 255, 0.6), inset 0 0 10px rgba(0, 255, 255, 0.1);
+            border-left-width: 6px;
+        }
+        .menu-button.tournament { color: #f0f; border-color: #f0f; border-left-color: #f0f; text-shadow: 0 0 5px #f0f; }
+        .menu-button.tournament:hover { background: rgba(255, 0, 255, 0.1); box-shadow: 0 0 15px rgba(255, 0, 255, 0.6), inset 0 0 10px rgba(255, 0, 255, 0.1); }
+        .menu-button.community { color: #0ff; border-color: #0ff; border-left-color: #0ff; text-shadow: 0 0 5px #0ff; }
+        .menu-button.community:hover { background: rgba(0, 255, 255, 0.1); box-shadow: 0 0 15px rgba(0, 255, 255, 0.6), inset 0 0 10px rgba(0, 255, 255, 0.1); }
+        .menu-button.editor { color: #ff0; border-color: #ff0; border-left-color: #ff0; text-shadow: 0 0 5px #ff0; }
+        .menu-button.editor:hover { background: rgba(255, 255, 0, 0.1); box-shadow: 0 0 15px rgba(255, 255, 0, 0.6), inset 0 0 10px rgba(255, 255, 0, 0.1); }
+        .menu-button.audio { color: #0a0; border-color: #0a0; border-left-color: #0a0; text-shadow: 0 0 5px #0a0; }
+        .menu-button.audio:hover { background: rgba(0, 170, 0, 0.1); box-shadow: 0 0 15px rgba(0, 170, 0, 0.6), inset 0 0 10px rgba(0, 170, 0, 0.1); }
+        
+        OPTION 3: Gradient Style
+        .menu-button {
+            width: 100%;
+            max-width: 280px;
+            padding: clamp(10px, 2.5vw, 14px);
+            background: linear-gradient(135deg, rgba(0, 255, 255, 0.2), rgba(0, 255, 255, 0.05));
+            color: #0ff;
+            border: 2px solid #0ff;
+            font-family: 'Courier New', monospace;
+            font-size: clamp(13px, 2.5vw, 18px);
+            font-weight: bold;
+            cursor: pointer;
+            box-shadow: 0 0 15px rgba(0, 255, 255, 0.4), inset 0 0 20px rgba(0, 255, 255, 0.1);
+            transition: all 0.3s;
+            text-align: center;
+            min-height: 50px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            text-shadow: 0 0 8px #0ff;
+        }
+        .menu-button:hover, .menu-button:active {
+            background: linear-gradient(135deg, rgba(0, 255, 255, 0.4), rgba(0, 255, 255, 0.15));
+            box-shadow: 0 0 25px rgba(0, 255, 255, 0.8), inset 0 0 30px rgba(0, 255, 255, 0.2);
+            transform: translateY(-3px);
+        }
+        .menu-button.tournament { 
+            background: linear-gradient(135deg, rgba(255, 0, 255, 0.2), rgba(255, 0, 255, 0.05));
+            border-color: #f0f; color: #f0f; text-shadow: 0 0 8px #f0f;
+            box-shadow: 0 0 15px rgba(255, 0, 255, 0.4), inset 0 0 20px rgba(255, 0, 255, 0.1);
+        }
+        .menu-button.tournament:hover { 
+            background: linear-gradient(135deg, rgba(255, 0, 255, 0.4), rgba(255, 0, 255, 0.15));
+            box-shadow: 0 0 25px rgba(255, 0, 255, 0.8), inset 0 0 30px rgba(255, 0, 255, 0.2);
+        }
+        .menu-button.community { 
+            background: linear-gradient(135deg, rgba(0, 255, 255, 0.2), rgba(0, 255, 255, 0.05));
+            border-color: #0ff; color: #0ff; text-shadow: 0 0 8px #0ff;
+            box-shadow: 0 0 15px rgba(0, 255, 255, 0.4), inset 0 0 20px rgba(0, 255, 255, 0.1);
+        }
+        .menu-button.community:hover { 
+            background: linear-gradient(135deg, rgba(0, 255, 255, 0.4), rgba(0, 255, 255, 0.15));
+            box-shadow: 0 0 25px rgba(0, 255, 255, 0.8), inset 0 0 30px rgba(0, 255, 255, 0.2);
+        }
+        .menu-button.editor { 
+            background: linear-gradient(135deg, rgba(255, 255, 0, 0.2), rgba(255, 255, 0, 0.05));
+            border-color: #ff0; color: #ff0; text-shadow: 0 0 8px #ff0;
+            box-shadow: 0 0 15px rgba(255, 255, 0, 0.4), inset 0 0 20px rgba(255, 255, 0, 0.1);
+        }
+        .menu-button.editor:hover { 
+            background: linear-gradient(135deg, rgba(255, 255, 0, 0.4), rgba(255, 255, 0, 0.15));
+            box-shadow: 0 0 25px rgba(255, 255, 0, 0.8), inset 0 0 30px rgba(255, 255, 0, 0.2);
+        }
+        .menu-button.audio { 
+            background: linear-gradient(135deg, rgba(0, 170, 0, 0.2), rgba(0, 170, 0, 0.05));
+            border-color: #0a0; color: #0a0; text-shadow: 0 0 8px #0a0;
+            box-shadow: 0 0 15px rgba(0, 170, 0, 0.4), inset 0 0 20px rgba(0, 170, 0, 0.1);
+        }
+        .menu-button.audio:hover { 
+            background: linear-gradient(135deg, rgba(0, 170, 0, 0.4), rgba(0, 170, 0, 0.15));
+            box-shadow: 0 0 25px rgba(0, 170, 0, 0.8), inset 0 0 30px rgba(0, 170, 0, 0.2);
+        }
+        
+        OPTION 4: Minimalist Clean Style
+        .menu-button {
+            width: 100%;
+            max-width: 280px;
+            padding: clamp(10px, 2.5vw, 14px);
+            background: rgba(0, 0, 0, 0.6);
+            color: #0ff;
+            border: 1px solid #0ff;
+            font-family: 'Courier New', monospace;
+            font-size: clamp(13px, 2.5vw, 18px);
+            font-weight: normal;
+            cursor: pointer;
+            box-shadow: none;
+            transition: all 0.2s;
+            text-align: center;
+            min-height: 50px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            text-shadow: none;
+        }
+        .menu-button:hover, .menu-button:active {
+            background: rgba(0, 255, 255, 0.1);
+            border-width: 2px;
+        }
+        .menu-button.tournament { border-color: #f0f; color: #f0f; }
+        .menu-button.community { border-color: #0ff; color: #0ff; }
+        .menu-button.editor { border-color: #ff0; color: #ff0; }
+        .menu-button.audio { border-color: #0a0; color: #0a0; }
+        
+        OPTION 5: Retro CRT/Pixel Style
+        .menu-button {
+            width: 100%;
+            max-width: 280px;
+            padding: clamp(10px, 2.5vw, 14px);
+            background: #000;
+            color: #0ff;
+            border: 3px solid #0ff;
+            border-style: double;
+            font-family: 'Courier New', monospace;
+            font-size: clamp(13px, 2.5vw, 18px);
+            font-weight: bold;
+            cursor: pointer;
+            box-shadow: 
+                0 0 0 2px #000,
+                0 0 0 4px #0ff,
+                0 0 10px #0ff;
+            transition: all 0.2s;
+            text-align: center;
+            min-height: 50px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            text-shadow: 2px 2px 0px #000, 0 0 5px #0ff;
+            letter-spacing: 1px;
+        }
+        .menu-button:hover, .menu-button:active {
+            background: #0ff;
+            color: #000;
+            box-shadow: 
+                0 0 0 2px #000,
+                0 0 0 4px #0ff,
+                0 0 20px #0ff,
+                inset 0 0 10px rgba(0, 0, 0, 0.3);
+            text-shadow: none;
+        }
+        .menu-button.tournament { border-color: #f0f; color: #f0f; box-shadow: 0 0 0 2px #000, 0 0 0 4px #f0f, 0 0 10px #f0f; text-shadow: 2px 2px 0px #000, 0 0 5px #f0f; }
+        .menu-button.tournament:hover { background: #f0f; color: #000; box-shadow: 0 0 0 2px #000, 0 0 0 4px #f0f, 0 0 20px #f0f, inset 0 0 10px rgba(0, 0, 0, 0.3); }
+        .menu-button.community { border-color: #0ff; color: #0ff; box-shadow: 0 0 0 2px #000, 0 0 0 4px #0ff, 0 0 10px #0ff; text-shadow: 2px 2px 0px #000, 0 0 5px #0ff; }
+        .menu-button.community:hover { background: #0ff; color: #000; box-shadow: 0 0 0 2px #000, 0 0 0 4px #0ff, 0 0 20px #0ff, inset 0 0 10px rgba(0, 0, 0, 0.3); }
+        .menu-button.editor { border-color: #ff0; color: #ff0; box-shadow: 0 0 0 2px #000, 0 0 0 4px #ff0, 0 0 10px #ff0; text-shadow: 2px 2px 0px #000, 0 0 5px #ff0; }
+        .menu-button.editor:hover { background: #ff0; color: #000; box-shadow: 0 0 0 2px #000, 0 0 0 4px #ff0, 0 0 20px #ff0, inset 0 0 10px rgba(0, 0, 0, 0.3); }
+        .menu-button.audio { border-color: #0a0; color: #0a0; box-shadow: 0 0 0 2px #000, 0 0 0 4px #0a0, 0 0 10px #0a0; text-shadow: 2px 2px 0px #000, 0 0 5px #0a0; }
+        .menu-button.audio:hover { background: #0a0; color: #000; box-shadow: 0 0 0 2px #000, 0 0 0 4px #0a0, 0 0 20px #0a0, inset 0 0 10px rgba(0, 0, 0, 0.3); }
+        */
+        
+        .menu-button span {
+            display: block;
+            margin-bottom: 3px;
+        }
+
+        /* Volume Controls Styling */
+        #volumeControls {
+            margin: 30px auto 0;
+            width: 100%;
+            max-width: 400px;
+            padding: 15px;
+            background: rgba(0, 0, 0, 0.5);
+            border: 1px solid #0ff;
+            box-shadow: 0 0 10px rgba(0, 255, 255, 0.3);
+        }
+        
+        #volumeControls label {
+            display: block;
+            color: #0ff;
+            font-size: clamp(12px, 1.5vw, 14px);
+            margin-bottom: 5px;
+            text-shadow: 0 0 5px #0ff;
+            font-family: 'Courier New', monospace;
+        }
+        
+        #volumeControls input[type="range"] {
+            width: 100%;
+            height: 6px;
+            background: #000;
+            outline: none;
+            border: 1px solid #0ff;
+            cursor: pointer;
+            -webkit-appearance: none;
+            appearance: none;
+        }
+        
+        #volumeControls input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 16px;
+            height: 16px;
+            background: #0ff;
+            cursor: pointer;
+            border: 1px solid #0ff;
+            box-shadow: 0 0 5px #0ff;
+        }
+        
+        #volumeControls input[type="range"]::-moz-range-thumb {
+            width: 16px;
+            height: 16px;
+            background: #0ff;
+            cursor: pointer;
+            border: 1px solid #0ff;
+            box-shadow: 0 0 5px #0ff;
+        }
+        
+        #volumeControls input[type="range"]:hover::-webkit-slider-thumb {
+            box-shadow: 0 0 10px #0ff;
+        }
+        
+        #volumeControls input[type="range"]:hover::-moz-range-thumb {
+            box-shadow: 0 0 10px #0ff;
+        }
+        
+        #volumeControls .volume-value {
+            color: #0ff;
+            font-size: clamp(10px, 1.2vw, 12px);
+            text-align: center;
+            margin-top: 3px;
+            font-family: 'Courier New', monospace;
+        }
+        
+        .menu-button-description {
+            font-size: clamp(9px, 1.5vw, 12px);
+            color: #000;
+            text-align: center;
+            margin-top: 3px;
+            opacity: 0.8;
+            font-weight: normal;
+            line-height: 1.2;
+        }
+
+        /* In-Game Notification System */
+        #gameNotification {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(0, 0, 0, 0.95);
+            border: 3px solid #0ff;
+            border-radius: 8px;
+            padding: clamp(20px, 4vw, 30px) clamp(30px, 6vw, 50px);
+            color: #0ff;
+            font-family: 'Courier New', monospace;
+            font-size: clamp(14px, 2.5vw, 18px);
+            font-weight: bold;
+            text-align: center;
+            z-index: 10000;
+            box-shadow: 0 0 30px rgba(0, 255, 255, 0.8), inset 0 0 20px rgba(0, 255, 255, 0.2);
+            text-shadow: 0 0 10px #0ff;
+            pointer-events: none;
+            opacity: 0;
+            transition: opacity 0.3s ease-in-out;
+            max-width: 90%;
+            word-wrap: break-word;
+            line-height: 1.5;
+        }
+
+        #gameNotification.show {
+            opacity: 1;
+        }
+
+        #gameNotification.fade-out {
+            opacity: 0;
+        }
+
+        /* ==================== MOBILE RESPONSIVE ==================== */
+
+        /* Medium screens and tablets: center menu content */
+        @media (max-width: 1200px) {
+            #mainMenuContent {
+                left: 50%;
+                transform: translateX(-50%);
+                width: 45%;
+            }
+        }
+
+        /* Portrait phones and small tablets */
+        @media (max-width: 768px) {
+            #mainMenuContent {
+                left: 50%;
+                transform: translateX(-50%);
+                width: 85%;
+                max-width: none;
+                padding: 10px;
+            }
+
+            #menuTitle {
+                font-size: clamp(22px, 7vw, 40px);
+                margin-bottom: 12px;
+            }
+
+            #menuSubtitle {
+                font-size: clamp(12px, 3vw, 18px);
+                margin-bottom: 15px;
+            }
+
+            #menuButtons {
+                gap: 6px;
+                max-width: none;
+            }
+
+            .menu-button {
+                max-width: none;
+                min-height: 40px;
+            }
+
+            .menu-wallet-button {
+                width: 110px;
+                height: 32px;
+            }
+
+            .menu-wallet-button,
+            .menu-wallet-button #menuWalletButtonText {
+                font-size: 10px;
+            }
+
+            .menu-faucet-button {
+                width: 110px;
+                height: 32px;
+                font-size: 10px;
+                top: clamp(52px, 7vw, 62px);
+            }
+
+            .completion-content,
+            .onchain-content,
+            .statistics-content,
+            .leaderboard-content,
+            .summary-content,
+            .quiz-content {
+                min-width: unset !important;
+                width: 95%;
+                max-width: 95% !important;
+            }
+
+            .completion-stats,
+            .statistics-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            #modeDescriptionPopup .mode-description-content,
+            #tutorialPopup .tutorial-content {
+                padding: 15px !important;
+                max-width: 95% !important;
+            }
+
+            .tutorial-item {
+                flex-direction: column !important;
+                gap: 10px !important;
+                text-align: center;
+            }
+        }
+
+        /* Landscape mobile: fix game aspect ratio with letterboxing */
+        @media (max-height: 500px) {
+            #gameContainer {
+                width: min(100vw, calc(100vh * 16 / 9));
+                height: 100vh;
+                margin: 0 auto;
+            }
+        }
+
+        /* Landscape mobile: compress vertically to fit everything */
+        @media (max-height: 500px) {
+            #mainMenuContent {
+                left: 50%;
+                transform: translateX(-50%);
+                width: 50%;
+                max-width: none;
+                padding: 5px 10px;
+                overflow-y: auto;
+                -webkit-overflow-scrolling: touch;
+            }
+
+            #menuTitle {
+                font-size: clamp(14px, 3.5vh, 24px);
+                margin-bottom: 4px;
+            }
+
+            #menuSubtitle {
+                font-size: clamp(10px, 2vh, 14px);
+                margin-bottom: 6px;
+            }
+
+            #menuButtons {
+                gap: 3px;
+                max-width: none;
+            }
+
+            .menu-button {
+                min-height: unset;
+                padding: 5px 10px;
+                font-size: clamp(10px, 2.2vh, 14px);
+                max-width: none;
+            }
+
+            .menu-button span {
+                margin-bottom: 0;
+            }
+
+            .menu-button-description {
+                display: none;
+            }
+
+            .menu-wallet-button {
+                width: 100px;
+                height: 28px;
+                top: 8px;
+                left: 8px;
+            }
+
+            .menu-wallet-button,
+            .menu-wallet-button #menuWalletButtonText {
+                font-size: 9px;
+            }
+
+            .menu-faucet-button {
+                width: 100px;
+                height: 28px;
+                font-size: 9px;
+                top: 40px;
+                left: 8px;
+            }
+
+            /* Start screen text */
+            #startScreenTitle {
+                font-size: clamp(20px, 5vh, 40px);
+                margin-top: 10px;
+            }
+
+            #startScreenSubtitle {
+                font-size: clamp(14px, 3vh, 24px);
+                margin-bottom: 10px;
+            }
+
+            /* Compress overlay screens */
+            #onchainFinalizationScreen,
+            #gameCompletionScreen,
+            #statisticsScreen,
+            #leaderboardScreen {
+                padding: 8px;
+            }
+
+            .completion-content,
+            .onchain-content,
+            .statistics-content,
+            .leaderboard-content {
+                min-width: unset !important;
+                padding: 10px !important;
+                max-height: 96vh;
+            }
+
+            .summary-content,
+            .quiz-content {
+                min-width: unset !important;
+                padding: 10px !important;
+            }
+
+            .completion-content h2,
+            .onchain-content h2,
+            .statistics-content h2,
+            .leaderboard-content h2 {
+                font-size: clamp(14px, 3.5vh, 22px);
+                margin-bottom: 8px;
+            }
+
+            .completion-main-stat {
+                padding: 8px;
+                margin-bottom: 10px;
+            }
+
+            .completion-main-value {
+                font-size: clamp(22px, 5vh, 36px);
+            }
+
+            .completion-stats,
+            .statistics-grid,
+            .summary-stats {
+                gap: 5px;
+            }
+
+            .completion-stat,
+            .stat-item,
+            .summary-stat,
+            .onchain-info-item {
+                padding: 5px;
+            }
+
+            .completion-stat-value,
+            .stat-item-value,
+            .stat-value,
+            .onchain-info-value {
+                font-size: clamp(14px, 2.5vh, 20px);
+            }
+
+            .completion-stat-label,
+            .stat-item-label,
+            .stat-label,
+            .onchain-info-label {
+                font-size: clamp(9px, 1.5vh, 12px);
+                margin-bottom: 3px;
+            }
+
+            .completion-buttons,
+            .statistics-buttons,
+            .nft-buttons {
+                gap: 5px;
+            }
+
+            .completion-button,
+            .statistics-button,
+            .onchain-button,
+            .nft-button {
+                min-width: 90px;
+                padding: 6px 12px;
+                font-size: clamp(10px, 2vh, 13px);
+            }
+
+            .onchain-button.primary.large {
+                font-size: clamp(12px, 2.5vh, 16px);
+                padding: 8px 16px;
+                min-width: 140px;
+            }
+
+            .onchain-status p {
+                font-size: clamp(10px, 1.8vh, 13px);
+                margin-bottom: 8px;
+            }
+
+            .onchain-section {
+                margin-bottom: 10px;
+            }
+
+            /* Statistics sections */
+            .statistics-section {
+                margin-bottom: 10px;
+            }
+
+            .statistics-section h3 {
+                font-size: clamp(12px, 2.5vh, 16px);
+                margin-bottom: 6px;
+                padding-bottom: 4px;
+            }
+
+            /* Quiz */
+            #quizQuestion {
+                font-size: clamp(12px, 2.2vh, 16px);
+                padding: 6px;
+                margin-bottom: 8px;
+            }
+
+            .quiz-answer-button {
+                padding: 6px 10px;
+                font-size: clamp(10px, 1.8vh, 14px);
+            }
+
+            .quiz-answers {
+                gap: 5px;
+                margin-bottom: 10px;
+            }
+
+            .quiz-content h2 {
+                font-size: clamp(14px, 3vh, 22px);
+                margin-bottom: 8px;
+            }
+
+            /* Leaderboard table */
+            .leaderboard-content h2 {
+                font-size: clamp(14px, 3vh, 22px) !important;
+            }
+
+            /* Tutorial & mode description popups */
+            #modeDescriptionPopup,
+            #tutorialPopup {
+                padding: 5px !important;
+            }
+
+            #modeDescriptionPopup .mode-description-content,
+            #tutorialPopup .tutorial-content {
+                padding: 10px !important;
+                max-width: 98% !important;
+            }
+
+            #modeDescriptionPopup h2,
+            #tutorialPopup h2 {
+                font-size: clamp(16px, 3.5vh, 24px) !important;
+                margin-bottom: 10px !important;
+            }
+
+            .tutorial-item {
+                gap: 10px !important;
+                padding: 8px !important;
+            }
+
+            /* Audio options */
+            #audioOptionsContent {
+                padding: 12px;
+            }
+
+            #audioOptionsContent h2 {
+                font-size: clamp(14px, 3vh, 20px);
+                margin-bottom: 10px;
+            }
+        }
+
+        /* Very small landscape phones (iPhone SE, etc.) */
+        @media (max-height: 380px) {
+            #mainMenuContent {
+                padding: 2px 8px;
+            }
+
+            #menuTitle {
+                font-size: clamp(12px, 3vh, 18px);
+                margin-bottom: 2px;
+            }
+
+            #menuSubtitle {
+                font-size: clamp(8px, 1.8vh, 12px);
+                margin-bottom: 3px;
+            }
+
+            #menuButtons {
+                gap: 2px;
+            }
+
+            .menu-button {
+                padding: 3px 8px;
+                font-size: clamp(8px, 2vh, 11px);
+            }
+
+            #startScreenTitle {
+                font-size: clamp(16px, 4vh, 28px);
+            }
+
+            #startScreenSubtitle {
+                font-size: clamp(10px, 2.5vh, 18px);
+            }
+        }
+
+        /* Landscape phones: combined width + height constraint */
+        @media (max-width: 900px) and (max-height: 500px) {
+            #mainMenuContent {
+                width: 55%;
+            }
+        }
+
+        @media (max-width: 700px) and (max-height: 500px) {
+            #mainMenuContent {
+                width: 70%;
+            }
+        }
+
+        @media (max-width: 500px) and (max-height: 500px) {
+            #mainMenuContent {
+                width: 85%;
+            }
+        }
+
+        /* Portrait mobile: enhance rotate hint for game canvas */
+        @media screen and (orientation: portrait) and (max-width: 768px) {
+            #gameContainer {
+                border-width: 1px;
+            }
+
+            #startScreen,
+            #mainMenu,
+            #audioOptionsPanel {
+                background-size: cover;
+                background-position: center center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div id="gameContainer">
+        <canvas id="gameCanvas"></canvas>
+        <!-- In-Game Notification -->
+        <div id="gameNotification"></div>
+        <div id="ui">
+            <div id="score">Score: 0</div>
+            <div id="levelCounter">Level 1/10</div>
+        </div>
+        <button id="backToMenu" style="position: absolute; top: 10px; right: 10px; padding: 8px 12px; background: #f0f; color: #000; border: none; font-family: 'Courier New', monospace; font-size: 12px; font-weight: bold; cursor: pointer; box-shadow: 0 0 10px #f0f; z-index: 100; display: none;">Menu</button>
+        <button id="backToEditor" style="position: absolute; top: 10px; right: 10px; padding: 8px 12px; background: #0f0; color: #000; border: none; font-family: 'Courier New', monospace; font-size: 12px; font-weight: bold; cursor: pointer; box-shadow: 0 0 10px #0f0; z-index: 100; display: none;">Back to Editor</button>
+        <div id="finalizedFlash"></div>
+        
+        <!-- Game Mode Description Popup (First Level Only, Before Tutorial) -->
+        <div id="modeDescriptionPopup" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.95); z-index: 10001; padding: 20px; box-sizing: border-box; overflow-y: auto; -webkit-overflow-scrolling: touch; touch-action: auto;">
+            <div class="mode-description-content" style="max-width: 800px; width: 100%; margin: auto; color: #0ff; font-family: 'Courier New', monospace; padding: 30px; background: rgba(0, 0, 0, 0.8); border: 3px solid #0ff; border-radius: 10px; box-shadow: 0 0 30px rgba(0, 255, 255, 0.8);">
+                <h2 style="color: #ff0; text-align: center; font-size: clamp(24px, 5vw, 36px); margin-bottom: 30px; text-shadow: 0 0 20px #ff0;">Mode Description</h2>
+                <div id="modeDescriptionText" style="color: #fff; font-size: clamp(14px, 2.5vw, 18px); line-height: 1.8; margin-bottom: 20px; white-space: pre-line; text-align: left;"></div>
+                <div id="modeDescriptionHighlight" style="color: #ff0; font-size: clamp(14px, 2.5vw, 18px); line-height: 1.8; margin-bottom: 30px; text-align: center; text-shadow: 0 0 20px #ff0; font-weight: bold;"></div>
+                <button id="modeDescriptionClose" style="display: block; margin: 30px auto 0; padding: 12px 30px; background: #0ff; color: #000; border: 2px solid #0ff; font-family: 'Courier New', monospace; font-size: clamp(14px, 2.5vw, 18px); font-weight: bold; cursor: pointer; box-shadow: 0 0 20px #0ff; border-radius: 5px; transition: all 0.3s;">I'm in</button>
+            </div>
+        </div>
+        
+        <!-- Tutorial Popup (First Level Only) -->
+        <div id="tutorialPopup" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.95); z-index: 10000; padding: 20px; box-sizing: border-box; overflow-y: auto; -webkit-overflow-scrolling: touch; touch-action: auto;">
+            <div class="tutorial-content" style="max-width: 800px; width: 100%; margin: 0 auto; color: #0ff; font-family: 'Courier New', monospace; padding: 30px; background: rgba(0, 0, 0, 0.8); border: 3px solid #0ff; border-radius: 10px; box-shadow: 0 0 30px rgba(0, 255, 255, 0.8);">
+                <h2 style="color: #ff0; text-align: center; font-size: clamp(24px, 5vw, 36px); margin-bottom: 30px; text-shadow: 0 0 20px #ff0;">Game Objects Guide</h2>
+                <div class="tutorial-items" style="display: flex; flex-direction: column; gap: 25px;">
+                    <!-- Slippage Cloud -->
+                    <div class="tutorial-item" style="display: flex; align-items: center; gap: 20px; padding: 15px; background: rgba(0, 255, 255, 0.1); border: 2px solid #0ff; border-radius: 8px;">
+                        <canvas id="tutorialCloud" width="80" height="80" style="border: 2px solid #0ff; border-radius: 50%; background: rgba(0, 0, 0, 0.5); flex-shrink: 0;"></canvas>
+                        <div style="flex: 1;">
+                            <h3 style="color: #0ff; font-size: clamp(16px, 3vw, 20px); margin-bottom: 8px; text-shadow: 0 0 10px #0ff;">Slippage Cloud</h3>
+                            <p style="color: #fff; font-size: clamp(12px, 2vw, 16px); line-height: 1.5; margin: 0;">A trap! It slows down finalization, changes the trajectory, and gives 10 points.</p>
+                        </div>
+                    </div>
+                    <!-- Arc Gate -->
+                    <div class="tutorial-item" style="display: flex; align-items: center; gap: 20px; padding: 15px; background: rgba(255, 0, 255, 0.1); border: 2px solid #f0f; border-radius: 8px;">
+                        <canvas id="tutorialGate" width="80" height="80" style="border: 2px solid #f0f; background: rgba(0, 0, 0, 0.5); flex-shrink: 0;"></canvas>
+                        <div style="flex: 1;">
+                            <h3 style="color: #f0f; font-size: clamp(16px, 3vw, 20px); margin-bottom: 8px; text-shadow: 0 0 10px #f0f;">Arc Gate</h3>
+                            <p style="color: #fff; font-size: clamp(12px, 2vw, 16px); line-height: 1.5; margin: 0;">Grants a 1.5× multiplier to your points for completing the level.</p>
+                        </div>
+                    </div>
+                    <!-- Barrier -->
+                    <div class="tutorial-item" style="display: flex; align-items: center; gap: 20px; padding: 15px; background: rgba(255, 255, 0, 0.1); border: 2px solid #ff0; border-radius: 8px;">
+                        <canvas id="tutorialBarrier" width="80" height="80" style="border: 2px solid #ff0; background: rgba(0, 0, 0, 0.5); flex-shrink: 0;"></canvas>
+                        <div style="flex: 1;">
+                            <h3 style="color: #ff0; font-size: clamp(16px, 3vw, 20px); margin-bottom: 8px; text-shadow: 0 0 10px #ff0;">Barrier</h3>
+                            <p style="color: #fff; font-size: clamp(12px, 2vw, 16px); line-height: 1.5; margin: 0;">Barrier — you’ve hit a compliance barrier! The transaction requires routing, the flight direction will change, and it gives 10 points.</p>
+                        </div>
+                    </div>
+                    <!-- Settlement Zone -->
+                    <div class="tutorial-item" style="display: flex; align-items: center; gap: 20px; padding: 15px; background: rgba(0, 255, 0, 0.1); border: 2px solid #0f0; border-radius: 8px;">
+                        <canvas id="tutorialSettlement" width="80" height="80" style="border: 2px solid #0f0; background: rgba(0, 0, 0, 0.5); flex-shrink: 0;"></canvas>
+                        <div style="flex: 1;">
+                            <h3 style="color: #0f0; font-size: clamp(16px, 3vw, 20px); margin-bottom: 8px; text-shadow: 0 0 10px #0f0;">Settlement Zone</h3>
+                            <p style="color: #fff; font-size: clamp(12px, 2vw, 16px); line-height: 1.5; margin: 0;">This is the finish! Entering it finalizes the transaction.</p>
+                        </div>
+                    </div>
+                </div>
+                <button id="tutorialClose" style="display: block; margin: 30px auto 0; padding: 12px 30px; background: #0ff; color: #000; border: 2px solid #0ff; font-family: 'Courier New', monospace; font-size: clamp(14px, 2.5vw, 18px); font-weight: bold; cursor: pointer; box-shadow: 0 0 20px #0ff; border-radius: 5px; transition: all 0.3s;">Got It!</button>
+            </div>
+        </div>
+
+        <!-- Level Completion Summary Screen -->
+        <div id="levelSummary" style="display: none;">
+            <div class="summary-content">
+                <h2>Transaction Finalized!</h2>
+                <div class="summary-stats">
+                    <div class="summary-stat">
+                        <div class="stat-label">Level Points</div>
+                        <div class="stat-value" id="summaryLevelPoints">0</div>
+                    </div>
+                    <div class="summary-stat">
+                        <div class="stat-label">Total Points</div>
+                        <div class="stat-value" id="summaryTotalPoints">0</div>
+                    </div>
+                    <div class="summary-stat">
+                        <div class="stat-label">Arc Gates Collected</div>
+                        <div class="stat-value" id="summaryGates">0</div>
+                    </div>
+                    <div class="summary-stat">
+                        <div class="stat-label">Slippage Clouds Passed</div>
+                        <div class="stat-value" id="summaryClouds">0</div>
+                    </div>
+                    <div class="summary-stat">
+                        <div class="stat-label">Barrier Collisions</div>
+                        <div class="stat-value" id="summaryBarriers">0</div>
+                    </div>
+                </div>
+                <button id="summaryContinue" class="summary-button">Continue</button>
+                <button id="summaryReturnToEditor" class="summary-button" style="background: #0f0; color: #000; box-shadow: 0 0 10px #0f0; display: none;">Return to Editor</button>
+            </div>
+        </div>
+
+        <!-- Quiz Screen -->
+        <div id="quizScreen" style="display: none;">
+            <div class="quiz-content">
+                <h2>Play quiz, gain life</h2>
+                <div id="quizQuestion">Question will appear here</div>
+                <div class="quiz-answers">
+                    <button id="quizAnswer1" class="quiz-answer-button">Answer 1</button>
+                    <button id="quizAnswer2" class="quiz-answer-button">Answer 2</button>
+                    <button id="quizAnswer3" class="quiz-answer-button">Answer 3</button>
+                </div>
+                <div id="quizResultMessage" class="quiz-result"></div>
+                <div style="display: flex; justify-content: center; gap: 10px; flex-wrap: wrap;">
+                    <button id="quizSkip">Skip</button>
+                    <button id="quizContinue">Continue</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Info Screen -->
+        <div id="infoScreen" style="display: none;">
+            <div class="info-content">
+                <h2>Did you know?</h2>
+                <div id="infoText"></div>
+                <button id="infoContinue">Continue</button>
+            </div>
+        </div>
+        
+        <!-- Game Completion Screen -->
+        <div id="gameCompletionScreen" style="display: none;">
+            <div class="completion-content">
+                <h2>🎉 Game Completed! 🎉</h2>
+                <div class="completion-main-stat">
+                    <div class="completion-main-label">Final Score</div>
+                    <div class="completion-main-value" id="completionFinalScore">0</div>
+                </div>
+                <div class="completion-stats">
+                    <div class="completion-stat">
+                        <div class="completion-stat-label">Levels Completed</div>
+                        <div class="completion-stat-value" id="completionLevelsCompleted">0</div>
+                    </div>
+                    <div class="completion-stat">
+                        <div class="completion-stat-label">Completion Time</div>
+                        <div class="completion-stat-value" id="completionTime">0:00</div>
+                    </div>
+                    <div class="completion-stat">
+                        <div class="completion-stat-label">Best Level Score</div>
+                        <div class="completion-stat-value" id="completionBestLevelScore">0</div>
+                    </div>
+                    <div class="completion-stat">
+                        <div class="completion-stat-label">Average Level Score</div>
+                        <div class="completion-stat-value" id="completionAverageLevelScore">0</div>
+                    </div>
+                    <div class="completion-stat">
+                        <div class="completion-stat-label">Game Mode</div>
+                        <div class="completion-stat-value" id="completionGameMode">Unknown</div>
+                    </div>
+                </div>
+                <div class="completion-buttons">
+                    <button id="completionFinalizeOnchain" class="completion-button primary">Finalize On-Chain</button>
+                    <button id="completionMintNFT" class="completion-button primary" style="background: #ff0; border-color: #ff0; color: #000; box-shadow: 0 0 20px #ff0;">Mint NFT</button>
+                    <button id="completionReturnToMenu" class="completion-button secondary">Return to Menu</button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Community Levels Completion Popup -->
+        <div id="communityCompletionPopup" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.95); z-index: 10002; padding: 20px; box-sizing: border-box; overflow-y: auto; align-items: center; justify-content: center;">
+            <div style="max-width: 600px; width: 100%; margin: 0 auto; color: #0ff; font-family: 'Courier New', monospace; text-align: center; padding: 40px 20px; display: flex; flex-direction: column; align-items: center; justify-content: center;">
+                <h2 style="color: #0ff; text-shadow: 0 0 20px #0ff; margin-bottom: 30px; font-size: 32px; margin-top: 0;">🎉 Congratulations! 🎉</h2>
+                <p style="font-size: 20px; line-height: 1.6; margin-bottom: 40px; color: #fff; margin-top: 0;">
+                    You've completed all community-created levels. Come back later for new ones, superhero!
+                </p>
+                <button id="communityCompletionReturnToMenu" class="menu-button" style="background: #0ff; color: #000; border: 2px solid #0ff; padding: 15px 40px; font-size: 18px; cursor: pointer; box-shadow: 0 0 20px #0ff; text-shadow: none; margin-top: 0;">
+                    Return to Menu
+                </button>
+            </div>
+        </div>
+        
+        <!-- Statistics Screen -->
+        <div id="statisticsScreen" style="display: none;">
+            <div class="statistics-content">
+                <h2>Player Statistics</h2>
+                
+                <!-- Overview Section -->
+                <div class="statistics-section">
+                    <h3>Overview</h3>
+                    <div class="statistics-grid">
+                        <div class="stat-item">
+                            <div class="stat-item-label">Games Played</div>
+                            <div class="stat-item-value" id="statsGamesPlayed">0</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-item-label">Games Completed</div>
+                            <div class="stat-item-value" id="statsGamesCompleted">0</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-item-label">Completion Rate</div>
+                            <div class="stat-item-value" id="statsCompletionRate">0%</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Best Scores Section -->
+                <div class="statistics-section">
+                    <h3>Best Scores</h3>
+                    <div class="statistics-grid">
+                        <div class="stat-item">
+                            <div class="stat-item-label">Best Final Score</div>
+                            <div class="stat-item-value" id="statsBestFinalScore">0</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-item-label">Best Level Score</div>
+                            <div class="stat-item-value" id="statsBestLevelScore">0</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-item-label">Average Final Score</div>
+                            <div class="stat-item-value" id="statsAverageFinalScore">0</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-item-label">Total Lifetime Points</div>
+                            <div class="stat-item-value" id="statsTotalLifetimePoints">0</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Performance Section -->
+                <div class="statistics-section">
+                    <h3>Performance</h3>
+                    <div class="statistics-grid">
+                        <div class="stat-item">
+                            <div class="stat-item-label">Total Levels Completed</div>
+                            <div class="stat-item-value" id="statsTotalLevels">0</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-item-label">Avg Levels Per Game</div>
+                            <div class="stat-item-value" id="statsAvgLevelsPerGame">0</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-item-label">Fastest Completion</div>
+                            <div class="stat-item-value" id="statsFastestTime">N/A</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-item-label">Average Time</div>
+                            <div class="stat-item-value" id="statsAvgTime">N/A</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Achievements Section -->
+                <div class="statistics-section">
+                    <h3>Achievements</h3>
+                    <div class="statistics-grid">
+                        <div class="stat-item">
+                            <div class="stat-item-label">Total Gates Passed</div>
+                            <div class="stat-item-value" id="statsTotalGates">0</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-item-label">Total Clouds Passed</div>
+                            <div class="stat-item-value" id="statsTotalClouds">0</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-item-label">Total Barriers Hit</div>
+                            <div class="stat-item-value" id="statsTotalBarriers">0</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-item-label">Perfect Games</div>
+                            <div class="stat-item-value" id="statsPerfectGames">0</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Game Mode Stats Section -->
+                <div class="statistics-section">
+                    <h3>Game Mode Stats</h3>
+                    <div class="statistics-grid">
+                        <div class="stat-item">
+                            <div class="stat-item-label">Immortal: Played</div>
+                            <div class="stat-item-value" id="statsImmortalPlayed">0</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-item-label">Immortal: Completed</div>
+                            <div class="stat-item-value" id="statsImmortalCompleted">0</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-item-label">Tournament: Played</div>
+                            <div class="stat-item-value" id="statsTournamentPlayed">0</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-item-label">Tournament: Completed</div>
+                            <div class="stat-item-value" id="statsTournamentCompleted">0</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Last Game Section -->
+                <div class="statistics-section">
+                    <h3>Last Game</h3>
+                    <div class="statistics-grid">
+                        <div class="stat-item">
+                            <div class="stat-item-label">Date</div>
+                            <div class="stat-item-value" id="statsLastGameDate">Never</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-item-label">Mode</div>
+                            <div class="stat-item-value" id="statsLastGameMode">N/A</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-item-label">Score</div>
+                            <div class="stat-item-value" id="statsLastGameScore">0</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="statistics-buttons">
+                    <button id="statsReset" class="statistics-button danger">Reset Statistics</button>
+                    <button id="statsClose" class="statistics-button primary">Close</button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Leaderboard Screen -->
+        <div id="leaderboardScreen" style="display: none;">
+            <div class="leaderboard-content">
+                <h2>🏆 Leaderboard 🏆</h2>
+                
+                <div class="leaderboard-mode-selector">
+                    <button class="leaderboard-mode-btn active" data-mode="Immortal">Immortal Mode</button>
+                    <button class="leaderboard-mode-btn" data-mode="Tournament">Tournament Mode</button>
+                </div>
+                
+                <div class="leaderboard-filters">
+                    <button class="leaderboard-filter-btn active" data-count="10">Top 10</button>
+                    <button class="leaderboard-filter-btn" data-count="25">Top 25</button>
+                    <button class="leaderboard-filter-btn" data-count="50">Top 50</button>
+                    <button class="leaderboard-filter-btn" data-count="100">Top 100</button>
+                </div>
+                
+                <div id="leaderboardPlayerRank" class="leaderboard-player-rank" style="display: none;">
+                    Your Rank: <span id="leaderboardPlayerRankValue"></span>
+                </div>
+                
+                <div id="leaderboardLoading" class="leaderboard-loading" style="display: none;">
+                    Loading leaderboard...
+                </div>
+                
+                <div id="leaderboardError" class="leaderboard-error" style="display: none;"></div>
+                
+                <div id="leaderboardList" class="leaderboard-list"></div>
+                
+                <div class="leaderboard-buttons">
+                    <button id="leaderboardRefresh" class="leaderboard-button secondary">Refresh</button>
+                    <button id="leaderboardClose" class="leaderboard-button primary">Close</button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- On-Chain Finalization Screen -->
+        <div id="onchainFinalizationScreen" style="display: none;">
+            <div class="onchain-content">
+                <h2>Finalize Score On-Chain</h2>
+                
+                <div class="onchain-section">
+                    <div class="onchain-info">
+                        <div class="onchain-info-item">
+                            <div class="onchain-info-label">Final Score</div>
+                            <div class="onchain-info-value" id="onchainFinalScore">0</div>
+                        </div>
+                        <div class="onchain-info-item">
+                            <div class="onchain-info-label">Levels Completed</div>
+                            <div class="onchain-info-value" id="onchainLevelsCompleted">0</div>
+                        </div>
+                        <div class="onchain-info-item">
+                            <div class="onchain-info-label">Game Mode</div>
+                            <div class="onchain-info-value" id="onchainGameMode">Unknown</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="onchain-section" id="onchainWalletSection">
+                    <div class="onchain-status" id="onchainWalletStatus">
+                        <div id="onchainWalletNotConnected">
+                            <p>Connect your wallet to finalize your score on-chain</p>
+                            <p style="font-size: clamp(10px, 1.8vw, 12px); margin-top: 10px; opacity: 0.8;">
+                                Supported wallets: MetaMask, Rabby
+                            </p>
+                            <div style="margin: 15px 0; padding: 10px; background: rgba(255, 255, 0, 0.1); border: 1px solid #ff0; border-radius: 5px;">
+                                <p style="font-size: clamp(10px, 1.8vw, 12px); color: #ff0; margin-bottom: 8px;">
+                                    <strong>Don't have a wallet?</strong>
+                                </p>
+                                <p style="font-size: clamp(9px, 1.6vw, 11px); color: #0ff; line-height: 1.4;">
+                                    Install <a href="https://metamask.io/download/" target="_blank" style="color: #0ff; text-decoration: underline;">MetaMask</a> or 
+                                    <a href="https://rabby.io/" target="_blank" style="color: #0ff; text-decoration: underline;">Rabby</a> browser extension, then refresh this page.
+                                </p>
+                            </div>
+                            <button id="onchainConnectWallet" class="onchain-button primary">Connect Wallet</button>
+                        </div>
+                        <div id="onchainWalletConnected" style="display: none;">
+                            <p>Connected: <span id="onchainWalletAddress"></span></p>
+                            <button id="onchainDisconnectWallet" class="onchain-button secondary">Disconnect</button>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="onchain-section" id="onchainTransactionSection" style="display: none;">
+                    <div class="onchain-status">
+                        <div id="onchainTransactionStatus">
+                            <p id="onchainStatusText">Preparing transaction...</p>
+                            <div id="onchainGasEstimate" style="display: none;">
+                                <p>Estimated Gas: <span id="onchainGasAmount"></span></p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="onchain-section" id="onchainSubmitSection" style="display: none;">
+                    <button id="onchainSubmitScore" class="onchain-button primary large">Finalize Score On-Chain</button>
+                </div>
+                
+                <div class="onchain-section" id="onchainSuccessSection" style="display: none;">
+                    <div class="onchain-success">
+                        <h3>✅ Score Finalized!</h3>
+                        <p>Your score has been successfully recorded on-chain.</p>
+                        <div class="onchain-tx-link">
+                            <a id="onchainTxLink" href="#" target="_blank">View Transaction on Etherscan</a>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="onchain-section" id="onchainErrorSection" style="display: none;">
+                    <div class="onchain-error">
+                        <h3>❌ Error</h3>
+                    </div>
+                </div>
+                
+                <div class="onchain-buttons">
+                    <button id="onchainClose" class="onchain-button secondary">Close</button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- NFT Minting Screen -->
+        <div id="nftMintingScreen" style="display: none;">
+            <div class="nft-content">
+                <h2>🎨 Mint Completion NFT</h2>
+                
+                <div class="nft-section">
+                    <div class="nft-preview">
+                        <div class="nft-preview-image" id="nftPreviewImage">
+                            <div class="nft-placeholder">NFT Preview</div>
+                        </div>
+                        <div class="nft-preview-info">
+                            <h3 id="nftPreviewName">ARCMAN: Final Settlement - Completion Certificate</h3>
+                            <div class="nft-attributes" id="nftAttributes">
+                                <!-- Attributes will be populated dynamically -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="nft-section" id="nftWalletSection">
+                    <div class="nft-status" id="nftWalletStatus">
+                        <div id="nftWalletNotConnected">
+                            <p>Connect your wallet to mint your completion NFT</p>
+                            <p style="font-size: clamp(10px, 1.8vw, 12px); margin-top: 10px; opacity: 0.8;">
+                                Supported wallets: MetaMask, Rabby
+                            </p>
+                            <button id="nftConnectWallet" class="nft-button primary">Connect Wallet</button>
+                        </div>
+                        <div id="nftWalletConnected" style="display: none;">
+                            <p>Connected: <span id="nftWalletAddress"></span></p>
+                            <div id="nftAlreadyMinted" style="display: none; margin-top: 15px; padding: 15px; background: rgba(255, 255, 0, 0.1); border: 2px solid #ff0; border-radius: 8px;">
+                                <p style="color: #ff0; font-weight: bold; margin-bottom: 10px;">✓ You already have a completion NFT!</p>
+                                <p style="color: #0ff; font-size: clamp(12px, 2vw, 14px);">Token ID: <span id="nftExistingTokenId"></span></p>
+                                <a id="nftViewTokenLink" href="#" target="_blank" style="color: #0ff; text-decoration: underline; font-size: clamp(12px, 2vw, 14px);">View on Block Explorer</a>
+                            </div>
+                            <button id="nftDisconnectWallet" class="nft-button secondary" style="margin-top: 10px;">Disconnect</button>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="nft-section" id="nftMintingSection" style="display: none;">
+                    <div class="nft-status-text" id="nftStatusText">Ready to mint</div>
+                    <div class="nft-gas-info" id="nftGasInfo" style="display: none;">
+                        <p>Estimated gas: <span id="nftGasAmount">-</span></p>
+                    </div>
+                    <button id="nftMintButton" class="nft-button primary">Mint NFT</button>
+                </div>
+                
+                <div class="nft-section" id="nftSuccessSection" style="display: none;">
+                    <div class="nft-success">
+                        <h3>🎉 NFT Minted Successfully! 🎉</h3>
+                        <p>Your completion certificate has been minted!</p>
+                        <div class="nft-success-info">
+                            <p>Token ID: <span id="nftTokenId"></span></p>
+                            <p>Transaction: <a id="nftTxLink" href="#" target="_blank">View on Block Explorer</a></p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="nft-section" id="nftErrorSection" style="display: none;">
+                    <div class="nft-error">
+                        <h3>❌ Error</h3>
+                    </div>
+                </div>
+                
+                <div class="nft-buttons">
+                    <button id="nftClose" class="nft-button secondary">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Click to Start Screen -->
+    <div id="startScreen">
+        <div class="scanline-overlay"></div>
+        <div id="startScreenContent">
+            <div id="startScreenTitle">ARCMAN: Final Settlement</div>
+            <div id="startScreenSubtitle">Click to Start</div>
+        </div>
+    </div>
+
+    <!-- Main Menu -->
+    <div id="mainMenu" class="hidden">
+        <div class="scanline-overlay"></div>
+        <!-- Wallet Connection Button (Top Left) -->
+        <button id="menuWalletButton" class="menu-wallet-button">
+            <span id="menuWalletButtonText">Connect Wallet</span>
+            <span id="menuWalletButtonAddress" style="display: none;"></span>
+        </button>
+        <!-- USDC Faucet Button (Below Wallet Button) -->
+        <a href="https://faucet.circle.com/" target="_blank" class="menu-faucet-button" id="menuFaucetButton">
+            USDC Faucet
+        </a>
+        <div id="mainMenuContent">
+            <div id="menuTitle">ARCMAN: Final Settlement</div>
+            <div id="menuSubtitle">Arcade Game</div>
+            <div id="menuButtons">
+            <button class="menu-button" id="menuImmortal">
+                <span>IMMORTAL MODE</span>
+            </button>
+            <button class="menu-button tournament" id="menuTournament">
+                <span>TOURNAMENT MODE</span>
+            </button>
+            <button class="menu-button community" id="menuCommunity">
+                <span>COMMUNITY LEVELS</span>
+            </button>
+            <button class="menu-button editor" id="menuEditor">
+                <span>LEVEL EDITOR</span>
+            </button>
+            <button class="menu-button statistics" id="menuStatistics">
+                <span>STATISTIC</span>
+            </button>
+            <button class="menu-button leaderboard" id="menuLeaderboard">
+                <span>LEADERBOARD</span>
+            </button>
+            <button class="menu-button audio" id="menuAudio">
+                <span>AUDIO OPTIONS</span>
+            </button>
+        </div>
+        </div>
+    </div>
+
+    <!-- Audio Options Panel -->
+    <div id="audioOptionsPanel" class="hidden">
+        <div class="scanline-overlay"></div>
+        <div id="audioOptionsContent">
+            <h2 style="color: #0ff; font-size: clamp(18px, 3vw, 24px); margin-bottom: 20px; text-shadow: 0 0 10px #0ff; font-family: 'Courier New', monospace;">AUDIO OPTIONS</h2>
+            
+            <!-- Volume Controls -->
+            <div id="volumeControls">
+                <div style="margin-bottom: 20px;">
+                    <label style="display: block; color: #0ff; font-size: clamp(12px, 1.5vw, 14px); margin-bottom: 8px; text-shadow: 0 0 5px #0ff; font-family: 'Courier New', monospace;">Music Volume</label>
+                    <input type="range" id="musicVolumeSlider" min="0" max="100" value="30" 
+                        style="width: 100%; height: 6px; background: #000; outline: none; border: 1px solid #0ff; cursor: pointer;">
+                    <div style="color: #0ff; font-size: clamp(10px, 1.2vw, 12px); text-align: center; margin-top: 5px; font-family: 'Courier New', monospace;">
+                        <span id="musicVolumeValue">30%</span>
+                    </div>
+                </div>
+                <div style="margin-bottom: 20px;">
+                    <label style="display: block; color: #0ff; font-size: clamp(12px, 1.5vw, 14px); margin-bottom: 8px; text-shadow: 0 0 5px #0ff; font-family: 'Courier New', monospace;">Sound Effects Volume</label>
+                    <input type="range" id="soundVolumeSlider" min="0" max="100" value="50" 
+                        style="width: 100%; height: 6px; background: #000; outline: none; border: 1px solid #0ff; cursor: pointer;">
+                    <div style="color: #0ff; font-size: clamp(10px, 1.2vw, 12px); text-align: center; margin-top: 5px; font-family: 'Courier New', monospace;">
+                        <span id="soundVolumeValue">50%</span>
+                    </div>
+                </div>
+            </div>
+            
+            <button class="menu-button" id="audioOptionsClose" style="margin-top: 20px;">
+                <span>CLOSE</span>
+            </button>
+        </div>
+    </div>
+
+    <!-- Level Editor -->
+    <div id="levelEditor">
+        <div id="editorPanel">
+            <div class="editor-section">
+                <h3>Level Editor</h3>
+                <button class="editor-button" id="editorClose">Close Editor</button>
+                <button class="editor-button" id="editorNew">New Level</button>
+                <button class="editor-button" id="editorSave">Save Level</button>
+                <button class="editor-button danger" id="editorDelete">Delete Level</button>
+                <button class="editor-button" id="editorExport" style="background: #ff0; color: #000; box-shadow: 0 0 10px #ff0;">Export</button>
+                <button class="editor-button" id="editorSubmit" style="background: #0f0; color: #000; box-shadow: 0 0 10px #0f0; margin-top: 5px;">Submit Level</button>
+            </div>
+
+            <div class="editor-section">
+                <h3>Level Info</h3>
+                <label>Level Name:</label>
+                <input type="text" id="editorLevelName" value="New Level">
+                <label>Level ID:</label>
+                <input type="number" id="editorLevelId" readonly>
+            </div>
+
+            <div class="editor-section">
+                <h3>Tools</h3>
+                <div id="editorToolbar">
+                    <button class="tool-button active" data-tool="select">Select</button>
+                    <button class="tool-button" data-tool="gate">Arc Gate</button>
+                    <button class="tool-button" data-tool="cloud">Slippage Cloud</button>
+                    <button class="tool-button" data-tool="life-restore">Life Restore</button>
+                    <button class="tool-button" data-tool="barrier-large">Barrier (Large)</button>
+                    <button class="tool-button" data-tool="barrier-medium">Barrier (Medium)</button>
+                    <button class="tool-button" data-tool="barrier-small">Barrier (Small)</button>
+                    <button class="tool-button" data-tool="settlement">Settlement Zone</button>
+                    <button class="tool-button" data-tool="player">Player Start</button>
+                    <button class="tool-button" data-tool="delete">Delete</button>
+                </div>
+                <div style="margin-top: 10px;">
+                    <button class="editor-button" id="editorRotate" style="width: 100%;">Rotate Selected (R)</button>
+                </div>
+            </div>
+
+            <div class="editor-section">
+                <h3>Level Preview</h3>
+                <canvas id="editorCanvas" width="600" height="450"></canvas>
+                <div id="editorInstructions">Click to place objects. Select tool to select, then press R or click Rotate to rotate (15° steps).</div>
+            </div>
+
+            <div class="editor-section">
+                <h3>Objects</h3>
+                <div id="editorObjects">
+                    <div>Arc Gates: <span id="gateCount">0</span></div>
+                    <div>Slippage Clouds: <span id="cloudCount">0</span></div>
+                    <div>Life Restores: <span id="lifeRestoreCount">0</span></div>
+                    <div>Barriers: <span id="barrierCount">0</span></div>
+                    <div>Settlement Zone: <span id="settlementCount">0</span></div>
+                </div>
+            </div>
+
+            <div class="editor-section">
+                <h3>Level List</h3>
+                <select id="levelSelect" style="width: 100%; padding: 5px; background: #000; color: #0ff; border: 1px solid #0ff; font-family: 'Courier New', monospace;">
+                    <option>Loading levels...</option>
+                </select>
+                <button class="editor-button" id="editorLoad">Load Level</button>
+                <button class="editor-button" id="editorLaunch" style="background: #0f0; color: #000; box-shadow: 0 0 10px #0f0; margin-top: 5px;">Launch Level</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Export Modal -->
+    <div id="exportModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.95); z-index: 1000; padding: 20px; box-sizing: border-box; overflow-y: auto;">
+        <div style="max-width: 800px; margin: 0 auto; color: #0ff; font-family: 'Courier New', monospace;">
+            <h2 style="color: #ff0; text-shadow: 0 0 10px #ff0; margin-bottom: 20px;">Export DEFAULT_LEVELS</h2>
+            <p style="margin-bottom: 15px; color: #0ff;">Copy the code below and replace the DEFAULT_LEVELS array in levels.js:</p>
+            <textarea id="exportCode" readonly style="width: 100%; height: 500px; background: #000; color: #0ff; border: 2px solid #0ff; padding: 15px; font-family: 'Courier New', monospace; font-size: 12px; box-sizing: border-box; resize: vertical; box-shadow: 0 0 20px #0ff;"></textarea>
+            <div style="margin-top: 15px;">
+                <button class="editor-button" id="exportCopy" style="width: 150px; margin-right: 10px;">Copy to Clipboard</button>
+                <button class="editor-button" id="exportClose" style="width: 150px; background: #f0f; color: #000; box-shadow: 0 0 10px #f0f;">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="levels.js"></script>
+    <script src="communityLevels.js"></script>
+    <!-- External libraries -->
+    <script src="https://cdn.jsdelivr.net/npm/ethers@6.9.0/dist/ethers.umd.min.js"></script>
+    <!-- Game modules (load in dependency order) -->
+    <script src="js/config.js"></script>
+    <script src="js/canvas.js"></script>
+    <script src="js/audio.js"></script>
+    <script src="js/state.js"></script>
+    <script src="js/gameObjects.js"></script>
+    <script src="js/physics.js"></script>
+    <script src="js/renderer.js"></script>
+    <script src="js/scoring.js"></script>
+    <script src="js/quizzes.js"></script>
+    <script src="js/quiz.js"></script>
+    <script src="js/infoScreens.js"></script>
+    <script src="js/infoManager.js"></script>
+    <script src="js/ui.js"></script>
+    <script src="js/statistics.js"></script>
+    <script src="js/web3.js"></script>
+    <script src="js/leaderboard.js"></script>
+    <script src="js/nft.js"></script>
+    <script src="js/gameFlow.js"></script>
+    <script src="js/levelEditor.js"></script>
+    <script src="js/input.js"></script>
+    <script src="js/main.js"></script>
+    <!-- Legacy game.js kept for reference (can be removed after testing) -->
+    <!-- <script src="game.js"></script> -->
+</body>
+</html>
+
+
