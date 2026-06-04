@@ -42,9 +42,11 @@ ARCMAN: Final Settlement is a browser-based arcade game in a retro pixel-art sty
   * `nft.js` — NFT minting functionality
   * `quizzes.js` — quiz questions and answers data
   * `quiz.js` — quiz system management for Tournament mode
+  * `infoScreens.js` — educational info-screen content (Arc / USDC / Circle facts)
+  * `infoManager.js` — info-screen scheduling and display (Tournament & Immortal)
   * `main.js` — main game loop & initialization
 * `levels.js` — level structure, default levels, `LevelManager`, loading and saving custom levels.
-* `game.js` — legacy file (kept for reference, not used in production)
+* `communityLevels.js` — bundled community-submitted levels (loaded alongside `levels.js`)
 
 **Assets**
 
@@ -57,9 +59,9 @@ ARCMAN: Final Settlement is a browser-based arcade game in a retro pixel-art sty
 
 **Backend**
 
-* `server.js` — Express server, `/api/finalize` endpoint, score signing for the smart contract (includes game mode in signature)
+* `server.js` — Express server with a **session-based anti-cheat** score flow (`/api/session/start` → `/api/session/event` → `/api/session/finalize`); the server computes the score from validated events and ECDSA-signs it for the smart contract (signature includes game mode). Also hosts `/api/submit-level` (Telegram notification for community levels) and `/api/health`.
 * `package.json` — dependencies and run scripts (`npm start`, `npm run dev`)
-* `.env` — Environment variables (PRIVATE_KEY for server signer) - see `ENV_SETUP.md`
+* `.env` — environment variables: `PRIVATE_KEY` (server signer), optional `TELEGRAM_BOT_TOKEN` / `TELEGRAM_CHAT_ID` (level submissions), optional `PORT` (default 3000)
 
 **Blockchain**
 
@@ -72,6 +74,7 @@ ARCMAN: Final Settlement is a browser-based arcade game in a retro pixel-art sty
 * Level coordinates are defined in relative values (0–1) and scaled to the current screen size.
 * Custom levels are stored in `localStorage`.
 * Server-side signing uses ECDSA signing with ethers.js for secure score verification.
+* The **final score is computed by the server** from validated in-game events (not submitted by the client), with anti-cheat checks: per-level object caps, a minimum time per level, session IP binding, and a finalize cooldown.
 * Proper on-chain finalization requires the backend server to be running.
 * The game targets a fullscreen canvas and prefers landscape orientation on mobile devices.
 * Audio system requires user interaction to unlock (handled by start screen).
@@ -104,6 +107,10 @@ ARCMAN: Final Settlement is a browser-based arcade game in a retro pixel-art sty
   - Skip quizzes if you have full lives or don't need them
   - Topics cover stablecoins, USDC, ARC blockchain, and Circle
   - Questions and answers are easily editable in `js/quizzes.js`
+- **Educational Info Screens**:
+  - Short Arc / USDC / Circle explainer screens appear after levels 1, 3, 5, 7, and 9
+  - Shown in **both** Immortal and Tournament modes (purely informational — no life reward)
+  - Content is editable in `js/infoScreens.js`; scheduling lives in `js/infoManager.js`
 - **Built-in Level Editor**: Create and edit custom levels with visual placement tools
   - **Drag and Drop**: Move objects by clicking and dragging them with the Select tool
   - **Launch Level**: Test levels directly from the editor without leaving
@@ -284,7 +291,7 @@ All coordinates are relative (0-1) for responsive scaling across different scree
 
 ## Architecture
 
-> **Note**: The codebase has been reorganized into a modular structure (19 modules in `js/` directory) for better maintainability. The original monolithic `game.js` (3011 lines) has been split into focused modules using the namespace pattern.
+> **Note**: The codebase is organized into a modular structure (21 modules in the `js/` directory) using the namespace pattern, instead of one monolithic file.
 
 ### Frontend Structure
 
@@ -310,6 +317,8 @@ The game uses a **modular namespace pattern** for better organization and mainta
 - `js/levelEditor.js` - Complete level editor system
 - `js/quizzes.js` - Quiz questions and answers data (editable quiz content)
 - `js/quiz.js` - Quiz system management for Tournament mode (quiz display, answer handling, life rewards)
+- `js/infoScreens.js` - Educational info-screen content (Arc / USDC / Circle facts)
+- `js/infoManager.js` - Info-screen scheduling and display (after levels 1, 3, 5, 7, 9 in both modes)
 
 **Blockchain & Statistics:**
 - `js/statistics.js` - Player statistics management and localStorage persistence
@@ -320,13 +329,11 @@ The game uses a **modular namespace pattern** for better organization and mainta
 **Supporting Files:**
 - `index.html` - Main game page with start screen, menus, and level editor UI
 - `levels.js` - Level data structure, default levels, and level management (`LevelManager` class)
-
-**Legacy:**
-- `game.js` - Original monolithic file (3011 lines) - kept for reference, not used in production
+- `communityLevels.js` - Bundled community-submitted levels, loaded alongside `levels.js`
 
 ### Module Organization
 
-The codebase is organized into **19 focused modules** (50-600 lines each) instead of one large file:
+The codebase is organized into **21 focused modules** (50-600 lines each) instead of one large file. Key modules and their dependencies:
 
 1. **Configuration** (`config.js`) - Pure constants, no dependencies
 2. **Canvas** (`canvas.js`) - Canvas operations, depends on `config.js`
@@ -352,12 +359,17 @@ The game includes a complete audio system managed by the `AudioManager` namespac
 - **Graceful Degradation**: Game continues to function if audio files are missing
 
 ### Backend
-- `server.js`: Express server for signing game scores
-- API endpoints:
-  - `POST /api/finalize` - Signs score data for blockchain submission (includes game mode)
-  - `GET /api/health` - Health check endpoint
-- Environment setup: Requires `PRIVATE_KEY` environment variable (see `ENV_SETUP.md`)
-- Serves static files and `index.html` at root
+`server.js` is an Express server that serves the static game and runs a **session-based, server-authoritative scoring flow** (anti-cheat). The client reports gameplay events; the server validates them, computes the score itself, and ECDSA-signs it for the smart contract.
+
+API endpoints:
+- `POST /api/session/start` — begin a session. Body: `{ player, gameMode }` (`gameMode` = `Immortal` | `Tournament`). Returns `{ sessionId, totalLevels }`. Any previous session for the same player is invalidated.
+- `POST /api/session/event` — report an event. Body: `{ sessionId, eventType }`, where `eventType` ∈ `levelStart | gatePassed | cloudPassed | barrierHit | levelComplete`. The server enforces per-level object caps (from `DEFAULT_LEVELS`), a minimum time per level, and session IP binding.
+- `POST /api/session/finalize` — finish a session. Body: `{ sessionId, nonce }`. Validates that all levels were completed and minimum timings were met, computes the score `Σ floor((100 + clouds·10 + barriers·10) · (1 + gates·0.5))`, then returns `{ score, signature, signerAddress, timestamp }`. Rate-limited to one finalize per player per 60s.
+- `POST /api/submit-level` — submit a custom level for approval. Body: `{ level }`. Sends the level JSON to Telegram (if `TELEGRAM_BOT_TOKEN` / `TELEGRAM_CHAT_ID` are set). Returns `{ success, telegramSent }`.
+- `GET /api/health` — health check, returns `{ status: 'ok' }`.
+- `GET /` and static files are served from the project root.
+
+Anti-cheat parameters: 1-hour session expiry, ≥ 3 s per level, 60 s finalize cooldown per player. Environment: `PRIVATE_KEY` (server signer — required for valid signatures), optional `TELEGRAM_BOT_TOKEN` / `TELEGRAM_CHAT_ID`, optional `PORT` (default `3000`).
 
 ### Smart Contracts
 - `contract.sol`: Solidity contract for score verification and leaderboard
@@ -411,14 +423,14 @@ Access statistics from the main menu "Statistics" button. Statistics persist acr
 
 ### Blockchain Configuration
 
-Update `js/config.js` with your deployed contract addresses:
+Contract addresses live in `js/config.js`. The current deployment (Arc Testnet) uses:
 
 ```javascript
 BLOCKCHAIN: {
-    CONTRACT_ADDRESS: '0x...',      // Score verification contract
-    NFT_CONTRACT_ADDRESS: '0x...',  // NFT contract
-    NETWORK: 'ArcTestnet',          // Network name
-    API_URL: 'http://localhost:3000' // Backend server URL
+    CONTRACT_ADDRESS: '0x1E880c3165f5f2ee6B4d00598C9B5e1BfAC6ED0f',     // Score / leaderboard contract
+    NFT_CONTRACT_ADDRESS: '0x6695B1B9d03fB3E94fdC7599abeB97DDF3E9a764', // NFT (ERC-721) contract
+    NETWORK: 'ArcTestnet',                  // Arc Testnet (chain ID 5042002)
+    API_URL: 'https://arcmangame.com'       // Backend server URL (use http://localhost:3000 locally)
 }
 ```
 
@@ -435,12 +447,18 @@ NFT_IMAGES: {
 
 ### Environment Setup
 
-1. Create a `.env` file in the project root
-2. Add your server signer private key:
-   ```
-   PRIVATE_KEY=0x...
-   ```
-3. See `ENV_SETUP.md` for detailed instructions
+Create a `.env` file in the project root:
+
+```
+PRIVATE_KEY=0x...              # server signer key (must match the signer the contract expects)
+# Optional — enables Telegram notifications for community level submissions:
+TELEGRAM_BOT_TOKEN=...
+TELEGRAM_CHAT_ID=...
+# Optional — server port (default 3000):
+PORT=3000
+```
+
+`.env` is git-ignored and must never be committed. If `PRIVATE_KEY` is unset, the server generates a throwaway key on startup, so on-chain finalization will fail signature verification.
 
 ## Audio Files
 
@@ -448,7 +466,8 @@ The game supports the following audio files (all optional):
 
 **Music (looping):**
 - `audio/menu-music.mp3` - Plays in the main menu
-- `audio/gameplay-music.mp3` - Plays during gameplay
+- `audio/gameplay-music.mp3` (plus `gameplay-music-1.mp3`, `gameplay-music-2.mp3`, `gameplay-music-3.mp3` variants) - Plays during gameplay
+- `audio/editor-music.mp3` - Plays in the level editor
 
 **Sound Effects:**
 - `audio/launch.mp3` - Plays when coin is launched
@@ -549,25 +568,30 @@ The project uses a **modular namespace pattern** for maintainability:
 
 Scripts must load in dependency order (handled automatically in `index.html`):
 1. `levels.js` - Level data (no dependencies)
-2. `js/config.js` - Configuration (no dependencies)
-3. `js/canvas.js` - Canvas setup (depends on config)
-4. `js/audio.js` - Audio system (no dependencies)
-5. `js/state.js` - Game state (depends on config)
-6. `js/gameObjects.js` - Object management (depends on state, config)
-7. `js/physics.js` - Physics engine (depends on state, config, audio)
-8. `js/renderer.js` - Rendering (depends on state, config, canvas)
-9. `js/scoring.js` - Scoring (depends on state)
-10. `js/quizzes.js` - Quiz data (no dependencies)
-11. `js/quiz.js` - Quiz management (depends on state, config, quizzes)
-12. `js/ui.js` - UI updates (depends on state)
-13. `js/statistics.js` - Statistics management (depends on state)
-14. `js/web3.js` - Web3 integration (depends on config)
-15. `js/leaderboard.js` - Leaderboard (depends on web3)
-16. `js/nft.js` - NFT minting (depends on web3, config)
-17. `js/gameFlow.js` - Game flow (depends on all above)
-18. `js/levelEditor.js` - Level editor (depends on state, config)
-19. `js/input.js` - Input handling (depends on state, gameFlow)
-20. `js/main.js` - Main loop (depends on all modules)
+2. `communityLevels.js` - Community level data (depends on levels)
+3. `js/config.js` - Configuration (no dependencies)
+4. `js/canvas.js` - Canvas setup (depends on config)
+5. `js/audio.js` - Audio system (no dependencies)
+6. `js/state.js` - Game state (depends on config)
+7. `js/gameObjects.js` - Object management (depends on state, config)
+8. `js/physics.js` - Physics engine (depends on state, config, audio)
+9. `js/renderer.js` - Rendering (depends on state, config, canvas)
+10. `js/scoring.js` - Scoring (depends on state)
+11. `js/quizzes.js` - Quiz data (no dependencies)
+12. `js/quiz.js` - Quiz management (depends on state, config, quizzes)
+13. `js/infoScreens.js` - Info-screen data (no dependencies)
+14. `js/infoManager.js` - Info-screen management (depends on state, infoScreens)
+15. `js/ui.js` - UI updates (depends on state)
+16. `js/statistics.js` - Statistics management (depends on state)
+17. `js/web3.js` - Web3 integration (depends on config)
+18. `js/leaderboard.js` - Leaderboard (depends on web3)
+19. `js/nft.js` - NFT minting (depends on web3, config)
+20. `js/gameFlow.js` - Game flow (depends on all above)
+21. `js/levelEditor.js` - Level editor (depends on state, config)
+22. `js/input.js` - Input handling (depends on state, gameFlow)
+23. `js/main.js` - Main loop (depends on all modules)
+
+> `ethers` (v6) is loaded from a CDN `<script>` before the `js/` modules. The order above is wired up in `index.html`.
 
 ### Development Commands
 
