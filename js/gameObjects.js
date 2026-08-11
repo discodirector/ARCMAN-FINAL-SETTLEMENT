@@ -30,8 +30,11 @@ const GameObjects = {
 
         // Load player position (relative 0-1 coordinates)
         const sizeScale = GameConfig.PLAYER_SIZE_SCALE || 1.0;
-        GameState.player.width = Math.max(30 * sizeScale, GameConfig.CONFIG.width * 0.04 * sizeScale);
-        GameState.player.height = Math.max(45 * sizeScale, GameConfig.CONFIG.height * 0.08 * sizeScale);
+        // Strictly proportional to the play area. A pixel floor here would make the
+        // player oversized on small screens, shifting the launch point (it is offset
+        // by player width/height) far enough to put some settlement zones out of reach.
+        GameState.player.width = GameConfig.CONFIG.width * 0.04 * sizeScale;
+        GameState.player.height = GameConfig.CONFIG.height * 0.08 * sizeScale;
         GameState.player.x = GameConfig.CONFIG.width * (levelData.player?.x || 0.12);
         GameState.player.y = GameConfig.CONFIG.height * (levelData.player?.y || 0.75);
 
@@ -268,8 +271,11 @@ const GameObjects = {
         GameState.player.x = GameConfig.CONFIG.width * 0.12;
         GameState.player.y = GameConfig.CONFIG.height * 0.75;
         const sizeScale = GameConfig.PLAYER_SIZE_SCALE || 1.0;
-        GameState.player.width = Math.max(30 * sizeScale, GameConfig.CONFIG.width * 0.04 * sizeScale);
-        GameState.player.height = Math.max(45 * sizeScale, GameConfig.CONFIG.height * 0.08 * sizeScale);
+        // Strictly proportional to the play area. A pixel floor here would make the
+        // player oversized on small screens, shifting the launch point (it is offset
+        // by player width/height) far enough to put some settlement zones out of reach.
+        GameState.player.width = GameConfig.CONFIG.width * 0.04 * sizeScale;
+        GameState.player.height = GameConfig.CONFIG.height * 0.08 * sizeScale;
         
         GameState.arcGates = [
             { x: GameConfig.CONFIG.width * 0.35, y: GameConfig.CONFIG.height * 0.3, width: GameConfig.CONFIG.width * 0.05, height: GameConfig.CONFIG.height * 0.13, active: true }

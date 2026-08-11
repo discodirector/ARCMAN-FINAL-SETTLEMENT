@@ -36,13 +36,27 @@ const CanvasManager = {
             GameConfig.CONFIG.width = 800;
             GameConfig.CONFIG.height = 600;
         } else {
-            GameConfig.CONFIG.width = containerWidth;
-            GameConfig.CONFIG.height = containerHeight;
+            // Level geometry is relative to the play area, but shot speed and gravity
+            // scale with WIDTH only. On a playfield taller than the 800x600 design
+            // ratio the coin can no longer reach the top, which makes some levels
+            // physically unwinnable — so letterbox instead of stretching.
+            const designAspect = GameConfig.BASE_CONFIG.width / GameConfig.BASE_CONFIG.height;
+            let playWidth = containerWidth;
+            let playHeight = containerHeight;
+            if (playWidth / playHeight < designAspect) {
+                playHeight = playWidth / designAspect;
+            }
+            GameConfig.CONFIG.width = playWidth;
+            GameConfig.CONFIG.height = playHeight;
         }
-        
-        // Set canvas CSS size to match container
+
+        // Set canvas CSS size to match the play area, centred inside the container
         this.canvas.style.width = GameConfig.CONFIG.width + 'px';
         this.canvas.style.height = GameConfig.CONFIG.height + 'px';
+        this.canvas.style.position = 'absolute';
+        this.canvas.style.left = '50%';
+        this.canvas.style.top = '50%';
+        this.canvas.style.transform = 'translate(-50%, -50%)';
         
         // Set canvas internal resolution to match viewport (for crisp rendering on high-DPI displays)
         const dpr = window.devicePixelRatio || 1;

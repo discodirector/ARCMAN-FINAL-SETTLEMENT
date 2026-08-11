@@ -1564,9 +1564,10 @@
         /* Landscape orientation preference for game canvas */
         @media screen and (orientation: portrait) and (max-width: 768px) {
             #gameContainer::before {
-                content: 'Rotate your device to landscape for better experience';
+                content: 'Rotate your device to landscape for a bigger playfield';
                 position: absolute;
-                top: 50%;
+                /* Sits in the letterbox band above the play area, not on top of it */
+                top: 12%;
                 left: 50%;
                 transform: translate(-50%, -50%);
                 color: #0ff;
