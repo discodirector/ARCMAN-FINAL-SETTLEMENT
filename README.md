@@ -105,7 +105,8 @@ ARCMAN: Final Settlement is a browser-based arcade game in a retro pixel-art sty
   - Each quiz contains 1 question with 3 answer options
   - Answer correctly to gain +1 life (up to maximum of 5)
   - Skip quizzes if you have full lives or don't need them
-  - Topics cover stablecoins, USDC, ARC blockchain, and Circle
+  - Topics cover Arc's architecture, USDC as gas, the ARC token, and the agentic economy
+  - Each quiz checks the info screen shown one level earlier
   - Questions and answers are easily editable in `js/quizzes.js`
 - **Educational Info Screens**:
   - Short Arc / USDC / Circle explainer screens appear after levels 1, 3, 5, 7, and 9
@@ -222,7 +223,7 @@ npm start
    - After completing levels 2, 4, 6, 8, or 10, a quiz appears
    - Answer the question correctly to gain +1 life
    - Skip the quiz if you have full lives or prefer to continue
-   - Quizzes cover topics about stablecoins, USDC, ARC blockchain, and Circle
+   - Quizzes cover Arc's architecture, USDC as gas, the ARC token, and the agentic economy
 9. **Game Completion**: After completing all levels, view your final score, completion time, and statistics
 10. **On-Chain Finalization**: Click "Finalize On-Chain" to submit your score to the blockchain (requires wallet connection)
 11. **NFT Minting**: Click "Mint NFT" to mint a completion certificate NFT (one per game mode: Immortal and Tournament)
@@ -536,13 +537,13 @@ Edit quiz questions and answers in `js/quizzes.js`. The file contains an array o
 const QUIZZES = [
     {
         id: 1, // For level 2
-        question: "What is a stablecoin?",
+        question: "What is Arc?",
         answers: [
-            "A cryptocurrency with a fixed value, pegged to a stable asset (such as the US dollar)",
-            "A cryptocurrency with high volatility, used for speculation",
-            "A token that automatically increases in price every day"
+            "A Layer-2 rollup that settles on Ethereum",
+            "An EVM-compatible Layer-1 built by Circle for stablecoin finance",
+            "A closed payment API with no blockchain behind it"
         ],
-        correctIndex: 0 // Index of the correct answer (0, 1, or 2)
+        correctIndex: 1 // Index of the correct answer (0, 1, or 2)
     },
     // ... more quizzes
 ];

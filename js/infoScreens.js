@@ -1,26 +1,28 @@
 // Educational Info Screens Data
 // Info screens appear after levels 1, 3, 5, 7, 9 in Tournament mode
+// Each screen sets up the quiz that follows it (screen 1 -> quiz after level 2, etc.)
+// Content verified against Arc / Circle public materials as of July 2026
 
 const INFO_SCREENS = [
     {
         id: 1, // After level 1
-        text: "Arc is a Layer-1 blockchain designed as infrastructure for onchain economic activity. It focuses on payments, settlement, and financial applications rather than niche use cases."
+        text: "Arc is an open Layer-1 blockchain from Circle, the company that issues USDC. It is EVM-compatible and purpose-built for stablecoin finance. Today Arc runs as a public testnet — the same network this game is played on."
     },
     {
         id: 2, // After level 3
-        text: "On Arc, transaction fees are paid using a stablecoin instead of a volatile token. USDC is used as gas, making costs immediately understandable in dollars."
+        text: "On Arc, gas is paid in USDC instead of a volatile token. Fees are quoted directly in dollars and average around $0.005 per transaction, so anyone can budget them like a normal cost."
     },
     {
         id: 3, // After level 5
-        text: "Using a stablecoin as gas removes exposure to market volatility. As a result, transaction fees remain stable and predictable."
+        text: "Arc pairs Malachite — a Rust implementation of Tendermint BFT — with a Reth execution layer. On the public testnet blocks land roughly every 0.5 seconds, and finality is deterministic and sub-second: no reorgs, no waiting for confirmations."
     },
     {
         id: 4, // After level 7
-        text: "Arc is developed within the ecosystem of Circle. The same company issues USDC and builds infrastructure for digital finance."
+        text: "ARC is the network's native token, but it is not the gas token. Protocol fees paid in stablecoins are converted into ARC automatically, then split between staking rewards and a permanent burn. ARC has not launched yet."
     },
     {
         id: 5, // After level 9
-        text: "Arc was designed for real financial use cases such as payments, clearing, FX, and asset tokenization. This focus positions it as a foundational layer for the stablecoin economy."
+        text: "Arc's biggest bet is the agentic economy — AI agents paying for compute, data and services on their own. That needs payments smaller than a cent, settled in USDC over open standards like x402."
     }
 ];
 
