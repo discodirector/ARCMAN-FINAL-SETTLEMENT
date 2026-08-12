@@ -474,6 +474,141 @@
             box-shadow: 0 0 25px #0ff;
         }
 
+
+        /* ---- Agent Shift mode ---- */
+        body.agent-mode #score,
+        body.agent-mode #levelCounter { display: none !important; }
+
+        #agentHud {
+            position: absolute; top: 8px; left: 50%; transform: translateX(-50%);
+            display: none; gap: clamp(8px, 2vw, 18px); z-index: 120;
+            background: rgba(0, 0, 0, .72); border: 1px solid #f80; border-radius: 6px;
+            padding: 6px clamp(8px, 2vw, 16px); font-family: 'Courier New', monospace;
+            font-size: clamp(10px, 2vw, 13px); white-space: nowrap;
+        }
+        body.agent-mode #agentHud { display: flex; }
+        #agentHud b { color: #fff; font-weight: bold; }
+        #agentHud i { color: #f80; font-style: normal; }
+
+        #agentBanner {
+            position: absolute; top: 46px; left: 50%; transform: translateX(-50%);
+            color: #ff0; font-family: 'Courier New', monospace; font-size: clamp(11px, 2.2vw, 14px);
+            text-shadow: 0 0 10px #ff0; opacity: 0; transition: opacity .3s; z-index: 120;
+            display: none; text-align: center; max-width: 90%;
+        }
+        body.agent-mode #agentBanner { display: block; }
+
+        #agentLog {
+            position: absolute; left: 8px; bottom: 8px; width: clamp(220px, 34vw, 360px);
+            max-height: 34%; overflow: hidden; display: none; z-index: 120;
+            font-family: 'Courier New', monospace; font-size: clamp(9px, 1.6vw, 12px);
+            line-height: 1.4; background: rgba(0, 0, 0, .6); border-left: 2px solid #f80;
+            padding: 6px 8px; border-radius: 0 4px 4px 0;
+        }
+        body.agent-mode #agentLog { display: block; }
+        #agentLog p { margin: 0 0 1px; color: #8cc; }
+        .agent-t-task { color: #7ff !important; }
+        .agent-t-pay { color: #0f0 !important; }
+        .agent-t-done { color: #0f8 !important; }
+        .agent-t-blocked { color: #f44 !important; font-weight: bold; }
+        .agent-t-expired { color: #f80 !important; }
+        .agent-t-human { color: #ff0 !important; }
+        .agent-t-miss { color: #f66 !important; }
+        .agent-t-search { color: #a8a !important; }
+        .agent-t-end { color: #f0f !important; font-weight: bold; }
+
+        .agent-overlay {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0, 0, 0, .93); display: none; align-items: center;
+            justify-content: center; z-index: 260; padding: 16px; overflow-y: auto;
+        }
+        .agent-panel {
+            background: #000; border: 3px solid #0ff; box-shadow: 0 0 30px #0ff;
+            border-radius: 8px; padding: clamp(16px, 4vw, 28px); max-width: 560px; margin: auto;
+            font-family: 'Courier New', monospace;
+        }
+        .agent-panel h2 { color: #0ff; margin: 0 0 14px; font-size: clamp(15px, 3.4vw, 19px); text-shadow: 0 0 14px #0ff; }
+        .agent-panel .agent-body { color: #dff; font-size: clamp(12px, 2.6vw, 15px); line-height: 1.6; margin-bottom: 18px; }
+        .agent-panel b { color: #ff0; }
+        .agent-panel button {
+            background: rgba(0, 255, 255, .15); color: #0ff; border: 2px solid #0ff;
+            padding: 10px 18px; font: bold clamp(12px, 2.4vw, 14px) 'Courier New', monospace;
+            cursor: pointer; border-radius: 4px;
+        }
+        .agent-panel button:hover { background: rgba(0, 255, 255, .3); }
+        #agentPolicy { margin-bottom: 18px; }
+        #agentPolicy label { display: block; margin: 10px 0 3px; color: #7ff; font-size: clamp(11px, 2.2vw, 13px); }
+        #agentPolicy input[type=range] { width: 100%; accent-color: #f80; }
+        #agentPolicy .agent-val { color: #ff0; font-weight: bold; }
+        #agentDots { margin-top: 14px; color: #055; letter-spacing: 4px; text-align: center; }
+
+        /* ---- simulated Agent Wallet ---- */
+        #agentWallet {
+            position: absolute; right: 10px; top: 52px; width: clamp(228px, 25vw, 296px);
+            display: none; z-index: 280; font-family: 'Courier New', monospace;
+            background: linear-gradient(180deg, #05141d 0%, #000 70%);
+            border: 2px solid #0ff; border-radius: 12px; overflow: hidden;
+            box-shadow: 0 0 26px rgba(0, 255, 255, .3);
+        }
+        #agentWallet.aw-asking { border-color: #ff0; box-shadow: 0 0 34px rgba(255, 255, 0, .45); }
+        .aw-head {
+            display: flex; justify-content: space-between; align-items: center; gap: 6px;
+            padding: 7px 10px; border-bottom: 1px solid #044; background: rgba(0, 255, 255, .07);
+        }
+        .aw-brand { color: #0ff; font-size: 11px; font-weight: bold; letter-spacing: .5px; }
+        .aw-sim {
+            color: #000; background: #f80; border-radius: 3px; padding: 1px 5px;
+            font-size: 8px; font-weight: bold; letter-spacing: 1px;
+        }
+        .aw-bal { padding: 9px 10px 8px; }
+        #awBalance { color: #fff; font-size: 21px; font-weight: bold; }
+        .aw-cur { color: #7ff; font-size: 11px; }
+        .aw-meta { display: flex; justify-content: space-between; margin-top: 3px; font-size: 9px; color: #588; }
+        #awReq { display: none; border-top: 1px solid #440; background: rgba(255, 255, 0, .05); padding: 9px 10px 11px; }
+        #awTitle { color: #ff0; font-size: 12px; font-weight: bold; margin-bottom: 3px; }
+        #awSub { color: #8aa; font-size: 9px; margin-bottom: 8px; line-height: 1.4; }
+        .aw-tag { color: #000; background: #7ff; border-radius: 2px; padding: 0 3px; font-size: 8px; }
+        .aw-row {
+            display: flex; justify-content: space-between; gap: 8px; font-size: 10px;
+            padding: 3px 0; border-bottom: 1px dotted #133;
+        }
+        .aw-row span { color: #7aa; }
+        .aw-row b { color: #ff0; text-align: right; }
+        #awOtpWrap { display: none; text-align: center; margin: 9px 0 4px; }
+        #awCode { color: #ff0; font-size: 19px; letter-spacing: 6px; text-shadow: 0 0 12px #ff0; }
+        #awOtpInput {
+            margin-top: 6px; width: 120px; text-align: center; letter-spacing: 4px; padding: 4px;
+            font: 14px 'Courier New', monospace; background: #000; color: #0ff; border: 2px solid #0ff;
+        }
+        #awAutoWrap { display: none; margin: 9px 0 2px; color: #8cc; font-size: 9px; line-height: 1.3; cursor: pointer; }
+        #awAutoWrap input { accent-color: #f80; vertical-align: middle; margin-right: 4px; }
+        .aw-btns { display: flex; gap: 6px; margin-top: 10px; }
+        .aw-btns button {
+            flex: 1; padding: 7px 4px; border-radius: 5px; cursor: pointer;
+            font: bold 10px 'Courier New', monospace; background: rgba(255, 255, 255, .06);
+            color: #9bb; border: 1px solid #566;
+        }
+        .aw-btns button#awApprove { background: rgba(0, 255, 136, .16); color: #0f8; border-color: #0f8; }
+        .aw-btns button:hover { background: rgba(255, 255, 255, .16); }
+        .aw-btns button#awApprove:hover { background: rgba(0, 255, 136, .3); }
+        #awWarn { color: #f80; font-size: 8.5px; line-height: 1.45; margin-top: 9px; }
+        #awActs { padding: 4px 10px 9px; max-height: 132px; overflow: hidden; }
+        .aw-act { display: flex; align-items: baseline; gap: 5px; font-size: 9px; padding: 2px 0; }
+        .aw-act span { color: #8aa; flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+        .aw-act b.aw-out { color: #f80; }
+        .aw-act b.aw-in { color: #0f8; }
+        .aw-act i { color: #366; font-style: normal; font-size: 8px; }
+
+        @media (max-width: 760px), (max-height: 520px) {
+            #agentWallet { right: 6px; top: 40px; width: 168px; }
+            #awBalance { font-size: 16px; }
+            #awActs { display: none; }
+            #agentWallet.aw-asking {
+                left: 0; right: 0; top: auto; bottom: 0; width: auto;
+                border-radius: 12px 12px 0 0; max-height: 78%; overflow-y: auto;
+            }
+        }
+
         /* Info Screen */
         #infoScreen {
             position: absolute;
@@ -2217,6 +2352,8 @@
         }
         .menu-button.tournament { color: #f0f; border-color: #f0f; border-left-color: #f0f; text-shadow: 0 0 5px #f0f; }
         .menu-button.tournament:hover { background: rgba(255, 0, 255, 0.1); box-shadow: 0 0 15px rgba(255, 0, 255, 0.6), inset 0 0 10px rgba(255, 0, 255, 0.1); }
+        .menu-button.agent { color: #f80; border-color: #f80; border-left-color: #f80; text-shadow: 0 0 5px #f80; }
+        .menu-button.agent:hover { background: rgba(255, 136, 0, 0.1); box-shadow: 0 0 15px rgba(255, 136, 0, 0.6), inset 0 0 10px rgba(255, 136, 0, 0.1); }
         .menu-button.community { color: #0ff; border-color: #0ff; border-left-color: #0ff; text-shadow: 0 0 5px #0ff; }
         .menu-button.community:hover { background: rgba(0, 255, 255, 0.1); box-shadow: 0 0 15px rgba(0, 255, 255, 0.6), inset 0 0 10px rgba(0, 255, 255, 0.1); }
         .menu-button.editor { color: #ff0; border-color: #ff0; border-left-color: #ff0; text-shadow: 0 0 5px #ff0; }
@@ -2317,6 +2454,7 @@
             border-width: 2px;
         }
         .menu-button.tournament { border-color: #f0f; color: #f0f; }
+        .menu-button.agent { border-color: #f80; color: #f80; }
         .menu-button.community { border-color: #0ff; color: #0ff; }
         .menu-button.editor { border-color: #ff0; color: #ff0; }
         .menu-button.audio { border-color: #0a0; color: #0a0; }
@@ -2361,6 +2499,8 @@
         }
         .menu-button.tournament { border-color: #f0f; color: #f0f; box-shadow: 0 0 0 2px #000, 0 0 0 4px #f0f, 0 0 10px #f0f; text-shadow: 2px 2px 0px #000, 0 0 5px #f0f; }
         .menu-button.tournament:hover { background: #f0f; color: #000; box-shadow: 0 0 0 2px #000, 0 0 0 4px #f0f, 0 0 20px #f0f, inset 0 0 10px rgba(0, 0, 0, 0.3); }
+        .menu-button.agent { border-color: #f80; color: #f80; box-shadow: 0 0 0 2px #000, 0 0 0 4px #f80, 0 0 10px #f80; text-shadow: 2px 2px 0px #000, 0 0 5px #f80; }
+        .menu-button.agent:hover { background: #f80; color: #000; box-shadow: 0 0 0 2px #000, 0 0 0 4px #f80, 0 0 20px #f80, inset 0 0 10px rgba(0, 0, 0, 0.3); }
         .menu-button.community { border-color: #0ff; color: #0ff; box-shadow: 0 0 0 2px #000, 0 0 0 4px #0ff, 0 0 10px #0ff; text-shadow: 2px 2px 0px #000, 0 0 5px #0ff; }
         .menu-button.community:hover { background: #0ff; color: #000; box-shadow: 0 0 0 2px #000, 0 0 0 4px #0ff, 0 0 20px #0ff, inset 0 0 10px rgba(0, 0, 0, 0.3); }
         .menu-button.editor { border-color: #ff0; color: #ff0; box-shadow: 0 0 0 2px #000, 0 0 0 4px #ff0, 0 0 10px #ff0; text-shadow: 2px 2px 0px #000, 0 0 5px #ff0; }
@@ -3006,6 +3146,64 @@
             </div>
         </div>
 
+        <!-- Agent Shift mode -->
+        <div id="agentHud">
+            <span><i>left</i> <b id="agentClock">60s</b></span>
+            <span><i>earned</i> <b id="agentEarned">$0.00</b></span>
+            <span><i>spent</i> <b id="agentSpent">$0.00</b></span>
+            <span><i>gas</i> <b id="agentGas">$0.000</b></span>
+            <span><i>margin</i> <b id="agentMargin">—</b></span>
+            <span><i>done</i> <b id="agentDone">0</b></span>
+            <span><i>queue</i> <b id="agentQueue">0</b></span>
+        </div>
+        <div id="agentBanner"></div>
+        <div id="agentLog"></div>
+
+        <div id="agentCard" class="agent-overlay">
+            <div class="agent-panel">
+                <h2 id="agentCardTitle"></h2>
+                <div class="agent-body" id="agentCardBody"></div>
+                <div id="agentPolicy" style="display:none">
+                    <label>Per-transaction limit <span class="agent-val" id="agentPerTxVal">$1.00</span></label>
+                    <input type="range" id="agentPerTx" min="0.02" max="6" step="0.01" value="1">
+                    <label>Shift budget <span class="agent-val" id="agentBudgetVal">$5.00</span></label>
+                    <input type="range" id="agentBudget" min="1" max="20" step="0.5" value="5">
+                    <label>Price criterion <span class="agent-val" id="agentMaxPriceVal">$0.35</span></label>
+                    <input type="range" id="agentMaxPrice" min="0.02" max="6" step="0.01" value="0.35">
+                </div>
+                <button id="agentCardBtn">Continue</button>
+                <div id="agentDots"></div>
+            </div>
+        </div>
+
+        <!-- Simulated agent wallet: no keys, no network, no funds. -->
+        <div id="agentWallet">
+            <div class="aw-head">
+                <span class="aw-brand">&#9678; Arc Agent Wallet</span>
+                <span class="aw-sim">SIMULATOR</span>
+            </div>
+            <div class="aw-bal">
+                <span id="awBalance">——.———</span> <span class="aw-cur">USDC</span>
+                <div class="aw-meta"><span id="awAddress">not connected</span><span id="awNet"></span></div>
+            </div>
+            <div id="awReq">
+                <div id="awTitle"></div>
+                <div id="awSub"></div>
+                <div id="awRows"></div>
+                <div id="awOtpWrap">
+                    <div id="awCode">000000</div>
+                    <input id="awOtpInput" maxlength="6" placeholder="------">
+                </div>
+                <label id="awAutoWrap"><input type="checkbox" id="awAuto" checked><span id="awAutoLabel"></span></label>
+                <div class="aw-btns">
+                    <button id="awReject">Reject</button>
+                    <button id="awApprove">Approve</button>
+                </div>
+                <div id="awWarn"></div>
+            </div>
+            <div id="awActs"></div>
+        </div>
+
         <!-- Info Screen -->
         <div id="infoScreen" style="display: none;">
             <div class="info-content">
@@ -3431,6 +3629,9 @@
             <button class="menu-button tournament" id="menuTournament">
                 <span>TOURNAMENT MODE</span>
             </button>
+            <button class="menu-button agent" id="menuAgent">
+                <span>AGENT SHIFT</span>
+            </button>
             <button class="menu-button community" id="menuCommunity">
                 <span>COMMUNITY LEVELS</span>
             </button>
@@ -3586,6 +3787,11 @@
     <script src="js/leaderboard.js"></script>
     <script src="js/nft.js"></script>
     <script src="js/gameFlow.js"></script>
+    <script src="js/agent.js"></script>
+    <script src="js/agentShift.js"></script>
+    <script src="js/agentWallet.js"></script>
+    <script src="js/agentOnboarding.js"></script>
+    <script src="js/agentMode.js"></script>
     <script src="js/levelEditor.js"></script>
     <script src="js/input.js"></script>
     <script src="js/main.js"></script>
