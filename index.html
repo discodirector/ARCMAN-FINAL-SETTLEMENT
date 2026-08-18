@@ -499,14 +499,14 @@
         body.agent-mode #agentBanner { display: block; }
 
         #agentLog {
-            position: absolute; left: 8px; bottom: 8px; width: clamp(220px, 34vw, 360px);
-            max-height: 34%; overflow: hidden; display: none; z-index: 120;
-            font-family: 'Courier New', monospace; font-size: clamp(9px, 1.6vw, 12px);
-            line-height: 1.4; background: rgba(0, 0, 0, .6); border-left: 2px solid #f80;
-            padding: 6px 8px; border-radius: 0 4px 4px 0;
+            position: absolute; left: 8px; bottom: 8px; width: clamp(280px, 38vw, 430px);
+            max-height: 38%; overflow: hidden; display: none; z-index: 120;
+            font-family: 'Courier New', monospace; font-size: clamp(12px, 2.1vw, 15px);
+            line-height: 1.45; background: rgba(0, 0, 0, .6); border-left: 2px solid #f80;
+            padding: 8px 10px; border-radius: 0 4px 4px 0;
         }
         body.agent-mode #agentLog { display: block; }
-        #agentLog p { margin: 0 0 1px; color: #8cc; }
+        #agentLog p { margin: 0 0 2px; color: #8cc; }
         .agent-t-task { color: #7ff !important; }
         .agent-t-pay { color: #0f0 !important; }
         .agent-t-done { color: #0f8 !important; }
@@ -544,69 +544,80 @@
 
         /* ---- simulated Agent Wallet ---- */
         #agentWallet {
-            position: absolute; right: 10px; top: 52px; width: clamp(228px, 25vw, 296px);
+            position: absolute; right: 10px; top: 52px; width: clamp(290px, 31vw, 386px);
+            max-height: calc(100% - 64px); overflow-y: auto;
             display: none; z-index: 280; font-family: 'Courier New', monospace;
             background: linear-gradient(180deg, #05141d 0%, #000 70%);
-            border: 2px solid #0ff; border-radius: 12px; overflow: hidden;
+            border: 2px solid #0ff; border-radius: 12px;
             box-shadow: 0 0 26px rgba(0, 255, 255, .3);
         }
         #agentWallet.aw-asking { border-color: #ff0; box-shadow: 0 0 34px rgba(255, 255, 0, .45); }
         .aw-head {
-            display: flex; justify-content: space-between; align-items: center; gap: 6px;
-            padding: 7px 10px; border-bottom: 1px solid #044; background: rgba(0, 255, 255, .07);
+            display: flex; justify-content: space-between; align-items: center; gap: 8px;
+            padding: 9px 12px; border-bottom: 1px solid #044; background: rgba(0, 255, 255, .07);
         }
-        .aw-brand { color: #0ff; font-size: 11px; font-weight: bold; letter-spacing: .5px; }
+        .aw-brand { color: #0ff; font-size: 14px; font-weight: bold; letter-spacing: .5px; }
         .aw-sim {
-            color: #000; background: #f80; border-radius: 3px; padding: 1px 5px;
-            font-size: 8px; font-weight: bold; letter-spacing: 1px;
+            color: #000; background: #f80; border-radius: 3px; padding: 2px 6px;
+            font-size: 10px; font-weight: bold; letter-spacing: 1px;
         }
-        .aw-bal { padding: 9px 10px 8px; }
-        #awBalance { color: #fff; font-size: 21px; font-weight: bold; }
-        .aw-cur { color: #7ff; font-size: 11px; }
-        .aw-meta { display: flex; justify-content: space-between; margin-top: 3px; font-size: 9px; color: #588; }
-        #awReq { display: none; border-top: 1px solid #440; background: rgba(255, 255, 0, .05); padding: 9px 10px 11px; }
-        #awTitle { color: #ff0; font-size: 12px; font-weight: bold; margin-bottom: 3px; }
-        #awSub { color: #8aa; font-size: 9px; margin-bottom: 8px; line-height: 1.4; }
-        .aw-tag { color: #000; background: #7ff; border-radius: 2px; padding: 0 3px; font-size: 8px; }
+        .aw-bal { padding: 11px 12px 10px; }
+        #awBalance { color: #fff; font-size: 27px; font-weight: bold; }
+        .aw-cur { color: #7ff; font-size: 14px; }
+        .aw-meta { display: flex; justify-content: space-between; gap: 8px; margin-top: 5px; font-size: 12px; color: #588; }
+        #awReq { display: none; border-top: 1px solid #440; background: rgba(255, 255, 0, .05); padding: 11px 12px 13px; }
+        #awTitle { color: #ff0; font-size: 16px; font-weight: bold; margin-bottom: 4px; }
+        #awSub { color: #8aa; font-size: 12px; margin-bottom: 10px; line-height: 1.4; }
+        .aw-tag { color: #000; background: #7ff; border-radius: 2px; padding: 0 4px; font-size: 11px; }
         .aw-row {
-            display: flex; justify-content: space-between; gap: 8px; font-size: 10px;
-            padding: 3px 0; border-bottom: 1px dotted #133;
+            display: flex; justify-content: space-between; gap: 10px; font-size: 13px;
+            padding: 4px 0; border-bottom: 1px dotted #133;
         }
         .aw-row span { color: #7aa; }
         .aw-row b { color: #ff0; text-align: right; }
-        #awOtpWrap { display: none; text-align: center; margin: 9px 0 4px; }
-        #awCode { color: #ff0; font-size: 19px; letter-spacing: 6px; text-shadow: 0 0 12px #ff0; }
+        #awOtpWrap { display: none; text-align: center; margin: 11px 0 4px; }
+        #awCode { color: #ff0; font-size: 25px; letter-spacing: 8px; text-shadow: 0 0 12px #ff0; }
         #awOtpInput {
-            margin-top: 6px; width: 120px; text-align: center; letter-spacing: 4px; padding: 4px;
-            font: 14px 'Courier New', monospace; background: #000; color: #0ff; border: 2px solid #0ff;
+            margin-top: 8px; width: 155px; text-align: center; letter-spacing: 5px; padding: 6px;
+            font: 18px 'Courier New', monospace; background: #000; color: #0ff; border: 2px solid #0ff;
         }
-        #awAutoWrap { display: none; margin: 9px 0 2px; color: #8cc; font-size: 9px; line-height: 1.3; cursor: pointer; }
-        #awAutoWrap input { accent-color: #f80; vertical-align: middle; margin-right: 4px; }
-        .aw-btns { display: flex; gap: 6px; margin-top: 10px; }
+        #awAutoWrap { display: none; margin: 11px 0 2px; color: #8cc; font-size: 12px; line-height: 1.35; cursor: pointer; }
+        #awAutoWrap input { accent-color: #f80; vertical-align: middle; margin-right: 5px; }
+        .aw-btns { display: flex; gap: 8px; margin-top: 12px; }
         .aw-btns button {
-            flex: 1; padding: 7px 4px; border-radius: 5px; cursor: pointer;
-            font: bold 10px 'Courier New', monospace; background: rgba(255, 255, 255, .06);
+            flex: 1; padding: 9px 5px; border-radius: 5px; cursor: pointer;
+            font: bold 13px 'Courier New', monospace; background: rgba(255, 255, 255, .06);
             color: #9bb; border: 1px solid #566;
         }
         .aw-btns button#awApprove { background: rgba(0, 255, 136, .16); color: #0f8; border-color: #0f8; }
         .aw-btns button:hover { background: rgba(255, 255, 255, .16); }
         .aw-btns button#awApprove:hover { background: rgba(0, 255, 136, .3); }
-        #awWarn { color: #f80; font-size: 8.5px; line-height: 1.45; margin-top: 9px; }
-        #awActs { padding: 4px 10px 9px; max-height: 132px; overflow: hidden; }
-        .aw-act { display: flex; align-items: baseline; gap: 5px; font-size: 9px; padding: 2px 0; }
+        #awWarn { color: #f80; font-size: 11px; line-height: 1.5; margin-top: 11px; }
+        #awActs { padding: 6px 12px 11px; max-height: 168px; overflow: hidden; }
+        .aw-act { display: flex; align-items: baseline; gap: 7px; font-size: 12px; padding: 3px 0; }
         .aw-act span { color: #8aa; flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
         .aw-act b.aw-out { color: #f80; }
         .aw-act b.aw-in { color: #0f8; }
-        .aw-act i { color: #366; font-style: normal; font-size: 8px; }
+        .aw-act i { color: #366; font-style: normal; font-size: 11px; }
 
-        @media (max-width: 760px), (max-height: 520px) {
-            #agentWallet { right: 6px; top: 40px; width: 168px; }
-            #awBalance { font-size: 16px; }
+        /* Narrow or short: the panel shrinks to a balance chip and the request
+           takes over the bottom of the screen, where the text can stay big. */
+        @media (max-width: 860px), (max-height: 560px) {
+            /* Bigger type on a small screen means fewer lines, not a taller
+               box — the log must stay clear of the letterboxed playfield. */
+            #agentLog { max-height: 27%; width: min(64vw, 300px); }
+            #agentWallet { right: 6px; top: 40px; width: 200px; }
+            .aw-brand { font-size: 12px; }
+            #awBalance { font-size: 20px; }
+            .aw-cur { font-size: 12px; }
+            .aw-meta { font-size: 10px; }
             #awActs { display: none; }
             #agentWallet.aw-asking {
                 left: 0; right: 0; top: auto; bottom: 0; width: auto;
-                border-radius: 12px 12px 0 0; max-height: 78%; overflow-y: auto;
+                border-radius: 12px 12px 0 0; max-height: 82%; overflow-y: auto;
             }
+            #agentWallet.aw-asking .aw-brand { font-size: 14px; }
+            #agentWallet.aw-asking #awBalance { font-size: 24px; }
         }
 
         /* Info Screen */
