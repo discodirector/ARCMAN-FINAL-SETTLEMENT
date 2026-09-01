@@ -3,17 +3,13 @@ const InfoManager = {
     currentInfo: null,
 
     shouldShowInfo: function(levelId) {
-        const infoLevels = [1, 3, 5, 7, 9];
-        return (GameState.tournamentMode || GameState.immortalMode) && infoLevels.includes(levelId);
+        return GameState.tournamentMode && this.getInfoForLevel(levelId) !== null;
     },
 
+    // One screen per level — the screen's id is the level it follows
     getInfoForLevel: function(levelId) {
-        const levelToInfoIndex = { 1: 0, 3: 1, 5: 2, 7: 3, 9: 4 };
-        const idx = levelToInfoIndex[levelId];
-        if (idx !== undefined && INFO_SCREENS && INFO_SCREENS[idx]) {
-            return INFO_SCREENS[idx];
-        }
-        return null;
+        if (typeof INFO_SCREENS === 'undefined') return null;
+        return INFO_SCREENS.find(screen => screen.id === levelId) || null;
     },
 
     showInfo: function(infoData) {
@@ -48,6 +44,18 @@ const InfoManager = {
         if (screen) screen.style.display = 'none';
 
         this.currentInfo = null;
+
+        // The quiz on this level checks the screen just read, so it comes next
+        const currentLevel = GameState.levelManager && GameState.levelManager.getCurrentLevel();
+        if (currentLevel && typeof QuizManager !== 'undefined' && QuizManager.shouldShowQuiz(currentLevel.id)) {
+            const quizData = QuizManager.getQuizForLevel(currentLevel.id);
+            if (quizData) {
+                setTimeout(() => {
+                    QuizManager.showQuiz(quizData);
+                }, 300);
+                return;
+            }
+        }
 
         setTimeout(() => {
             if (typeof GameFlow !== 'undefined' && GameFlow.advanceToNextLevel) {

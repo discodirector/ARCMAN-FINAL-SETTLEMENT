@@ -5,28 +5,13 @@ const QuizManager = {
     
     // Check if quiz should be shown for this level
     shouldShowQuiz: function(levelId) {
-        // Quizzes appear after levels 2, 4, 6, 8, 10
-        // levelId is 1-indexed, so we check for levels 2, 4, 6, 8, 10
-        const quizLevels = [2, 4, 6, 8, 10];
-        return GameState.tournamentMode && quizLevels.includes(levelId);
+        return GameState.tournamentMode && this.getQuizForLevel(levelId) !== null;
     },
     
-    // Get quiz data for a specific level
+    // Get quiz data for a specific level — the quiz's id is the level it follows
     getQuizForLevel: function(levelId) {
-        // Map level ID to quiz index (level 2 -> quiz 0, level 4 -> quiz 1, etc.)
-        const levelToQuizIndex = {
-            2: 0,
-            4: 1,
-            6: 2,
-            8: 3,
-            10: 4
-        };
-        
-        const quizIndex = levelToQuizIndex[levelId];
-        if (quizIndex !== undefined && QUIZZES && QUIZZES[quizIndex]) {
-            return QUIZZES[quizIndex];
-        }
-        return null;
+        if (typeof QUIZZES === 'undefined') return null;
+        return QUIZZES.find(quiz => quiz.id === levelId) || null;
     },
     
     // Show quiz screen
@@ -168,7 +153,9 @@ const QuizManager = {
         if (resultMessage) {
             resultMessage.style.display = 'block';
             if (isCorrect) {
-                resultMessage.textContent = 'Correct! +1 Life';
+                // With a quiz after every level, full lives are common — don't promise a life we can't give
+                const gainedLife = GameState.tournamentLives < GameConfig.MAX_TOURNAMENT_LIVES;
+                resultMessage.textContent = gainedLife ? 'Correct! +1 Life' : 'Correct!';
                 resultMessage.className = 'quiz-result correct-result';
                 this.awardLife();
             } else {

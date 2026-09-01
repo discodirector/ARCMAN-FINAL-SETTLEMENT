@@ -69,7 +69,7 @@ const Scoring = {
                 if (GameState.levelManager) {
                     const currentLevel = GameState.levelManager.getCurrentLevel();
                     
-                    // Check for info screen (levels 1, 3, 5, 7, 9)
+                    // Every level has an info screen; it hands off to that level's quiz
                     if (currentLevel && typeof InfoManager !== 'undefined' && InfoManager.shouldShowInfo(currentLevel.id)) {
                         const infoData = InfoManager.getInfoForLevel(currentLevel.id);
                         if (infoData) {
@@ -80,7 +80,7 @@ const Scoring = {
                         }
                     }
                     
-                    // Check for quiz (levels 2, 4, 6, 8, 10 — Tournament mode only)
+                    // Fallback: a level with a quiz but no info screen
                     if (GameState.tournamentMode && currentLevel && typeof QuizManager !== 'undefined' && QuizManager.shouldShowQuiz(currentLevel.id)) {
                         const quizData = QuizManager.getQuizForLevel(currentLevel.id);
                         if (quizData) {

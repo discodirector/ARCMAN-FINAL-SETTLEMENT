@@ -15,7 +15,7 @@ ARCMAN: Final Settlement is a browser-based arcade game in a retro pixel-art sty
 * Calculates and validates scoring with multipliers, bonuses, and penalties.
 * Tracks comprehensive player statistics (games played, best scores, completion times, achievements).
 * Signs results on the server and submits them to a smart contract for on-chain finalization.
-* Maintains separate leaderboards for each game mode (Immortal and Tournament).
+* Maintains an on-chain Tournament leaderboard.
 * Mints ERC-721 NFT completion certificates (one per game mode).
 
 ### Which files are involved
@@ -43,7 +43,7 @@ ARCMAN: Final Settlement is a browser-based arcade game in a retro pixel-art sty
   * `quizzes.js` — quiz questions and answers data
   * `quiz.js` — quiz system management for Tournament mode
   * `infoScreens.js` — educational info-screen content (Arc / USDC / Circle facts)
-  * `infoManager.js` — info-screen scheduling and display (Tournament & Immortal)
+  * `infoManager.js` — info-screen scheduling and display, and the hand-off to that level's quiz
   * `main.js` — main game loop & initialization
 * `levels.js` — level structure, default levels, `LevelManager`, loading and saving custom levels.
 * `communityLevels.js` — bundled community-submitted levels (loaded alongside `levels.js`)
@@ -97,21 +97,18 @@ ARCMAN: Final Settlement is a browser-based arcade game in a retro pixel-art sty
 - **Animated Player Character**: PNG sequence animation system supporting multiple animations (idle, throwing)
 - **Multi-Level System**: 4+ default levels with automatic progression
 - **Game Modes**:
-  - **Immortal Mode**: Infinite retries, perfect for practice
-  - **Tournament Mode**: Lives-based challenge (5 lives) with quiz system
+  - **Tournament Mode**: Lives-based challenge (5 lives) with info screens and quizzes
+  - **Community Levels**: Play levels submitted by other players
   - **Level Editor**: Create and edit custom levels
-- **Quiz System** (Tournament Mode):
-  - Quizzes appear after completing levels 2, 4, 6, 8, and 10
-  - Each quiz contains 1 question with 3 answer options
-  - Answer correctly to gain +1 life (up to maximum of 5)
-  - Skip quizzes if you have full lives or don't need them
-  - Topics cover Arc's architecture, USDC as gas, the ARC token, and the agentic economy
-  - Each quiz checks the info screen shown one level earlier
-  - Questions and answers are easily editable in `js/quizzes.js`
-- **Educational Info Screens**:
-  - Short Arc / USDC / Circle explainer screens appear after levels 1, 3, 5, 7, and 9
-  - Shown in **both** Immortal and Tournament modes (purely informational — no life reward)
-  - Content is editable in `js/infoScreens.js`; scheduling lives in `js/infoManager.js`
+- **Learn-then-check loop** (Tournament Mode): every level ends with an info screen followed by a quiz on what it just said
+  - **Educational Info Screens**: one short Arc / USDC / Circle / x402 explainer after each of the 10 levels
+    - Content is editable in `js/infoScreens.js`; scheduling lives in `js/infoManager.js`
+  - **Quiz System**: the quiz for a level appears right after that level's info screen
+    - Each quiz contains 1 question with 3 answer options
+    - Answer correctly to gain +1 life (up to maximum of 5)
+    - Skip quizzes if you have full lives or don't need them
+    - Topics run from Arc's architecture and USDC as gas to x402, agent wallets, CCTP and settlement
+    - Questions and answers are easily editable in `js/quizzes.js`
 - **Built-in Level Editor**: Create and edit custom levels with visual placement tools
   - **Drag and Drop**: Move objects by clicking and dragging them with the Select tool
   - **Launch Level**: Test levels directly from the editor without leaving
@@ -133,12 +130,12 @@ ARCMAN: Final Settlement is a browser-based arcade game in a retro pixel-art sty
 - **Blockchain Integration**: 
   - Server-signed score verification with smart contract storage
   - On-chain score finalization with wallet connection (MetaMask, Rabby)
-  - Separate leaderboards for each game mode (Immortal/Tournament)
+  - On-chain Tournament leaderboard
   - Top 10/25/50/100 leaderboard views
   - Player rank tracking
 - **NFT Minting**: 
   - ERC-721 completion certificates
-  - One NFT per game mode (Immortal and Tournament)
+  - One NFT per player
   - Game mode-specific images and metadata
   - Completion date and game mode attributes
 
@@ -202,8 +199,8 @@ npm start
 
 1. **Start Screen**: Click anywhere on the start screen to begin (unlocks audio)
 2. **Main Menu**: Choose your game mode:
-   - **Immortal Mode**: Play through all levels with infinite retries
-   - **Tournament Mode**: Challenge yourself with a lives system (5 lives)
+   - **Tournament Mode**: Play through all levels with a lives system (5 lives)
+   - **Community Levels**: Play levels submitted by other players
    - **Level Editor**: Create and edit custom levels
 3. **Aiming**: Click and drag from the player character to aim your shot (player switches to throwing animation while aiming)
 4. **Launching**: Release to launch the coin from the player's right side along the glowing arc trajectory
@@ -219,15 +216,15 @@ npm start
    - Barrier collisions: +10 points each
    - Final score = (100 + bonuses) × multiplier
 7. **Level Progression**: When a level is completed, the game automatically advances to the next level
-8. **Quiz System** (Tournament Mode only):
-   - After completing levels 2, 4, 6, 8, or 10, a quiz appears
+8. **Info Screen, then Quiz** (Tournament Mode only):
+   - After every level an info screen appears, followed by a quiz on what it just explained
    - Answer the question correctly to gain +1 life
    - Skip the quiz if you have full lives or prefer to continue
-   - Quizzes cover Arc's architecture, USDC as gas, the ARC token, and the agentic economy
+   - Topics run from Arc's architecture and USDC as gas to x402, agent wallets, CCTP and settlement
 9. **Game Completion**: After completing all levels, view your final score, completion time, and statistics
 10. **On-Chain Finalization**: Click "Finalize On-Chain" to submit your score to the blockchain (requires wallet connection)
-11. **NFT Minting**: Click "Mint NFT" to mint a completion certificate NFT (one per game mode: Immortal and Tournament)
-12. **Leaderboard**: View top players and your rank - separate leaderboards for Immortal and Tournament modes
+11. **NFT Minting**: Click "Mint NFT" to mint a completion certificate NFT (one per player)
+12. **Leaderboard**: View top players and your rank on the Tournament leaderboard
 13. **Statistics**: Access detailed player statistics from the main menu, including games played, best scores, completion times, and achievements
 
 ## Level Editor
@@ -313,13 +310,13 @@ The game uses a **modular namespace pattern** for better organization and mainta
 - `js/ui.js` - UI update functions
 
 **Game Flow:**
-- `js/gameFlow.js` - Game mode management (immortal, tournament, editor), level progression, round management, completion screens, statistics, leaderboard, NFT minting
+- `js/gameFlow.js` - Game mode management (tournament, community, editor), level progression, round management, completion screens, statistics, leaderboard, NFT minting
 - `js/input.js` - Input handling (mouse, touch, keyboard events)
 - `js/levelEditor.js` - Complete level editor system
 - `js/quizzes.js` - Quiz questions and answers data (editable quiz content)
 - `js/quiz.js` - Quiz system management for Tournament mode (quiz display, answer handling, life rewards)
 - `js/infoScreens.js` - Educational info-screen content (Arc / USDC / Circle facts)
-- `js/infoManager.js` - Info-screen scheduling and display (after levels 1, 3, 5, 7, 9 in both modes)
+- `js/infoManager.js` - Info-screen scheduling and display (one after every level in Tournament mode), then hands off to that level's quiz
 
 **Blockchain & Statistics:**
 - `js/statistics.js` - Player statistics management and localStorage persistence
@@ -363,7 +360,7 @@ The game includes a complete audio system managed by the `AudioManager` namespac
 `server.js` is an Express server that serves the static game and runs a **session-based, server-authoritative scoring flow** (anti-cheat). The client reports gameplay events; the server validates them, computes the score itself, and ECDSA-signs it for the smart contract.
 
 API endpoints:
-- `POST /api/session/start` — begin a session. Body: `{ player, gameMode }` (`gameMode` = `Immortal` | `Tournament`). Returns `{ sessionId, totalLevels }`. Any previous session for the same player is invalidated.
+- `POST /api/session/start` — begin a session. Body: `{ player, gameMode }` (`gameMode` = `Tournament`; `Immortal` is still accepted so sessions from an older cached client keep working). Returns `{ sessionId, totalLevels }`. Any previous session for the same player is invalidated.
 - `POST /api/session/event` — report an event. Body: `{ sessionId, eventType }`, where `eventType` ∈ `levelStart | gatePassed | cloudPassed | barrierHit | levelComplete`. The server enforces per-level object caps (from `DEFAULT_LEVELS`), a minimum time per level, and session IP binding.
 - `POST /api/session/finalize` — finish a session. Body: `{ sessionId, nonce }`. Validates that all levels were completed and minimum timings were met, computes the score `Σ floor((100 + clouds·10 + barriers·10) · (1 + gates·0.5))`, then returns `{ score, signature, signerAddress, timestamp }`. Rate-limited to one finalize per player per 60s.
 - `POST /api/submit-level` — submit a custom level for approval. Body: `{ level }`. Sends the level JSON to Telegram (if `TELEGRAM_BOT_TOKEN` / `TELEGRAM_CHAT_ID` are set). Returns `{ success, telegramSent }`.
@@ -376,7 +373,7 @@ Anti-cheat parameters: 1-hour session expiry, ≥ 3 s per level, 60 s finalize c
 - `contract.sol`: Solidity contract for score verification and leaderboard
   - Uses server-signed validation with game mode support
   - Stores best scores per player per game mode
-  - Maintains separate top 100 leaderboards for Immortal and Tournament modes
+  - Maintains a top 100 leaderboard per game mode (the game now writes only to Tournament)
   - Game mode is included in signature verification
 - `nftContract.sol`: ERC-721 NFT contract for completion certificates
   - Allows players to mint one NFT per game mode
@@ -393,7 +390,7 @@ The game uses a comprehensive blockchain integration system:
    - Verified by the smart contract
    - Stored on-chain with game mode-specific leaderboard support
 3. **Leaderboards**: 
-   - Separate leaderboards for Immortal and Tournament modes
+   - Tournament leaderboard read from the contract
    - Toggle between game modes using mode selector buttons
    - View top 10, 25, 50, or 100 players
    - See your rank in each game mode
@@ -401,7 +398,7 @@ The game uses a comprehensive blockchain integration system:
    - Player highlighting for your own entries
 4. **NFT Minting**:
    - Mint completion certificate NFTs after finishing a game
-   - One NFT per game mode (Immortal and Tournament)
+   - One NFT per player
    - NFTs include completion date and game mode attributes
    - Game mode-specific images (configurable in `js/config.js`)
    - ERC-721 standard compatible
@@ -415,7 +412,7 @@ The game tracks comprehensive player statistics stored in browser localStorage:
 - **Best Scores**: Best final score, best level score, average final score, total lifetime points
 - **Performance**: Total levels completed, average levels per game, fastest completion time, average completion time
 - **Achievements**: Total gates passed, total clouds passed, total barriers hit, perfect games
-- **Game Mode Breakdown**: Statistics for Immortal and Tournament modes separately
+- **Game Mode Breakdown**: Tournament statistics
 - **Last Game**: Details about the most recent game session
 
 Access statistics from the main menu "Statistics" button. Statistics persist across browser sessions and can be reset if needed.
@@ -441,7 +438,6 @@ Configure different images for each game mode in `js/config.js`:
 
 ```javascript
 NFT_IMAGES: {
-    Immortal: 'https://your-domain.com/images/nft-immortal.png',
     Tournament: 'https://your-domain.com/images/nft-tournament.png'
 }
 ```
@@ -531,12 +527,12 @@ PLAYER_SIZE_SCALE: 1.0, // 1.0 = default, 1.5 = 50% bigger, 2.0 = double size, e
 
 ### Quiz Questions
 
-Edit quiz questions and answers in `js/quizzes.js`. The file contains an array of 5 quizzes that appear after levels 2, 4, 6, 8, and 10 in Tournament mode:
+Edit quiz questions and answers in `js/quizzes.js`. The file contains one quiz per level (10 in total); each appears right after that level's info screen in Tournament mode:
 
 ```javascript
 const QUIZZES = [
     {
-        id: 1, // For level 2
+        id: 1, // For level 1 — checks the info screen with the same id
         question: "What is Arc?",
         answers: [
             "A Layer-2 rollup that settles on Ethereum",
@@ -550,7 +546,7 @@ const QUIZZES = [
 ```
 
 Each quiz object contains:
-- `id`: Quiz identifier (matches the level where it appears)
+- `id`: The level this quiz follows — it must match the `id` of the info screen in `js/infoScreens.js` that sets it up
 - `question`: The question text
 - `answers`: Array of 3 answer options
 - `correctIndex`: Index (0-2) of the correct answer in the answers array
