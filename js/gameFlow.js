@@ -53,12 +53,6 @@ const GameFlow = {
             return;
         }
         
-        // Agent Shift keeps its own books — no scoring, no level progression.
-        if (GameState.agentShiftMode && typeof AgentMode !== 'undefined') {
-            AgentMode.onSettled();
-            return;
-        }
-
         GameState.gameState = 'finalized';
 
         // Notify server of level completion
@@ -1621,11 +1615,6 @@ const GameFlow = {
             return; // Don't reset if we're in menu
         }
 
-        if (GameState.agentShiftMode && typeof AgentMode !== 'undefined') {
-            AgentMode.onMissed();
-            return;
-        }
-        
         GameState.gameState = 'aiming';
         GameState.coin = null;
         GameState.initialCoinVelocity = null; // Reset initial velocity
@@ -1765,9 +1754,6 @@ const GameFlow = {
     
     // Show main menu
     showMainMenu: function() {
-        if (GameState.agentShiftMode && typeof AgentMode !== 'undefined') {
-            AgentMode.exit();
-        }
         GameState.gameMode = null;
         GameState.gameState = 'menu';
         GameState.editorMode = false; // Exit editor mode when returning to menu

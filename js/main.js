@@ -71,11 +71,6 @@ const Game = {
             }
         }
         
-        // Agent Shift steps on the same frame as physics — one clock for both
-        if (GameState.agentShiftMode && typeof AgentMode !== 'undefined' && AgentMode.active) {
-            AgentMode.tick();
-        }
-
         requestAnimationFrame(() => Game.gameLoop());
     },
     
@@ -114,11 +109,6 @@ const Game = {
         
         // Setup menu event listeners
         GameFlow.setupMenuListeners();
-
-        // Agent Shift mode wires its own menu entry and overlays
-        if (typeof AgentMode !== 'undefined' && AgentMode.init) {
-            AgentMode.init();
-        }
         
         // Start game loop
         this.gameLoop();

@@ -475,7 +475,7 @@
         }
 
 
-        /* ---- Agent Shift mode ---- */
+        /* ---- Agent Shift mode (retired — kept with js/agent*.js in case it returns) ---- */
         body.agent-mode #score,
         body.agent-mode #levelCounter { display: none !important; }
 
@@ -3157,7 +3157,7 @@
             </div>
         </div>
 
-        <!-- Agent Shift mode -->
+        <!-- Agent Shift mode — retired: no script loads these nodes, they render nothing. -->
         <div id="agentHud">
             <span><i>left</i> <b id="agentClock">60s</b></span>
             <span><i>earned</i> <b id="agentEarned">$0.00</b></span>
@@ -3640,9 +3640,6 @@
             <button class="menu-button tournament" id="menuTournament">
                 <span>TOURNAMENT MODE</span>
             </button>
-            <button class="menu-button agent" id="menuAgent">
-                <span>AGENT SHIFT</span>
-            </button>
             <button class="menu-button community" id="menuCommunity">
                 <span>COMMUNITY LEVELS</span>
             </button>
@@ -3798,11 +3795,10 @@
     <script src="js/leaderboard.js"></script>
     <script src="js/nft.js"></script>
     <script src="js/gameFlow.js"></script>
-    <script src="js/agent.js"></script>
-    <script src="js/agentShift.js"></script>
-    <script src="js/agentWallet.js"></script>
-    <script src="js/agentOnboarding.js"></script>
-    <script src="js/agentMode.js"></script>
+    <!-- Agent Shift is retired. The modules stay in js/ (agent.js, agentShift.js,
+         agentWallet.js, agentOnboarding.js, agentMode.js) together with their
+         markup and styles; re-adding these five tags and the AGENT SHIFT menu
+         button brings the mode back. -->
     <script src="js/levelEditor.js"></script>
     <script src="js/input.js"></script>
     <script src="js/main.js"></script>
