@@ -96,6 +96,106 @@ const QUIZZES = [
     },
     {
         id: 10, // For level 10
+        question: "What sits behind every USDC in circulation?",
+        answers: [
+            "A dollar of reserves — cash and short-dated Treasuries, attested monthly",
+            "A basket of other cryptocurrencies held by Circle",
+            "An algorithm that mints and burns to defend the price"
+        ],
+        correctIndex: 0
+    },
+    {
+        id: 11, // For level 11
+        question: "How does new USDC come into existence?",
+        answers: [
+            "It is mined by validators as a block reward",
+            "Someone pays dollars to Circle and the same amount is minted; redeeming burns it",
+            "Traders buy it on an exchange until the supply grows"
+        ],
+        correctIndex: 1
+    },
+    {
+        id: 12, // For level 12
+        question: "Does Circle issue anything other than a dollar stablecoin?",
+        answers: [
+            "No — USDC is the only one",
+            "Yes — EURC, a euro stablecoin with the same reserve model",
+            "Yes, but only tokens pegged to gold"
+        ],
+        correctIndex: 1
+    },
+    {
+        id: 13, // For level 13
+        question: "What does Arc's FX engine settle inside a single contract?",
+        answers: [
+            "Both legs of the currency swap, or neither",
+            "One leg now and the other at the end of the day",
+            "The trade fee, while the currencies move by wire"
+        ],
+        correctIndex: 0
+    },
+    {
+        id: 14, // For level 14
+        question: "What do Arc's confidential transfers hide?",
+        answers: [
+            "Everything — the network keeps no record at all",
+            "The amount, while addresses stay visible and details can be disclosed on request",
+            "The sender's identity, while the amount is public"
+        ],
+        correctIndex: 1
+    },
+    {
+        id: 15, // For level 15
+        question: "Who validates blocks on Arc today?",
+        answers: [
+            "Anyone who stakes enough tokens, from day one",
+            "A permissioned set of known institutions, opening up over time",
+            "Circle alone, with no other validators planned"
+        ],
+        correctIndex: 1
+    },
+    {
+        id: 16, // For level 16
+        question: "Why can a cross-border bank transfer take days?",
+        answers: [
+            "The money physically travels between countries",
+            "It hops through correspondent banks with their own cut-off times and weekends",
+            "Regulators manually approve every payment"
+        ],
+        correctIndex: 1
+    },
+    {
+        id: 17, // For level 17
+        question: "Who has been using the Arc testnet since it opened?",
+        answers: [
+            "Nobody — it is a private demo inside Circle",
+            "Over a hundred institutions running real payment flows with test money",
+            "Only retail players in games like this one"
+        ],
+        correctIndex: 1
+    },
+    {
+        id: 18, // For level 18
+        question: "You send USDC to the wrong address. What can be done?",
+        answers: [
+            "Nothing — a settled transfer has no chargeback",
+            "Circle reverses it if you file a support ticket",
+            "Validators roll back the block on request"
+        ],
+        correctIndex: 0
+    },
+    {
+        id: 19, // For level 19
+        question: "What stage is Arc at right now?",
+        answers: [
+            "A public testnet, with mainnet beta still ahead",
+            "Fully launched mainnet with the ARC token trading",
+            "A whitepaper with no running network"
+        ],
+        correctIndex: 0
+    },
+    {
+        id: 20, // For level 20
         question: "When is a payment actually settled?",
         answers: [
             "When the sender clicks send",

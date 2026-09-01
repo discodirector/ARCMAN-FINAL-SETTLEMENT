@@ -521,6 +521,761 @@ const DEFAULT_LEVELS = [
     },
     {
         id: 10,
+        name: "Fully Backed",
+        player: {
+            x: 0.08,
+            y: 0.78
+        },
+        arcGates: [
+            {
+                x: 0.3592,
+                y: 0.0414,
+                width: 0.05,
+                height: 0.13,
+                active: true,
+                rotation: 0
+            },
+            {
+                x: 0.625,
+                y: 0.0442,
+                width: 0.05,
+                height: 0.13,
+                active: true,
+                rotation: 0
+            }
+        ],
+        slippageClouds: [
+            {
+                x: 0.7273,
+                y: 0.2665,
+                radius: 0.06
+            }
+        ],
+        settlementZone: {
+            x: 0.84,
+            y: 0.6,
+            width: 0.1,
+            height: 0.13
+        },
+        barriers: [
+            {
+                x: 0.4636,
+                y: 0.18,
+                width: 0.01,
+                height: 0.3,
+                size: "large",
+                rotation: 240
+            },
+            {
+                x: 0.8014,
+                y: 0.4214,
+                width: 0.01,
+                height: 0.2,
+                size: "medium",
+                rotation: 270
+            }
+        ],
+        lifeRestores: []
+    },
+    {
+        id: 11,
+        name: "One In, One Out",
+        player: {
+            x: 0.88,
+            y: 0.78
+        },
+        arcGates: [
+            {
+                x: 0.6786,
+                y: 0.5972,
+                width: 0.05,
+                height: 0.13,
+                active: true,
+                rotation: 0
+            },
+            {
+                x: 0.3785,
+                y: 0.5329,
+                width: 0.05,
+                height: 0.13,
+                active: true,
+                rotation: 0
+            }
+        ],
+        slippageClouds: [
+            {
+                x: 0.5135,
+                y: 0.5621,
+                radius: 0.06
+            }
+        ],
+        settlementZone: {
+            x: 0.06,
+            y: 0.58,
+            width: 0.1,
+            height: 0.13
+        },
+        barriers: [
+            {
+                x: 0.58,
+                y: 0.687,
+                width: 0.01,
+                height: 0.3,
+                size: "large",
+                rotation: 150
+            },
+            {
+                x: 0.3196,
+                y: 0.5061,
+                width: 0.01,
+                height: 0.2,
+                size: "medium",
+                rotation: 120
+            },
+            {
+                x: 0.3348,
+                y: 0.7163,
+                width: 0.01,
+                height: 0.12,
+                size: "small",
+                rotation: 30
+            }
+        ],
+        lifeRestores: []
+    },
+    {
+        id: 12,
+        name: "Not Only Dollars",
+        player: {
+            x: 0.1,
+            y: 0.14
+        },
+        arcGates: [
+            {
+                x: 0.3182,
+                y: 0.2434,
+                width: 0.05,
+                height: 0.13,
+                active: true,
+                rotation: 0
+            },
+            {
+                x: 0.4874,
+                y: 0.377,
+                width: 0.05,
+                height: 0.13,
+                active: true,
+                rotation: 0
+            },
+            {
+                x: 0.5861,
+                y: 0.4649,
+                width: 0.05,
+                height: 0.13,
+                active: true,
+                rotation: 0
+            }
+        ],
+        slippageClouds: [
+            {
+                x: 0.6896,
+                y: 0.6173,
+                radius: 0.06
+            }
+        ],
+        settlementZone: {
+            x: 0.82,
+            y: 0.72,
+            width: 0.1,
+            height: 0.13
+        },
+        barriers: [
+            {
+                x: 0.2182,
+                y: 0.3044,
+                width: 0.01,
+                height: 0.2,
+                size: "medium",
+                rotation: 45
+            },
+            {
+                x: 0.7803,
+                y: 0.6586,
+                width: 0.01,
+                height: 0.3,
+                size: "large",
+                rotation: 210
+            }
+        ],
+        lifeRestores: []
+    },
+    {
+        id: 13,
+        name: "Both Legs at Once",
+        player: {
+            x: 0.08,
+            y: 0.8
+        },
+        arcGates: [
+            {
+                x: 0.3446,
+                y: 0.6403,
+                width: 0.05,
+                height: 0.13,
+                active: true,
+                rotation: 0
+            },
+            {
+                x: 0.6448,
+                y: 0.6068,
+                width: 0.05,
+                height: 0.13,
+                active: true,
+                rotation: 0
+            }
+        ],
+        slippageClouds: [
+            {
+                x: 0.446,
+                y: 0.6239,
+                radius: 0.06
+            },
+            {
+                x: 0.5453,
+                y: 0.6175,
+                radius: 0.06
+            }
+        ],
+        settlementZone: {
+            x: 0.87,
+            y: 0.78,
+            width: 0.08,
+            height: 0.1
+        },
+        barriers: [
+            {
+                x: 0.3192,
+                y: 0.8697,
+                width: 0.01,
+                height: 0.3,
+                size: "large",
+                rotation: 240
+            },
+            {
+                x: 0.554,
+                y: 0.7731,
+                width: 0.01,
+                height: 0.12,
+                size: "small",
+                rotation: 90
+            },
+            {
+                x: 0.7769,
+                y: 0.7621,
+                width: 0.01,
+                height: 0.2,
+                size: "medium",
+                rotation: 210
+            }
+        ],
+        lifeRestores: []
+    },
+    {
+        id: 14,
+        name: "Sealed Envelope",
+        player: {
+            x: 0.09,
+            y: 0.76
+        },
+        arcGates: [
+            {
+                x: 0.389,
+                y: 0.0599,
+                width: 0.05,
+                height: 0.13,
+                active: true,
+                rotation: 0
+            },
+            {
+                x: 0.814,
+                y: 0.0572,
+                width: 0.05,
+                height: 0.13,
+                active: true,
+                rotation: 0
+            }
+        ],
+        slippageClouds: [
+            {
+                x: 0.3678,
+                y: 0.281,
+                radius: 0.06
+            },
+            {
+                x: 0.3171,
+                y: 0.3882,
+                radius: 0.06
+            },
+            {
+                x: 0.2855,
+                y: 0.2653,
+                radius: 0.06
+            }
+        ],
+        settlementZone: {
+            x: 0.82,
+            y: 0.26,
+            width: 0.1,
+            height: 0.13
+        },
+        barriers: [
+            {
+                x: 0.3148,
+                y: 0.0951,
+                width: 0.01,
+                height: 0.3,
+                size: "large",
+                rotation: 45
+            },
+            {
+                x: 0.5971,
+                y: 0.0873,
+                width: 0.01,
+                height: 0.2,
+                size: "medium",
+                rotation: 150
+            }
+        ],
+        lifeRestores: [
+            {
+                x: 0.4974,
+                y: 0.4333,
+                radius: 0.022
+            }
+        ]
+    },
+    {
+        id: 15,
+        name: "Who Signs the Block",
+        player: {
+            x: 0.88,
+            y: 0.74
+        },
+        arcGates: [
+            {
+                x: 0.6272,
+                y: 0.5527,
+                width: 0.05,
+                height: 0.13,
+                active: true,
+                rotation: 0
+            },
+            {
+                x: 0.4217,
+                y: 0.4715,
+                width: 0.05,
+                height: 0.13,
+                active: true,
+                rotation: 0
+            }
+        ],
+        slippageClouds: [
+            {
+                x: 0.5434,
+                y: 0.5434,
+                radius: 0.06
+            },
+            {
+                x: 0.3452,
+                y: 0.5586,
+                radius: 0.06
+            }
+        ],
+        settlementZone: {
+            x: 0.09,
+            y: 0.36,
+            width: 0.1,
+            height: 0.13
+        },
+        barriers: [
+            {
+                x: 0.2808,
+                y: 0.4188,
+                width: 0.01,
+                height: 0.2,
+                size: "medium",
+                rotation: 120
+            },
+            {
+                x: 0.76,
+                y: 0.751,
+                width: 0.01,
+                height: 0.3,
+                size: "large",
+                rotation: 45
+            },
+            {
+                x: 0.3893,
+                y: 0.4218,
+                width: 0.01,
+                height: 0.2,
+                size: "medium",
+                rotation: 150
+            }
+        ],
+        lifeRestores: []
+    },
+    {
+        id: 16,
+        name: "Correspondent",
+        player: {
+            x: 0.86,
+            y: 0.12
+        },
+        arcGates: [
+            {
+                x: 0.3985,
+                y: 0.0714,
+                width: 0.05,
+                height: 0.13,
+                active: true,
+                rotation: 0
+            },
+            {
+                x: 0.3376,
+                y: 0.1835,
+                width: 0.05,
+                height: 0.13,
+                active: true,
+                rotation: 0
+            },
+            {
+                x: 0.2861,
+                y: 0.2982,
+                width: 0.05,
+                height: 0.13,
+                active: true,
+                rotation: 0
+            }
+        ],
+        slippageClouds: [
+            {
+                x: 0.2586,
+                y: 0.5934,
+                radius: 0.06
+            },
+            {
+                x: 0.1835,
+                y: 0.6651,
+                radius: 0.06
+            }
+        ],
+        settlementZone: {
+            x: 0.07,
+            y: 0.74,
+            width: 0.1,
+            height: 0.13
+        },
+        barriers: [
+            {
+                x: 0.7499,
+                y: 0.0544,
+                width: 0.01,
+                height: 0.3,
+                size: "large",
+                rotation: 270
+            },
+            {
+                x: 0.5167,
+                y: 0.1915,
+                width: 0.01,
+                height: 0.2,
+                size: "medium",
+                rotation: 30
+            },
+            {
+                x: 0.2031,
+                y: 0.4279,
+                width: 0.01,
+                height: 0.12,
+                size: "small",
+                rotation: 90
+            }
+        ],
+        lifeRestores: []
+    },
+    {
+        id: 17,
+        name: "Institutional Traffic",
+        player: {
+            x: 0.08,
+            y: 0.74
+        },
+        arcGates: [
+            {
+                x: 0.3839,
+                y: 0.5595,
+                width: 0.05,
+                height: 0.13,
+                active: true,
+                rotation: 0
+            },
+            {
+                x: 0.6713,
+                y: 0.5243,
+                width: 0.05,
+                height: 0.13,
+                active: true,
+                rotation: 0
+            }
+        ],
+        slippageClouds: [
+            {
+                x: 0.5456,
+                y: 0.6328,
+                radius: 0.06
+            },
+            {
+                x: 0.789,
+                y: 0.6293,
+                radius: 0.06
+            }
+        ],
+        settlementZone: {
+            x: 0.85,
+            y: 0.66,
+            width: 0.1,
+            height: 0.13
+        },
+        barriers: [
+            {
+                x: 0.338,
+                y: 0.7577,
+                width: 0.01,
+                height: 0.3,
+                size: "large",
+                rotation: 240
+            },
+            {
+                x: 0.2816,
+                y: 0.5741,
+                width: 0.01,
+                height: 0.2,
+                size: "medium",
+                rotation: 120
+            },
+            {
+                x: 0.5639,
+                y: 0.4867,
+                width: 0.01,
+                height: 0.3,
+                size: "large",
+                rotation: 120
+            },
+            {
+                x: 0.2046,
+                y: 0.8131,
+                width: 0.01,
+                height: 0.12,
+                size: "small",
+                rotation: 120
+            },
+            {
+                x: 0.4695,
+                y: 0.5129,
+                width: 0.01,
+                height: 0.2,
+                size: "medium",
+                rotation: 240
+            }
+        ],
+        lifeRestores: [
+            {
+                x: 0.233,
+                y: 0.4582,
+                radius: 0.022
+            }
+        ]
+    },
+    {
+        id: 18,
+        name: "No Take-Backs",
+        player: {
+            x: 0.1,
+            y: 0.82
+        },
+        arcGates: [
+            {
+                x: 0.3043,
+                y: 0.214,
+                width: 0.05,
+                height: 0.13,
+                active: true,
+                rotation: 0
+            },
+            {
+                x: 0.3908,
+                y: 0.0303,
+                width: 0.05,
+                height: 0.13,
+                active: true,
+                rotation: 0
+            },
+            {
+                x: 0.7219,
+                y: 0.0599,
+                width: 0.05,
+                height: 0.13,
+                active: true,
+                rotation: 0
+            }
+        ],
+        slippageClouds: [
+            {
+                x: 0.2859,
+                y: 0.4957,
+                radius: 0.06
+            },
+            {
+                x: 0.8008,
+                y: 0.2435,
+                radius: 0.06
+            }
+        ],
+        settlementZone: {
+            x: 0.84,
+            y: 0.3,
+            width: 0.1,
+            height: 0.12
+        },
+        barriers: [
+            {
+                x: 0.4271,
+                y: 0.2632,
+                width: 0.01,
+                height: 0.3,
+                size: "large",
+                rotation: 45
+            },
+            {
+                x: 0.6233,
+                y: 0.056,
+                width: 0.01,
+                height: 0.3,
+                size: "large",
+                rotation: 0
+            },
+            {
+                x: 0.5062,
+                y: 0.1214,
+                width: 0.01,
+                height: 0.2,
+                size: "medium",
+                rotation: 45
+            }
+        ],
+        lifeRestores: []
+    },
+    {
+        id: 19,
+        name: "Road to Mainnet",
+        player: {
+            x: 0.07,
+            y: 0.8
+        },
+        arcGates: [
+            {
+                x: 0.2704,
+                y: 0.633,
+                width: 0.05,
+                height: 0.13,
+                active: true,
+                rotation: 0
+            },
+            {
+                x: 0.4271,
+                y: 0.5409,
+                width: 0.05,
+                height: 0.13,
+                active: true,
+                rotation: 0
+            },
+            {
+                x: 0.5315,
+                y: 0.5064,
+                width: 0.05,
+                height: 0.13,
+                active: true,
+                rotation: 0
+            },
+            {
+                x: 0.6795,
+                y: 0.4946,
+                width: 0.05,
+                height: 0.13,
+                active: true,
+                rotation: 0
+            }
+        ],
+        slippageClouds: [
+            {
+                x: 0.2006,
+                y: 0.7211,
+                radius: 0.06
+            },
+            {
+                x: 0.3898,
+                y: 0.713,
+                radius: 0.06
+            },
+            {
+                x: 0.7885,
+                y: 0.625,
+                radius: 0.06
+            }
+        ],
+        settlementZone: {
+            x: 0.86,
+            y: 0.55,
+            width: 0.09,
+            height: 0.12
+        },
+        barriers: [
+            {
+                x: 0.2984,
+                y: 0.5406,
+                width: 0.01,
+                height: 0.3,
+                size: "large",
+                rotation: 120
+            },
+            {
+                x: 0.2677,
+                y: 0.8637,
+                width: 0.01,
+                height: 0.2,
+                size: "medium",
+                rotation: 120
+            },
+            {
+                x: 0.6319,
+                y: 0.6647,
+                width: 0.01,
+                height: 0.3,
+                size: "large",
+                rotation: 0
+            }
+        ],
+        lifeRestores: [
+            {
+                x: 0.1525,
+                y: 0.4217,
+                radius: 0.022
+            }
+        ]
+    },
+    {
+        id: 20,
         name: "Final Settlement",
         player: {
             x: 0.08,

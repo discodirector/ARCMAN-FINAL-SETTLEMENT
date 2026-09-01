@@ -95,13 +95,13 @@ ARCMAN: Final Settlement is a browser-based arcade game in a retro pixel-art sty
   - **Trail Particles**: Small scattered particles that trail behind the coin during flight
   - **PNG Sprite Support**: Optional PNG sprites for coin and player character
 - **Animated Player Character**: PNG sequence animation system supporting multiple animations (idle, throwing)
-- **Multi-Level System**: 4+ default levels with automatic progression
+- **Multi-Level System**: 20 default levels with automatic progression
 - **Game Modes**:
   - **Tournament Mode**: Lives-based challenge (5 lives) with info screens and quizzes
   - **Community Levels**: Play levels submitted by other players
   - **Level Editor**: Create and edit custom levels
 - **Learn-then-check loop** (Tournament Mode): every level ends with an info screen followed by a quiz on what it just said
-  - **Educational Info Screens**: one short Arc / USDC / Circle / x402 explainer after each of the 10 levels
+  - **Educational Info Screens**: one short Arc / USDC / Circle / x402 explainer after each of the 20 levels
     - Content is editable in `js/infoScreens.js`; scheduling lives in `js/infoManager.js`
   - **Quiz System**: the quiz for a level appears right after that level's info screen
     - Each quiz contains 1 question with 3 answer options
@@ -527,7 +527,7 @@ PLAYER_SIZE_SCALE: 1.0, // 1.0 = default, 1.5 = 50% bigger, 2.0 = double size, e
 
 ### Quiz Questions
 
-Edit quiz questions and answers in `js/quizzes.js`. The file contains one quiz per level (10 in total); each appears right after that level's info screen in Tournament mode:
+Edit quiz questions and answers in `js/quizzes.js`. The file contains one quiz per level (20 in total); each appears right after that level's info screen in Tournament mode:
 
 ```javascript
 const QUIZZES = [
