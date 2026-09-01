@@ -528,16 +528,16 @@ const DEFAULT_LEVELS = [
         },
         arcGates: [
             {
-                x: 0.3592,
-                y: 0.0414,
+                x: 0.2121,
+                y: 0.7088,
                 width: 0.05,
                 height: 0.13,
                 active: true,
                 rotation: 0
             },
             {
-                x: 0.625,
-                y: 0.0442,
+                x: 0.7161,
+                y: 0.6016,
                 width: 0.05,
                 height: 0.13,
                 active: true,
@@ -546,8 +546,8 @@ const DEFAULT_LEVELS = [
         ],
         slippageClouds: [
             {
-                x: 0.7273,
-                y: 0.2665,
+                x: 0.6386,
+                y: 0.674,
                 radius: 0.06
             }
         ],
@@ -559,20 +559,12 @@ const DEFAULT_LEVELS = [
         },
         barriers: [
             {
-                x: 0.4636,
-                y: 0.18,
+                x: 0.2476,
+                y: 0.4385,
                 width: 0.01,
                 height: 0.3,
                 size: "large",
-                rotation: 240
-            },
-            {
-                x: 0.8014,
-                y: 0.4214,
-                width: 0.01,
-                height: 0.2,
-                size: "medium",
-                rotation: 270
+                rotation: 312
             }
         ],
         lifeRestores: []
@@ -586,16 +578,16 @@ const DEFAULT_LEVELS = [
         },
         arcGates: [
             {
-                x: 0.6786,
-                y: 0.5972,
+                x: 0.2523,
+                y: 0.4668,
                 width: 0.05,
                 height: 0.13,
                 active: true,
                 rotation: 0
             },
             {
-                x: 0.3785,
-                y: 0.5329,
+                x: 0.7895,
+                y: 0.4081,
                 width: 0.05,
                 height: 0.13,
                 active: true,
@@ -604,8 +596,8 @@ const DEFAULT_LEVELS = [
         ],
         slippageClouds: [
             {
-                x: 0.5135,
-                y: 0.5621,
+                x: 0.2046,
+                y: 0.4704,
                 radius: 0.06
             }
         ],
@@ -617,28 +609,12 @@ const DEFAULT_LEVELS = [
         },
         barriers: [
             {
-                x: 0.58,
-                y: 0.687,
+                x: 0.6394,
+                y: 0.559,
                 width: 0.01,
                 height: 0.3,
                 size: "large",
-                rotation: 150
-            },
-            {
-                x: 0.3196,
-                y: 0.5061,
-                width: 0.01,
-                height: 0.2,
-                size: "medium",
-                rotation: 120
-            },
-            {
-                x: 0.3348,
-                y: 0.7163,
-                width: 0.01,
-                height: 0.12,
-                size: "small",
-                rotation: 30
+                rotation: 190
             }
         ],
         lifeRestores: []
@@ -652,24 +628,16 @@ const DEFAULT_LEVELS = [
         },
         arcGates: [
             {
-                x: 0.3182,
-                y: 0.2434,
+                x: 0.7735,
+                y: 0.3591,
                 width: 0.05,
                 height: 0.13,
                 active: true,
                 rotation: 0
             },
             {
-                x: 0.4874,
-                y: 0.377,
-                width: 0.05,
-                height: 0.13,
-                active: true,
-                rotation: 0
-            },
-            {
-                x: 0.5861,
-                y: 0.4649,
+                x: 0.23,
+                y: 0.0056,
                 width: 0.05,
                 height: 0.13,
                 active: true,
@@ -678,8 +646,8 @@ const DEFAULT_LEVELS = [
         ],
         slippageClouds: [
             {
-                x: 0.6896,
-                y: 0.6173,
+                x: 0.6693,
+                y: 0.2737,
                 radius: 0.06
             }
         ],
@@ -691,20 +659,12 @@ const DEFAULT_LEVELS = [
         },
         barriers: [
             {
-                x: 0.2182,
-                y: 0.3044,
-                width: 0.01,
-                height: 0.2,
-                size: "medium",
-                rotation: 45
-            },
-            {
-                x: 0.7803,
-                y: 0.6586,
+                x: 0.3289,
+                y: 0.1382,
                 width: 0.01,
                 height: 0.3,
                 size: "large",
-                rotation: 210
+                rotation: 6
             }
         ],
         lifeRestores: []
@@ -718,16 +678,16 @@ const DEFAULT_LEVELS = [
         },
         arcGates: [
             {
-                x: 0.3446,
-                y: 0.6403,
+                x: 0.7627,
+                y: 0.4709,
                 width: 0.05,
                 height: 0.13,
                 active: true,
                 rotation: 0
             },
             {
-                x: 0.6448,
-                y: 0.6068,
+                x: 0.2343,
+                y: 0.4441,
                 width: 0.05,
                 height: 0.13,
                 active: true,
@@ -736,46 +696,30 @@ const DEFAULT_LEVELS = [
         ],
         slippageClouds: [
             {
-                x: 0.446,
-                y: 0.6239,
+                x: 0.2486,
+                y: 0.6434,
                 radius: 0.06
             },
             {
-                x: 0.5453,
-                y: 0.6175,
+                x: 0.7034,
+                y: 0.5223,
                 radius: 0.06
             }
         ],
         settlementZone: {
-            x: 0.87,
+            x: 0.86,
             y: 0.78,
-            width: 0.08,
-            height: 0.1
+            width: 0.09,
+            height: 0.11
         },
         barriers: [
             {
-                x: 0.3192,
-                y: 0.8697,
+                x: 0.3291,
+                y: 0.6524,
                 width: 0.01,
                 height: 0.3,
                 size: "large",
-                rotation: 240
-            },
-            {
-                x: 0.554,
-                y: 0.7731,
-                width: 0.01,
-                height: 0.12,
-                size: "small",
-                rotation: 90
-            },
-            {
-                x: 0.7769,
-                y: 0.7621,
-                width: 0.01,
-                height: 0.2,
-                size: "medium",
-                rotation: 210
+                rotation: 337
             }
         ],
         lifeRestores: []
@@ -789,16 +733,16 @@ const DEFAULT_LEVELS = [
         },
         arcGates: [
             {
-                x: 0.389,
-                y: 0.0599,
+                x: 0.6836,
+                y: 0.3179,
                 width: 0.05,
                 height: 0.13,
                 active: true,
                 rotation: 0
             },
             {
-                x: 0.814,
-                y: 0.0572,
+                x: 0.2967,
+                y: 0.5303,
                 width: 0.05,
                 height: 0.13,
                 active: true,
@@ -807,18 +751,8 @@ const DEFAULT_LEVELS = [
         ],
         slippageClouds: [
             {
-                x: 0.3678,
-                y: 0.281,
-                radius: 0.06
-            },
-            {
-                x: 0.3171,
-                y: 0.3882,
-                radius: 0.06
-            },
-            {
-                x: 0.2855,
-                y: 0.2653,
+                x: 0.5499,
+                y: 0.4455,
                 radius: 0.06
             }
         ],
@@ -830,26 +764,18 @@ const DEFAULT_LEVELS = [
         },
         barriers: [
             {
-                x: 0.3148,
-                y: 0.0951,
-                width: 0.01,
-                height: 0.3,
-                size: "large",
-                rotation: 45
-            },
-            {
-                x: 0.5971,
-                y: 0.0873,
+                x: 0.2509,
+                y: 0.4135,
                 width: 0.01,
                 height: 0.2,
                 size: "medium",
-                rotation: 150
+                rotation: 321
             }
         ],
         lifeRestores: [
             {
-                x: 0.4974,
-                y: 0.4333,
+                x: 0.436,
+                y: 0.5623,
                 radius: 0.022
             }
         ]
@@ -863,16 +789,16 @@ const DEFAULT_LEVELS = [
         },
         arcGates: [
             {
-                x: 0.6272,
-                y: 0.5527,
+                x: 0.5403,
+                y: 0.2965,
                 width: 0.05,
                 height: 0.13,
                 active: true,
                 rotation: 0
             },
             {
-                x: 0.4217,
-                y: 0.4715,
+                x: 0.7137,
+                y: 0.3268,
                 width: 0.05,
                 height: 0.13,
                 active: true,
@@ -881,13 +807,13 @@ const DEFAULT_LEVELS = [
         ],
         slippageClouds: [
             {
-                x: 0.5434,
-                y: 0.5434,
+                x: 0.8197,
+                y: 0.459,
                 radius: 0.06
             },
             {
-                x: 0.3452,
-                y: 0.5586,
+                x: 0.2564,
+                y: 0.304,
                 radius: 0.06
             }
         ],
@@ -899,28 +825,12 @@ const DEFAULT_LEVELS = [
         },
         barriers: [
             {
-                x: 0.2808,
-                y: 0.4188,
-                width: 0.01,
-                height: 0.2,
-                size: "medium",
-                rotation: 120
-            },
-            {
-                x: 0.76,
-                y: 0.751,
+                x: 0.6511,
+                y: 0.4704,
                 width: 0.01,
                 height: 0.3,
                 size: "large",
-                rotation: 45
-            },
-            {
-                x: 0.3893,
-                y: 0.4218,
-                width: 0.01,
-                height: 0.2,
-                size: "medium",
-                rotation: 150
+                rotation: 178
             }
         ],
         lifeRestores: []
@@ -934,24 +844,24 @@ const DEFAULT_LEVELS = [
         },
         arcGates: [
             {
-                x: 0.3985,
-                y: 0.0714,
+                x: 0.1985,
+                y: 0.4876,
                 width: 0.05,
                 height: 0.13,
                 active: true,
                 rotation: 0
             },
             {
-                x: 0.3376,
-                y: 0.1835,
+                x: 0.2924,
+                y: 0.411,
                 width: 0.05,
                 height: 0.13,
                 active: true,
                 rotation: 0
             },
             {
-                x: 0.2861,
-                y: 0.2982,
+                x: 0.6403,
+                y: 0.2393,
                 width: 0.05,
                 height: 0.13,
                 active: true,
@@ -960,13 +870,8 @@ const DEFAULT_LEVELS = [
         ],
         slippageClouds: [
             {
-                x: 0.2586,
-                y: 0.5934,
-                radius: 0.06
-            },
-            {
-                x: 0.1835,
-                y: 0.6651,
+                x: 0.326,
+                y: 0.3254,
                 radius: 0.06
             }
         ],
@@ -978,28 +883,20 @@ const DEFAULT_LEVELS = [
         },
         barriers: [
             {
-                x: 0.7499,
-                y: 0.0544,
+                x: 0.2794,
+                y: 0.5705,
                 width: 0.01,
                 height: 0.3,
                 size: "large",
-                rotation: 270
+                rotation: 127
             },
             {
-                x: 0.5167,
-                y: 0.1915,
+                x: 0.3987,
+                y: -0.0169,
                 width: 0.01,
                 height: 0.2,
                 size: "medium",
-                rotation: 30
-            },
-            {
-                x: 0.2031,
-                y: 0.4279,
-                width: 0.01,
-                height: 0.12,
-                size: "small",
-                rotation: 90
+                rotation: 125
             }
         ],
         lifeRestores: []
@@ -1013,16 +910,16 @@ const DEFAULT_LEVELS = [
         },
         arcGates: [
             {
-                x: 0.3839,
-                y: 0.5595,
+                x: 0.7209,
+                y: 0.2815,
                 width: 0.05,
                 height: 0.13,
                 active: true,
                 rotation: 0
             },
             {
-                x: 0.6713,
-                y: 0.5243,
+                x: 0.3278,
+                y: 0.2348,
                 width: 0.05,
                 height: 0.13,
                 active: true,
@@ -1031,13 +928,13 @@ const DEFAULT_LEVELS = [
         ],
         slippageClouds: [
             {
-                x: 0.5456,
-                y: 0.6328,
+                x: 0.2528,
+                y: 0.5204,
                 radius: 0.06
             },
             {
-                x: 0.789,
-                y: 0.6293,
+                x: 0.8155,
+                y: 0.4552,
                 radius: 0.06
             }
         ],
@@ -1049,50 +946,18 @@ const DEFAULT_LEVELS = [
         },
         barriers: [
             {
-                x: 0.338,
-                y: 0.7577,
+                x: 0.3283,
+                y: 0.4801,
                 width: 0.01,
                 height: 0.3,
                 size: "large",
-                rotation: 240
-            },
-            {
-                x: 0.2816,
-                y: 0.5741,
-                width: 0.01,
-                height: 0.2,
-                size: "medium",
-                rotation: 120
-            },
-            {
-                x: 0.5639,
-                y: 0.4867,
-                width: 0.01,
-                height: 0.3,
-                size: "large",
-                rotation: 120
-            },
-            {
-                x: 0.2046,
-                y: 0.8131,
-                width: 0.01,
-                height: 0.12,
-                size: "small",
-                rotation: 120
-            },
-            {
-                x: 0.4695,
-                y: 0.5129,
-                width: 0.01,
-                height: 0.2,
-                size: "medium",
-                rotation: 240
+                rotation: 9
             }
         ],
         lifeRestores: [
             {
-                x: 0.233,
-                y: 0.4582,
+                x: 0.2662,
+                y: 0.3617,
                 radius: 0.022
             }
         ]
@@ -1106,24 +971,24 @@ const DEFAULT_LEVELS = [
         },
         arcGates: [
             {
-                x: 0.3043,
-                y: 0.214,
+                x: 0.2359,
+                y: 0.6822,
                 width: 0.05,
                 height: 0.13,
                 active: true,
                 rotation: 0
             },
             {
-                x: 0.3908,
-                y: 0.0303,
+                x: 0.3074,
+                y: 0.6366,
                 width: 0.05,
                 height: 0.13,
                 active: true,
                 rotation: 0
             },
             {
-                x: 0.7219,
-                y: 0.0599,
+                x: 0.3802,
+                y: 0.5517,
                 width: 0.05,
                 height: 0.13,
                 active: true,
@@ -1132,13 +997,8 @@ const DEFAULT_LEVELS = [
         ],
         slippageClouds: [
             {
-                x: 0.2859,
-                y: 0.4957,
-                radius: 0.06
-            },
-            {
-                x: 0.8008,
-                y: 0.2435,
+                x: 0.6468,
+                y: 0.4419,
                 radius: 0.06
             }
         ],
@@ -1150,28 +1010,12 @@ const DEFAULT_LEVELS = [
         },
         barriers: [
             {
-                x: 0.4271,
-                y: 0.2632,
-                width: 0.01,
-                height: 0.3,
-                size: "large",
-                rotation: 45
-            },
-            {
-                x: 0.6233,
-                y: 0.056,
-                width: 0.01,
-                height: 0.3,
-                size: "large",
-                rotation: 0
-            },
-            {
-                x: 0.5062,
-                y: 0.1214,
+                x: 0.2542,
+                y: 0.453,
                 width: 0.01,
                 height: 0.2,
                 size: "medium",
-                rotation: 45
+                rotation: 300
             }
         ],
         lifeRestores: []
@@ -1185,32 +1029,24 @@ const DEFAULT_LEVELS = [
         },
         arcGates: [
             {
-                x: 0.2704,
-                y: 0.633,
+                x: 0.638,
+                y: 0.285,
                 width: 0.05,
                 height: 0.13,
                 active: true,
                 rotation: 0
             },
             {
-                x: 0.4271,
-                y: 0.5409,
+                x: 0.3048,
+                y: 0.3751,
                 width: 0.05,
                 height: 0.13,
                 active: true,
                 rotation: 0
             },
             {
-                x: 0.5315,
-                y: 0.5064,
-                width: 0.05,
-                height: 0.13,
-                active: true,
-                rotation: 0
-            },
-            {
-                x: 0.6795,
-                y: 0.4946,
+                x: 0.377,
+                y: 0.2813,
                 width: 0.05,
                 height: 0.13,
                 active: true,
@@ -1219,18 +1055,13 @@ const DEFAULT_LEVELS = [
         ],
         slippageClouds: [
             {
-                x: 0.2006,
-                y: 0.7211,
+                x: 0.2364,
+                y: 0.4656,
                 radius: 0.06
             },
             {
-                x: 0.3898,
-                y: 0.713,
-                radius: 0.06
-            },
-            {
-                x: 0.7885,
-                y: 0.625,
+                x: 0.236,
+                y: 0.6081,
                 radius: 0.06
             }
         ],
@@ -1242,34 +1073,18 @@ const DEFAULT_LEVELS = [
         },
         barriers: [
             {
-                x: 0.2984,
-                y: 0.5406,
+                x: 0.3824,
+                y: 0.4562,
                 width: 0.01,
                 height: 0.3,
                 size: "large",
-                rotation: 120
-            },
-            {
-                x: 0.2677,
-                y: 0.8637,
-                width: 0.01,
-                height: 0.2,
-                size: "medium",
-                rotation: 120
-            },
-            {
-                x: 0.6319,
-                y: 0.6647,
-                width: 0.01,
-                height: 0.3,
-                size: "large",
-                rotation: 0
+                rotation: 346
             }
         ],
         lifeRestores: [
             {
-                x: 0.1525,
-                y: 0.4217,
+                x: 0.8016,
+                y: 0.3754,
                 radius: 0.022
             }
         ]
