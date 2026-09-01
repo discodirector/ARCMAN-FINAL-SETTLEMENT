@@ -95,12 +95,11 @@ const NFTManager = {
     getImageForGameMode: function(gameMode) {
         // Get image URLs from config, with fallback defaults
         const imageUrls = GameConfig.BLOCKCHAIN.NFT_IMAGES || {
-            'Immortal': 'https://via.placeholder.com/512/0ff/000000?text=ARCMAN+Immortal',
             'Tournament': 'https://via.placeholder.com/512/f0f/000000?text=ARCMAN+Tournament'
         };
         
         // Return the image for the game mode, or default if not found
-        return imageUrls[gameMode] || imageUrls['Immortal'] || 'https://via.placeholder.com/512/2775CA/FFFFFF?text=ARCMAN+Completion';
+        return imageUrls[gameMode] || imageUrls['Tournament'] || 'https://via.placeholder.com/512/2775CA/FFFFFF?text=ARCMAN+Completion';
     },
     
     // Generate NFT metadata
@@ -113,7 +112,7 @@ const NFTManager = {
         });
         
         // Get image based on game mode
-        const imageUrl = this.getImageForGameMode(gameData.gameMode || 'Immortal');
+        const imageUrl = this.getImageForGameMode(gameData.gameMode || 'Tournament');
         
         return {
             name: "ARCMAN: Final Settlement - Completion Certificate",
@@ -121,7 +120,7 @@ const NFTManager = {
             image: imageUrl,
             attributes: [
                 { trait_type: "Completion Date", value: dateStr },
-                { trait_type: "Game Mode", value: gameData.gameMode || 'Immortal' }
+                { trait_type: "Game Mode", value: gameData.gameMode || 'Tournament' }
             ],
             external_url: "https://arcmangame.com"
         };
@@ -167,7 +166,7 @@ const NFTManager = {
         }
         
         const playerAddress = Web3Manager.currentAccount;
-        const gameMode = gameData.gameMode || 'Immortal';
+        const gameMode = gameData.gameMode || 'Tournament';
         
         // Check if player already has NFT for this game mode
         const hasNFT = await this.hasCompletionNFT(playerAddress, gameMode);
@@ -183,7 +182,7 @@ const NFTManager = {
             const finalScore = BigInt(gameData.finalScore);
             const levelsCompleted = BigInt(gameData.levelsCompleted);
             const completionTime = BigInt(Math.floor(gameData.completionTime));
-            const gameMode = gameData.gameMode || 'Immortal';
+            const gameMode = gameData.gameMode || 'Tournament';
             
             // Estimate gas
             const gasEstimate = await this.contract.mintCompletionNFT.estimateGas(
@@ -310,12 +309,6 @@ const NFTManager = {
         
         try {
             const nfts = [];
-            
-            // Check for Immortal mode NFT
-            const immortalTokenId = await this.getPlayerTokenId(address, 'Immortal');
-            if (immortalTokenId !== '0') {
-                nfts.push({ tokenId: immortalTokenId, gameMode: 'Immortal' });
-            }
             
             // Check for Tournament mode NFT
             const tournamentTokenId = await this.getPlayerTokenId(address, 'Tournament');

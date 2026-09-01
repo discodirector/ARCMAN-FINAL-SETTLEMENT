@@ -4,8 +4,7 @@ const GameState = {
     levelManager: null,
     
     // Game mode
-    gameMode: null, // null = menu, 'immortal', 'tournament', 'community', 'editor'
-    immortalMode: false,
+    gameMode: null, // null = menu, 'tournament', 'community', 'editor'
     tournamentMode: false,
     communityMode: false,
     

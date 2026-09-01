@@ -78,7 +78,7 @@ async function signMessage(player, score, levelId, nonce, gameMode) {
         // Better approach: use solidityPacked which matches abi.encodePacked
         const packedData = ethers.solidityPacked(
             ['address', 'uint256', 'uint256', 'uint256', 'string'],
-            [player, score, levelId, nonce, gameMode || 'Immortal']
+            [player, score, levelId, nonce, gameMode || 'Tournament']
         );
         
         // Hash the packed data (this matches contract's keccak256(abi.encodePacked(...)))
@@ -133,7 +133,7 @@ app.post('/api/session/start', (req, res) => {
             return res.status(400).json({ error: 'Invalid player address' });
         }
 
-        const validGameMode = gameMode || 'Immortal';
+        const validGameMode = gameMode || 'Tournament';
         if (validGameMode !== 'Immortal' && validGameMode !== 'Tournament') {
             return res.status(400).json({ error: 'Invalid game mode' });
         }

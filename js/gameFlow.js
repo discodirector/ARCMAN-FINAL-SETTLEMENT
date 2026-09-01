@@ -277,7 +277,7 @@ const GameFlow = {
             completionTime: completionTime,
             bestLevelScore: GameState.bestLevelScore,
             averageLevelScore: averageLevelScore,
-            gameMode: GameState.communityMode ? 'Community' : (GameState.immortalMode ? 'Immortal' : (GameState.tournamentMode ? 'Tournament' : 'Unknown')),
+            gameMode: GameState.communityMode ? 'Community' : (GameState.tournamentMode ? 'Tournament' : 'Unknown'),
             timestamp: GameState.gameEndTime,
             totalGates: totalGates,
             totalClouds: totalClouds,
@@ -500,13 +500,10 @@ const GameFlow = {
             if (perfectGamesEl) perfectGamesEl.textContent = formatted.perfectGames;
             
             // Game Mode Stats
-            const immortalPlayedEl = document.getElementById('statsImmortalPlayed');
-            const immortalCompletedEl = document.getElementById('statsImmortalCompleted');
+
             const tournamentPlayedEl = document.getElementById('statsTournamentPlayed');
             const tournamentCompletedEl = document.getElementById('statsTournamentCompleted');
             
-            if (immortalPlayedEl) immortalPlayedEl.textContent = formatted.immortalGamesPlayed;
-            if (immortalCompletedEl) immortalCompletedEl.textContent = formatted.immortalGamesCompleted;
             if (tournamentPlayedEl) tournamentPlayedEl.textContent = formatted.tournamentGamesPlayed;
             if (tournamentCompletedEl) tournamentCompletedEl.textContent = formatted.tournamentGamesCompleted;
             
@@ -647,27 +644,14 @@ const GameFlow = {
         // Show leaderboard screen
         leaderboardScreen.style.display = 'flex';
         
-        // Set default game mode based on completion data if available, otherwise Immortal
-        const defaultGameMode = GameState.completionData?.gameMode || 'Immortal';
-        
-        // Set active mode button
-        const modeButtons = document.querySelectorAll('.leaderboard-mode-btn');
-        modeButtons.forEach(btn => {
-            if (btn.getAttribute('data-mode') === defaultGameMode) {
-                btn.classList.add('active');
-            } else {
-                btn.classList.remove('active');
-            }
-        });
-        
         // Show screen first so buttons are accessible
         leaderboardScreen.style.display = 'flex';
         
         // Setup leaderboard listeners (buttons must be visible)
         this.setupLeaderboardListeners();
         
-        // Load leaderboard data (default to top 10, default game mode)
-        await this.loadLeaderboard(10, defaultGameMode);
+        // Load leaderboard data (top 10 by default)
+        await this.loadLeaderboard(10, 'Tournament');
     },
     
     // Hide leaderboard screen
@@ -809,7 +793,7 @@ const GameFlow = {
             // Always use the current completion data's game mode
             try {
                 // Get game mode from current completion data (should be the most recent)
-                const gameMode = GameState.completionData?.gameMode || 'Immortal';
+                const gameMode = GameState.completionData?.gameMode || 'Tournament';
                 console.log('Checking NFT status for game mode:', gameMode);
                 
                 const hasNFT = await NFTManager.hasCompletionNFT(Web3Manager.currentAccount, gameMode);
@@ -1044,29 +1028,6 @@ const GameFlow = {
         
         // Single event delegation handler for all buttons
         leaderboardContent.addEventListener('click', async (e) => {
-            // Game mode selector buttons
-            if (e.target.classList.contains('leaderboard-mode-btn')) {
-                e.preventDefault();
-                e.stopPropagation();
-                
-                const clickedBtn = e.target;
-                const gameMode = clickedBtn.getAttribute('data-mode');
-                
-                // Remove active class from all mode buttons
-                document.querySelectorAll('.leaderboard-mode-btn').forEach(b => {
-                    b.classList.remove('active');
-                });
-                // Add active class to clicked button
-                clickedBtn.classList.add('active');
-                
-                // Get current count from active filter button
-                const activeFilter = document.querySelector('.leaderboard-filter-btn.active');
-                const count = activeFilter ? parseInt(activeFilter.getAttribute('data-count')) : 10;
-                
-                await this.loadLeaderboard(count, gameMode);
-                return;
-            }
-            
             // Filter buttons
             if (e.target.classList.contains('leaderboard-filter-btn')) {
                 e.preventDefault();
@@ -1082,9 +1043,7 @@ const GameFlow = {
                 // Add active class to clicked button
                 clickedBtn.classList.add('active');
                 
-                // Get current game mode from active mode button
-                const activeMode = document.querySelector('.leaderboard-mode-btn.active');
-                const gameMode = activeMode ? activeMode.getAttribute('data-mode') : 'Immortal';
+                const gameMode = 'Tournament';
                 
                 await this.loadLeaderboard(count, gameMode);
                 return;
@@ -1097,9 +1056,7 @@ const GameFlow = {
                 
                 const activeFilter = document.querySelector('.leaderboard-filter-btn.active');
                 const count = activeFilter ? parseInt(activeFilter.getAttribute('data-count')) : 10;
-                const activeMode = document.querySelector('.leaderboard-mode-btn.active');
-                const gameMode = activeMode ? activeMode.getAttribute('data-mode') : 'Immortal';
-                await this.loadLeaderboard(count, gameMode);
+                await this.loadLeaderboard(count, 'Tournament');
                 return;
             }
             
@@ -1121,9 +1078,7 @@ const GameFlow = {
             newBtn.addEventListener('click', async () => {
                 const activeFilter = document.querySelector('.leaderboard-filter-btn.active');
                 const count = activeFilter ? parseInt(activeFilter.getAttribute('data-count')) : 10;
-                const activeMode = document.querySelector('.leaderboard-mode-btn.active');
-                const gameMode = activeMode ? activeMode.getAttribute('data-mode') : 'Immortal';
-                await this.loadLeaderboard(count, gameMode);
+                await this.loadLeaderboard(count, 'Tournament');
             });
         }
         
@@ -1140,7 +1095,7 @@ const GameFlow = {
     },
     
     // Load and display leaderboard
-    loadLeaderboard: async function(count = 10, gameMode = 'Immortal') {
+    loadLeaderboard: async function(count = 10, gameMode = 'Tournament') {
         const loadingEl = document.getElementById('leaderboardLoading');
         const errorEl = document.getElementById('leaderboardError');
         const listEl = document.getElementById('leaderboardList');
@@ -1554,7 +1509,7 @@ const GameFlow = {
                 score: serverScore,
                 levelId: BigInt(GameState.completionData.levelsCompleted),
                 nonce: nonceBigInt,
-                gameMode: GameState.completionData.gameMode || 'Immortal'
+                gameMode: GameState.completionData.gameMode || 'Tournament'
             };
             
             const result = await Web3Manager.submitScore(scoreData, signed.signature);
@@ -1757,7 +1712,6 @@ const GameFlow = {
         GameState.gameMode = null;
         GameState.gameState = 'menu';
         GameState.editorMode = false; // Exit editor mode when returning to menu
-        GameState.immortalMode = false;
         GameState.tournamentMode = false;
         GameState.communityMode = false;
         
@@ -1971,14 +1925,9 @@ const GameFlow = {
     
     // Setup menu event listeners
     setupMenuListeners: function() {
-        const menuImmortal = document.getElementById('menuImmortal');
         const menuTournament = document.getElementById('menuTournament');
         const menuEditor = document.getElementById('menuEditor');
         const backToMenuBtn = document.getElementById('backToMenu');
-        
-        if (menuImmortal) {
-            menuImmortal.addEventListener('click', this.startImmortalMode.bind(this));
-        }
         
         if (menuTournament) {
             menuTournament.addEventListener('click', this.startTournamentMode.bind(this));
@@ -2104,87 +2053,10 @@ const GameFlow = {
         }
     },
     
-    // Start Immortal Mode
-    startImmortalMode: async function() {
-        GameState.gameMode = 'immortal';
-        GameState.immortalMode = true;
-        GameState.tournamentMode = false;
-        GameState.communityMode = false;
-        GameState.gameState = 'aiming';
-        
-        // Load default levels
-        if (GameState.levelManager) {
-            GameState.levelManager.loadDefaultLevels();
-        }
-        
-        // Reset game completion state
-        GameState.resetGame();
-        GameState.gameStartTime = Date.now();
-        GameState.gameCompleted = false;
-        GameState.levelScores = [];
-        GameState.totalGatesPassed = 0;
-        GameState.totalCloudsPassed = 0;
-        GameState.totalBarriersHit = 0;
-
-        // Start anti-cheat session (must await so sessionId is set before first levelStart)
-        const account = Web3Manager.currentAccount;
-        if (account) {
-            await this.startSession(account, 'Immortal');
-        }
-        
-        this.hideMainMenu();
-        
-        // Play gameplay music
-        AudioManager.playGameplayMusic();
-        
-        // Setup canvas but skip automatic game object initialization (we'll do it manually)
-        CanvasManager.setupCanvas(true);
-        
-        // Load first level
-        if (GameState.levelManager) {
-            GameState.levelManager.setCurrentLevel(0);
-            const firstLevel = GameState.levelManager.getCurrentLevel();
-            if (firstLevel) {
-                if (typeof GameObjects !== 'undefined' && GameObjects.loadLevel) {
-                    GameObjects.loadLevel(firstLevel);
-                }
-                // Initialize stars for the level
-                if (typeof GameObjects !== 'undefined' && GameObjects.initStars) {
-                    GameObjects.initStars();
-                }
-                this.resetRound();
-
-                // Notify server of first level start
-                this.sendSessionEvent('levelStart');
-
-                if (typeof UI !== 'undefined' && UI.updateLevelUI) {
-                    UI.updateLevelUI();
-                }
-                
-                // Show mode description on first level (before tutorial)
-                if (GameState.levelManager.currentLevelIndex === 0) {
-                    this.showModeDescription('immortal');
-                }
-            }
-        } else {
-            console.error('Level manager not initialized');
-        }
-        
-        console.log('Immortal mode started. Game objects:', {
-            player: GameState.player,
-            gates: GameState.arcGates.length,
-            clouds: GameState.slippageClouds.length,
-            settlement: !!GameState.settlementZone,
-            stars: GameState.stars.length,
-            config: { width: GameConfig.CONFIG.width, height: GameConfig.CONFIG.height }
-        });
-    },
-    
     // Start Tournament Mode
     startTournamentMode: async function() {
         GameState.gameMode = 'tournament';
         GameState.tournamentMode = true;
-        GameState.immortalMode = false;
         GameState.communityMode = false;
         GameState.gameState = 'aiming';
         
@@ -2264,7 +2136,6 @@ const GameFlow = {
     startCommunityMode: function() {
         GameState.gameMode = 'community';
         GameState.communityMode = true;
-        GameState.immortalMode = false;
         GameState.tournamentMode = false;
         GameState.gameState = 'aiming'; // Set game state to aiming
         
@@ -2342,10 +2213,7 @@ const GameFlow = {
         // Set description text based on mode
         let mainText = '';
         let highlightText = '';
-        if (mode === 'immortal') {
-            mainText = 'You are <span style="color: #0ff; text-shadow: 0 0 20px #0ff; font-weight: bold;">Arc Man</span>. Your mission: finalize the stablecoin transaction. Launch the token in an arc and hit the Settlement Zone.\n\nScore points, compete with others, climb the Leaderboard, and mint your final NFT.';
-            highlightText = 'In this mode, you have infinite lives. Practice and enjoy!';
-        } else if (mode === 'tournament') {
+        if (mode === 'tournament') {
             mainText = 'You are <span style="color: #0ff; text-shadow: 0 0 20px #0ff; font-weight: bold;">Arc Man</span>. Your mission: finalize the stablecoin transaction. Launch the token in an arc and hit the Settlement Zone.\n\nScore points, compete with others, climb the Leaderboard, and mint your final NFT.';
             highlightText = 'You have 5 lives in this mode. Correct answers in the quiz will restore them.';
         }
@@ -2581,7 +2449,6 @@ const GameFlow = {
     // Start Editor Mode
     startEditorMode: function() {
         GameState.gameMode = 'editor';
-        GameState.immortalMode = false;
         GameState.tournamentMode = false;
         GameState.gameState = 'aiming'; // Allow editor to function
         

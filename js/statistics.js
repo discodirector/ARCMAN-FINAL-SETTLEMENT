@@ -27,8 +27,6 @@ const PlayerStatistics = {
         perfectGames: 0, // Games where all levels were completed
         
         // Game Mode Stats
-        immortalGamesPlayed: 0,
-        immortalGamesCompleted: 0,
         tournamentGamesPlayed: 0,
         tournamentGamesCompleted: 0,
         
@@ -76,10 +74,7 @@ const PlayerStatistics = {
         this.stats.gamesCompleted++;
         
         // Update game mode specific stats
-        if (completionData.gameMode === 'Immortal') {
-            this.stats.immortalGamesPlayed++;
-            this.stats.immortalGamesCompleted++;
-        } else if (completionData.gameMode === 'Tournament') {
+        if (completionData.gameMode === 'Tournament') {
             this.stats.tournamentGamesPlayed++;
             this.stats.tournamentGamesCompleted++;
         }
@@ -192,8 +187,6 @@ const PlayerStatistics = {
             perfectGames: stats.perfectGames,
             
             // Game Mode Stats
-            immortalGamesPlayed: stats.immortalGamesPlayed,
-            immortalGamesCompleted: stats.immortalGamesCompleted,
             tournamentGamesPlayed: stats.tournamentGamesPlayed,
             tournamentGamesCompleted: stats.tournamentGamesCompleted,
             
@@ -225,8 +218,6 @@ const PlayerStatistics = {
             totalCloudsPassed: 0,
             totalBarriersHit: 0,
             perfectGames: 0,
-            immortalGamesPlayed: 0,
-            immortalGamesCompleted: 0,
             tournamentGamesPlayed: 0,
             tournamentGamesCompleted: 0,
             lastGameDate: null,

@@ -1127,8 +1127,7 @@ const LevelEditor = {
         
         // Set up test mode BEFORE hiding editor (so toggleEditor doesn't show menu)
         GameState.gameMode = 'test';
-        GameState.immortalMode = true; // Use immortal mode mechanics (no lives)
-        GameState.tournamentMode = false;
+        GameState.tournamentMode = false; // no lives in a test run
         GameState.gameState = 'aiming';
         
         // Hide editor (now that gameMode is 'test', it won't show menu)
@@ -1231,7 +1230,6 @@ const LevelEditor = {
         // Return to editor
         GameState.gameMode = 'editor';
         GameState.editorMode = true;
-        GameState.immortalMode = false;
         GameState.tournamentMode = false;
         this.toggleEditor(true);
         

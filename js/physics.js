@@ -340,7 +340,7 @@ const Physics = {
                     }, 2000);
                 }
             } else {
-                // In immortal mode, just reset and try again
+                // Outside tournament mode nothing is at stake — just reset and try again
                 if (typeof GameFlow !== 'undefined' && GameFlow.resetRound) {
                     GameFlow.resetRound();
                 }

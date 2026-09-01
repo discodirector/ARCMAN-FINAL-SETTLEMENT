@@ -77,11 +77,10 @@ const GameConfig = {
         },
         // Backend API URL
         API_URL: 'https://localhost:3000', // Update for production
-        // NFT image URLs for each game mode
-        // For development: use local paths (images/nft-immortal.png, images/nft-tournament.png)
-        // For production: replace with IPFS/CDN URLs (e.g., https://ipfs.io/ipfs/QmXx...)
+        // NFT image URL for the completion certificate
+        // For development: use a local path (images/nft-tournament.png)
+        // For production: replace with an IPFS/CDN URL (e.g., https://ipfs.io/ipfs/QmXx...)
         NFT_IMAGES: {
-            Immortal: 'https://black-generous-crocodile-850.mypinata.cloud/ipfs/bafybeicayq4fii7wd52rzqkhysvjd6vhohzxvw2ooez34fssrpvzfizuta', // Local file for development, replace with IPFS/CDN for production
             Tournament: 'https://black-generous-crocodile-850.mypinata.cloud/ipfs/bafybeiabkfecwarftaaaj3vvgavqaco4idmvshbtzkwbaqbrwu5qdsejoy' // Local file for development, replace with IPFS/CDN for production
         }
     },

@@ -444,7 +444,7 @@ const Web3Manager = {
                 scoreData.score,
                 scoreData.levelId,
                 scoreData.nonce,
-                scoreData.gameMode || 'Immortal'
+                scoreData.gameMode || 'Tournament'
             ];
             
             // Estimate gas
@@ -506,7 +506,7 @@ const Web3Manager = {
     },
     
     // Get leaderboard from contract
-    getLeaderboard: async function(count = 100, gameMode = 'Immortal') {
+    getLeaderboard: async function(count = 100, gameMode = 'Tournament') {
         try {
             const provider = this.provider || this.getReadOnlyProvider();
             
@@ -532,7 +532,7 @@ const Web3Manager = {
     },
     
     // Get player's score for a specific game mode
-    getPlayerScore: async function(playerAddress, gameMode = 'Immortal') {
+    getPlayerScore: async function(playerAddress, gameMode = 'Tournament') {
         try {
             const provider = this.provider || this.getReadOnlyProvider();
             

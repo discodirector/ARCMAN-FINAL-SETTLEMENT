@@ -5,13 +5,13 @@ const Leaderboard = {
     data: null,
     
     // Current game mode filter
-    currentGameMode: 'Immortal',
+    currentGameMode: 'Tournament',
     
     // Player's rank (null if not on leaderboard)
     playerRank: null,
     
     // Fetch leaderboard from smart contract
-    fetchLeaderboard: async function(count = 100, gameMode = 'Immortal') {
+    fetchLeaderboard: async function(count = 100, gameMode = 'Tournament') {
         try {
             if (typeof Web3Manager === 'undefined') {
                 throw new Error('Web3Manager is not available');
@@ -22,7 +22,7 @@ const Leaderboard = {
             }
             
             // Store current game mode
-            this.currentGameMode = gameMode || 'Immortal';
+            this.currentGameMode = gameMode || 'Tournament';
             
             console.log(`Fetching leaderboard (top ${count}) for ${this.currentGameMode} mode...`);
             
@@ -118,7 +118,7 @@ const Leaderboard = {
     // Refresh leaderboard data
     refresh: async function(count = 100, gameMode = null) {
         try {
-            const mode = gameMode || this.currentGameMode || 'Immortal';
+            const mode = gameMode || this.currentGameMode || 'Tournament';
             await this.fetchLeaderboard(count, mode);
             return this.data;
         } catch (error) {
