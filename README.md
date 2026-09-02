@@ -41,6 +41,8 @@ ARCMAN: Final Settlement is a browser-based arcade game in a retro pixel-art sty
   * `leaderboard.js` — leaderboard data fetching and formatting
   * `nft.js` — NFT minting functionality
   * `quizzes.js` — quiz questions and answers data
+  * `rescueTopics.js` — rescue-quiz topics: a hint and three questions each
+  * `rescue.js` — the one second chance a run gets when the last life is lost
   * `quiz.js` — quiz system management for Tournament mode
   * `infoScreens.js` — educational info-screen content (Arc / USDC / Circle facts)
   * `infoManager.js` — info-screen scheduling and display, and the hand-off to that level's quiz
@@ -109,6 +111,10 @@ ARCMAN: Final Settlement is a browser-based arcade game in a retro pixel-art sty
     - Skip quizzes if you have full lives or don't need them
     - Topics run from Arc's architecture and USDC as gas to x402, agent wallets, CCTP and settlement
     - Questions and answers are easily editable in `js/quizzes.js`
+- **Rescue Quiz** (Tournament Mode): losing the last life no longer ends the run outright
+  - A topic is drawn from `js/rescueTopics.js`: the hint comes first, then that topic's three questions
+  - 3 of 3 correct — carry on from the same level with 3 lives; 2 of 3 — with 1 life; fewer — the run restarts from level 1
+  - One rescue per run, and its questions never repeat the per-level quizzes
 - **Built-in Level Editor**: Create and edit custom levels with visual placement tools
   - **Drag and Drop**: Move objects by clicking and dragging them with the Select tool
   - **Launch Level**: Test levels directly from the editor without leaving
@@ -221,11 +227,15 @@ npm start
    - Answer the question correctly to gain +1 life
    - Skip the quiz if you have full lives or prefer to continue
    - Topics run from Arc's architecture and USDC as gas to x402, agent wallets, CCTP and settlement
-9. **Game Completion**: After completing all levels, view your final score, completion time, and statistics
-10. **On-Chain Finalization**: Click "Finalize On-Chain" to submit your score to the blockchain (requires wallet connection)
-11. **NFT Minting**: Click "Mint NFT" to mint a completion certificate NFT (one per player)
-12. **Leaderboard**: View top players and your rank on the Tournament leaderboard
-13. **Statistics**: Access detailed player statistics from the main menu, including games played, best scores, completion times, and achievements
+9. **Rescue Quiz** (Tournament Mode only):
+   - Run out of lives and a hint appears, followed by three questions on it
+   - Answer all three and you return to the same level with 3 lives; two of three returns you with 1 life
+   - One or none, and the run restarts from the first level. One rescue per run
+10. **Game Completion**: After completing all levels, view your final score, completion time, and statistics
+11. **On-Chain Finalization**: Click "Finalize On-Chain" to submit your score to the blockchain (requires wallet connection)
+12. **NFT Minting**: Click "Mint NFT" to mint a completion certificate NFT (one per player)
+13. **Leaderboard**: View top players and your rank on the Tournament leaderboard
+14. **Statistics**: Access detailed player statistics from the main menu, including games played, best scores, completion times, and achievements
 
 ## Level Editor
 
@@ -315,6 +325,8 @@ The game uses a **modular namespace pattern** for better organization and mainta
 - `js/levelEditor.js` - Complete level editor system
 - `js/quizzes.js` - Quiz questions and answers data (editable quiz content)
 - `js/quiz.js` - Quiz system management for Tournament mode (quiz display, answer handling, life rewards)
+- `js/rescueTopics.js` - Rescue-quiz topic base: each topic carries a hint and three questions
+- `js/rescue.js` - Rescue quiz: one hint and three questions when the last life is lost, once per run
 - `js/infoScreens.js` - Educational info-screen content (Arc / USDC / Circle facts)
 - `js/infoManager.js` - Info-screen scheduling and display (one after every level in Tournament mode), then hands off to that level's quiz
 

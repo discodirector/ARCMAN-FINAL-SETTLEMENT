@@ -475,6 +475,104 @@
         }
 
 
+        /* Rescue quiz — shown once a run, when the last life is gone */
+        #rescueScreen {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.96);
+            z-index: 255;
+            display: none;
+            align-items: flex-start;
+            justify-content: center;
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
+            touch-action: auto;
+        }
+
+        .rescue-content {
+            border-color: #f0f;
+            box-shadow: 0 0 30px #f0f, inset 0 0 20px rgba(255, 0, 255, 0.15);
+        }
+
+        .rescue-content h2 {
+            color: #f0f;
+            text-shadow: 0 0 15px #f0f;
+        }
+
+        #rescueLead {
+            color: #dff;
+            font-family: 'Courier New', monospace;
+            font-size: clamp(13px, 2.4vw, 17px);
+            line-height: 1.5;
+            margin-bottom: clamp(14px, 3vw, 20px);
+        }
+
+        #rescueHint {
+            color: #0ff;
+            background: rgba(0, 255, 255, 0.08);
+            border: 2px solid #0ff;
+            border-radius: 5px;
+            padding: clamp(12px, 2.5vw, 18px);
+            margin-bottom: clamp(18px, 3.5vw, 26px);
+            font-family: 'Courier New', monospace;
+            font-size: clamp(13px, 2.4vw, 17px);
+            line-height: 1.6;
+            text-align: left;
+        }
+
+        #rescueHint b {
+            color: #ff0;
+            display: inline-block;
+            margin-bottom: 6px;
+        }
+
+        #rescueProgress {
+            color: #f0f;
+            font-family: 'Courier New', monospace;
+            font-size: clamp(11px, 2vw, 14px);
+            letter-spacing: 1px;
+            margin-bottom: clamp(10px, 2vw, 14px);
+        }
+
+        #rescueQuestion {
+            color: #ff0;
+            font-size: clamp(15px, 2.8vw, 21px);
+            text-shadow: 0 0 12px #ff0;
+            margin-bottom: clamp(18px, 3.5vw, 26px);
+            font-family: 'Courier New', monospace;
+            line-height: 1.5;
+            padding: clamp(10px, 2vw, 15px);
+            background: rgba(255, 255, 0, 0.1);
+            border: 2px solid #ff0;
+            border-radius: 5px;
+        }
+
+        #rescueButton {
+            margin-top: clamp(8px, 2vw, 14px);
+            background: rgba(255, 0, 255, 0.2);
+            color: #f0f;
+            border: 2px solid #f0f;
+            padding: clamp(10px, 2vw, 14px) clamp(20px, 4vw, 30px);
+            font-size: clamp(12px, 2vw, 16px);
+            font-weight: bold;
+            font-family: 'Courier New', monospace;
+            cursor: pointer;
+            box-shadow: 0 0 15px rgba(255, 0, 255, 0.5);
+            border-radius: 5px;
+            transition: all 0.3s;
+        }
+
+        #rescueButton:hover {
+            background: rgba(255, 0, 255, 0.4);
+            box-shadow: 0 0 25px #f0f;
+            transform: scale(1.05);
+        }
+
+        #rescueButton:active { transform: scale(0.95); }
+
         /* ---- Agent Shift mode (retired — kept with js/agent*.js in case it returns) ---- */
         body.agent-mode #score,
         body.agent-mode #levelCounter { display: none !important; }
@@ -3125,6 +3223,26 @@
             </div>
         </div>
 
+        <!-- Rescue quiz: one hint, three questions, one way back into the run -->
+        <div id="rescueScreen" style="display: none;">
+            <div class="quiz-content rescue-content">
+                <h2 id="rescueTitle">Out of lives</h2>
+                <div id="rescueLead"></div>
+                <div id="rescueHint"></div>
+                <div id="rescueQuestionWrap" style="display: none;">
+                    <div id="rescueProgress"></div>
+                    <div id="rescueQuestion"></div>
+                    <div class="quiz-answers">
+                        <button id="rescueAnswer1" class="quiz-answer-button">Answer 1</button>
+                        <button id="rescueAnswer2" class="quiz-answer-button">Answer 2</button>
+                        <button id="rescueAnswer3" class="quiz-answer-button">Answer 3</button>
+                    </div>
+                </div>
+                <div id="rescueResult" class="quiz-result"></div>
+                <button id="rescueButton">Continue</button>
+            </div>
+        </div>
+
         <!-- Agent Shift mode — retired: no script loads these nodes, they render nothing. -->
         <div id="agentHud">
             <span><i>left</i> <b id="agentClock">60s</b></span>
@@ -3739,6 +3857,8 @@
     <script src="js/scoring.js"></script>
     <script src="js/quizzes.js"></script>
     <script src="js/quiz.js"></script>
+    <script src="js/rescueTopics.js"></script>
+    <script src="js/rescue.js"></script>
     <script src="js/infoScreens.js"></script>
     <script src="js/infoManager.js"></script>
     <script src="js/ui.js"></script>

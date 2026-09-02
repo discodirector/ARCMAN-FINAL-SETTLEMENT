@@ -129,6 +129,7 @@ const GameFlow = {
         
         // Reset lives to 5
         GameState.tournamentLives = GameConfig.MAX_TOURNAMENT_LIVES;
+        GameState.rescueUsed = false;
         if (typeof UI !== 'undefined' && UI.updateLivesUI) {
             UI.updateLivesUI();
         }
@@ -1759,6 +1760,10 @@ const GameFlow = {
             QuizManager.hideQuiz();
         }
         
+        if (typeof RescueManager !== 'undefined' && RescueManager.hide) {
+            RescueManager.hide();
+        }
+        
         // Hide info screen if visible
         if (typeof InfoManager !== 'undefined' && InfoManager.hideInfo) {
             InfoManager.hideInfo();
@@ -2067,6 +2072,7 @@ const GameFlow = {
         
         // Reset lives to 5 when starting tournament mode
         GameState.tournamentLives = GameConfig.MAX_TOURNAMENT_LIVES;
+        GameState.rescueUsed = false;
         
         // Play gameplay music
         AudioManager.playGameplayMusic();
@@ -2215,7 +2221,7 @@ const GameFlow = {
         let highlightText = '';
         if (mode === 'tournament') {
             mainText = 'You are <span style="color: #0ff; text-shadow: 0 0 20px #0ff; font-weight: bold;">Arc Man</span>. Your mission: finalize the stablecoin transaction. Launch the token in an arc and hit the Settlement Zone.\n\nScore points, compete with others, climb the Leaderboard, and mint your final NFT.';
-            highlightText = 'You have 5 lives in this mode. Correct answers in the quiz will restore them.';
+            highlightText = 'You have 5 lives in this mode. Correct answers in the quiz restore them — and if you lose them all, one last quiz can put you back in.';
         }
         
         descriptionTextEl.innerHTML = mainText;

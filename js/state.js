@@ -47,6 +47,7 @@ const GameState = {
     
     // Tournament mode lives system
     tournamentLives: 5,
+    rescueUsed: false, // the one rescue quiz a tournament run gets
     
     // Editor state
     editorMode: false,
@@ -121,6 +122,7 @@ const GameState = {
         this.resetRound();
         this.totalPoints = 0;
         this.tournamentLives = GameConfig.MAX_TOURNAMENT_LIVES;
+        this.rescueUsed = false;
         this.gameState = 'aiming';
         this.sessionId = null;
         this.gameStartTime = null;

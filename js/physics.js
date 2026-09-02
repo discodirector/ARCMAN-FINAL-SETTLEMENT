@@ -328,7 +328,11 @@ const Physics = {
                 
                 if (GameState.tournamentLives <= 0) {
                     setTimeout(() => {
-                        if (typeof GameFlow !== 'undefined' && GameFlow.restartTournamentFromFirst) {
+                        // One rescue per run: answer three questions on a topic
+                        // and keep the run, or start over as before
+                        if (typeof RescueManager !== 'undefined' && RescueManager.available()) {
+                            RescueManager.start();
+                        } else if (typeof GameFlow !== 'undefined' && GameFlow.restartTournamentFromFirst) {
                             GameFlow.restartTournamentFromFirst();
                         }
                     }, 2000);
