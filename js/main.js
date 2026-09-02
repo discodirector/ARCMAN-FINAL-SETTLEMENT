@@ -61,13 +61,13 @@ const Game = {
                 } else {
                     totalScore = GameState.totalPoints;
                 }
-                scoreEl.textContent = `Score: ${totalScore}`;
+                scoreEl.textContent = t('hud.score', { score: totalScore });
             }
             const levelCounterEl = document.getElementById('levelCounter');
             if (levelCounterEl && GameState.levelManager) {
                 const current = GameState.levelManager.currentLevelIndex + 1;
                 const total = GameState.levelManager.getAllLevels().length;
-                levelCounterEl.textContent = `Level ${current}/${total}`;
+                levelCounterEl.textContent = t('hud.level', { current: current, total: total });
             }
         }
         
@@ -76,6 +76,16 @@ const Game = {
     
     // Initialize game
     init: function() {
+        // Language first: every screen below renders its text through I18n.t()
+        I18n.init();
+        LanguageSwitcher.init();
+        // The wallet button is the one menu control whose text is set in JS
+        I18n.onChange(() => {
+            if (typeof GameFlow !== 'undefined' && GameFlow.updateMenuWalletButton) {
+                GameFlow.updateMenuWalletButton();
+            }
+        });
+        
         // Initialize audio manager
         AudioManager.init();
         

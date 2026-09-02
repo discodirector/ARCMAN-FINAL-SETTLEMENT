@@ -35,10 +35,13 @@ const QuizManager = {
         const skipBtn = document.getElementById('quizSkip');
         const resultMessage = document.getElementById('quizResultMessage');
         
-        if (questionEl) questionEl.textContent = quizData.question;
-        if (answer1El) answer1El.textContent = quizData.answers[0];
-        if (answer2El) answer2El.textContent = quizData.answers[1];
-        if (answer3El) answer3El.textContent = quizData.answers[2];
+        // Wording comes from the active language pack; correctIndex stays with
+        // the source data in quizzes.js, so the answers keep their order.
+        const text = I18n.quiz(quizData);
+        if (questionEl) questionEl.textContent = text.question;
+        if (answer1El) answer1El.textContent = text.answers[0];
+        if (answer2El) answer2El.textContent = text.answers[1];
+        if (answer3El) answer3El.textContent = text.answers[2];
         
         // Reset button states
         if (answer1El) {
@@ -65,9 +68,9 @@ const QuizManager = {
             skipBtn.style.display = 'block';
             // Check if player has full lives
             if (GameState.tournamentLives >= GameConfig.MAX_TOURNAMENT_LIVES) {
-                skipBtn.textContent = 'Skip (You have full lives)';
+                skipBtn.textContent = t('quizUi.skipFullLives');
             } else {
-                skipBtn.textContent = 'Skip';
+                skipBtn.textContent = t('quizUi.skip');
             }
         }
         
@@ -155,11 +158,12 @@ const QuizManager = {
             if (isCorrect) {
                 // With a quiz after every level, full lives are common — don't promise a life we can't give
                 const gainedLife = GameState.tournamentLives < GameConfig.MAX_TOURNAMENT_LIVES;
-                resultMessage.textContent = gainedLife ? 'Correct! +1 Life' : 'Correct!';
+                resultMessage.textContent = gainedLife ? t('quizUi.correctLife') : t('quizUi.correct');
                 resultMessage.className = 'quiz-result correct-result';
                 this.awardLife();
             } else {
-                resultMessage.textContent = `Incorrect. Correct answer: ${this.currentQuiz.answers[correctIndex]}`;
+                const correctText = I18n.quiz(this.currentQuiz).answers[correctIndex];
+                resultMessage.textContent = t('quizUi.incorrect', { answer: correctText });
                 resultMessage.className = 'quiz-result incorrect-result';
             }
         }

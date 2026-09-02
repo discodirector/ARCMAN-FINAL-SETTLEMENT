@@ -32,7 +32,7 @@ const RescueManager = {
     },
 
     pickTopic: function () {
-        const pool = RESCUE_TOPICS.filter(t => t.id !== this.lastTopicId);
+        const pool = RESCUE_TOPICS.filter(topic => topic.id !== this.lastTopicId);
         const list = pool.length ? pool : RESCUE_TOPICS;
         return list[Math.floor(Math.random() * list.length)];
     },
@@ -41,8 +41,11 @@ const RescueManager = {
         if (!this.available()) return false;
 
         this.active = true;
-        this.topic = this.pickTopic();
-        this.lastTopicId = this.topic.id;
+        // The drawn topic is translated once here; correctIndex is carried over
+        // unchanged, so scoring does not depend on the language.
+        const source = this.pickTopic();
+        this.lastTopicId = source.id;
+        this.topic = I18n.rescueTopic(source);
         this.index = 0;
         this.correct = 0;
         this.answered = false;
@@ -67,10 +70,9 @@ const RescueManager = {
         const result = this.el('rescueResult');
         const button = this.el('rescueButton');
 
-        if (title) title.textContent = 'Out of lives';
+        if (title) title.textContent = t('rescue.title');
         if (lead) {
-            lead.textContent = 'Three questions stand between you and the run you were having. '
-                + 'Read this first — the answers are all in here.';
+            lead.textContent = t('rescue.lead');
             lead.style.display = 'block';
         }
         if (hint) {
@@ -80,7 +82,7 @@ const RescueManager = {
         if (questionWrap) questionWrap.style.display = 'none';
         if (result) { result.style.display = 'none'; result.textContent = ''; }
         if (button) {
-            button.textContent = 'I have read it — ask me';
+            button.textContent = t('rescue.readIt');
             button.style.display = 'block';
             this.onButton(() => this.showQuestion());
         }
@@ -105,8 +107,11 @@ const RescueManager = {
         if (hint) hint.style.display = 'none';
         if (questionWrap) questionWrap.style.display = 'block';
         if (progress) {
-            progress.textContent = 'Question ' + (this.index + 1) + ' of ' + this.topic.questions.length
-                + '   ·   ' + this.correct + ' right so far';
+            progress.textContent = t('rescue.progress', {
+                current: this.index + 1,
+                total: this.topic.questions.length,
+                correct: this.correct
+            });
         }
         if (question) question.textContent = q.question;
         if (result) { result.style.display = 'none'; result.textContent = ''; }
@@ -145,13 +150,15 @@ const RescueManager = {
         if (result) {
             result.style.display = 'block';
             result.className = 'quiz-result ' + (right ? 'correct-result' : 'incorrect-result');
-            result.textContent = right ? 'Correct' : 'Wrong — it was: ' + q.answers[q.correctIndex];
+            result.textContent = right
+                ? t('rescue.correct')
+                : t('rescue.wrong', { answer: q.answers[q.correctIndex] });
         }
 
         const button = this.el('rescueButton');
         if (button) {
             const last = this.index === this.topic.questions.length - 1;
-            button.textContent = last ? 'See where that leaves you' : 'Next question';
+            button.textContent = last ? t('rescue.seeResult') : t('rescue.next');
             button.style.display = 'block';
             this.onButton(() => {
                 this.index++;
@@ -173,20 +180,20 @@ const RescueManager = {
         const button = this.el('rescueButton');
 
         if (questionWrap) questionWrap.style.display = 'none';
-        if (title) title.textContent = this.correct + ' of ' + total + ' correct';
+        if (title) title.textContent = t('rescue.verdictTitle', { correct: this.correct, total: total });
         if (lead) {
             lead.style.display = 'block';
             lead.textContent = lives
-                ? 'Back in — with ' + lives + (lives === 1 ? ' life' : ' lives') + '. This was the one rescue of the run.'
-                : 'Not enough. The run restarts from the first level.';
+                ? (lives === 1 ? t('rescue.backInOne') : t('rescue.backIn', { lives: lives }))
+                : t('rescue.notEnough');
         }
         if (result) {
             result.style.display = 'block';
             result.className = 'quiz-result ' + (lives ? 'correct-result' : 'incorrect-result');
-            result.textContent = lives ? 'Rescued' : 'Run over';
+            result.textContent = lives ? t('rescue.rescued') : t('rescue.runOver');
         }
         if (button) {
-            button.textContent = lives ? 'Back to the level' : 'Start over';
+            button.textContent = lives ? t('rescue.backToLevel') : t('rescue.startOver');
             button.style.display = 'block';
             this.onButton(() => this.finish(lives));
         }

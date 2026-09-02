@@ -155,13 +155,13 @@ const NFTManager = {
     // Mint NFT for game completion
     mintNFT: async function(gameData) {
         if (!Web3Manager.isConnected()) {
-            throw new Error('Wallet not connected');
+            throw new Error(t('wallet.notConnected'));
         }
         
         if (!this.contract) {
             const initialized = await this.initializeContract();
             if (!initialized) {
-                throw new Error('Failed to initialize NFT contract');
+                throw new Error(t('wallet.nftInitFailed'));
             }
         }
         
@@ -171,7 +171,7 @@ const NFTManager = {
         // Check if player already has NFT for this game mode
         const hasNFT = await this.hasCompletionNFT(playerAddress, gameMode);
         if (hasNFT) {
-            throw new Error(`You already have a completion NFT for ${gameMode} mode`);
+            throw new Error(t('wallet.nftExists', { mode: I18n.gameModeLabel(gameMode) }));
         }
         
         try {

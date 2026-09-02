@@ -12,7 +12,7 @@ const UI = {
         const levelProgressEl = document.getElementById('levelProgress');
         
         if (levelNameEl && currentLevel) {
-            levelNameEl.textContent = `Level ${currentLevel.id}: ${currentLevel.name}`;
+            levelNameEl.textContent = t('hud.levelName', { id: currentLevel.id, name: I18n.levelName(currentLevel) });
         }
         
         if (levelProgressEl) {
@@ -29,7 +29,7 @@ const UI = {
         if (livesCounterEl) {
             if (GameState.tournamentMode) {
                 livesCounterEl.style.display = 'block';
-                livesCounterEl.textContent = `Lives: ${GameState.tournamentLives}`;
+                livesCounterEl.textContent = t('hud.lives', { lives: GameState.tournamentLives });
             } else {
                 livesCounterEl.style.display = 'none';
             }

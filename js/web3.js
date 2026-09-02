@@ -203,13 +203,13 @@ const Web3Manager = {
             // Check if any wallet is installed
             if (!this.isWalletInstalled()) {
                 const walletName = this.getWalletName();
-                throw new Error(`${walletName} is not installed. Please install MetaMask or Rabby wallet to continue.`);
+                throw new Error(t('wallet.notInstalled', { wallet: walletName }));
             }
             
             // Get the appropriate provider
             const provider = this.getWalletProvider();
             if (!provider) {
-                throw new Error('No wallet provider found. Please install MetaMask or Rabby wallet.');
+                throw new Error(t('wallet.noProvider'));
             }
             
             const providerName = provider.isMetaMask ? 'MetaMask' : (provider.isRabby ? 'Rabby' : 'Unknown');
@@ -219,7 +219,7 @@ const Web3Manager = {
             const accounts = await provider.request({ method: 'eth_requestAccounts' });
             
             if (!accounts || accounts.length === 0) {
-                throw new Error('No accounts found. Please unlock your wallet.');
+                throw new Error(t('wallet.noAccounts'));
             }
             
             // Get provider and signer
@@ -247,13 +247,13 @@ const Web3Manager = {
             
             // Provide more helpful error messages
             if (error.code === 4001) {
-                throw new Error('Connection rejected. Please approve the connection request in your wallet.');
+                throw new Error(t('wallet.rejected'));
             } else if (error.code === -32002) {
-                throw new Error('Connection request already pending. Please check your wallet.');
+                throw new Error(t('wallet.pending'));
             } else if (error.message) {
                 throw error;
             } else {
-                throw new Error('Failed to connect wallet. Please try again.');
+                throw new Error(t('wallet.connectFailed'));
             }
         }
     },
@@ -307,7 +307,7 @@ const Web3Manager = {
                             throw new Error(`Cannot add network: Network configuration not available for ${GameConfig.BLOCKCHAIN.NETWORK}`);
                         }
                     } else if (switchError.code === 4001) {
-                        throw new Error(`Please approve the network switch to ${GameConfig.BLOCKCHAIN.NETWORK} in your wallet.`);
+                        throw new Error(t('wallet.switchNetwork', { network: GameConfig.BLOCKCHAIN.NETWORK }));
                     } else {
                         throw new Error(`Failed to switch network: ${switchError.message}`);
                     }
@@ -319,7 +319,7 @@ const Web3Manager = {
                     ? networkAfter.chainId 
                     : BigInt(networkAfter.chainId || 0);
                 if (chainIdAfter !== expectedChainIdBigInt) {
-                    throw new Error(`Failed to switch to ${GameConfig.BLOCKCHAIN.NETWORK}. Please switch manually in your wallet.`);
+                    throw new Error(t('wallet.switchFailed', { network: GameConfig.BLOCKCHAIN.NETWORK }));
                 }
             } else {
                 console.log(`Connected to ${GameConfig.BLOCKCHAIN.NETWORK} (chain ID: ${currentChainId})`);
@@ -430,12 +430,12 @@ const Web3Manager = {
     submitScore: async function(scoreData, signature) {
         try {
             if (!this.isConnected()) {
-                throw new Error('Wallet not connected');
+                throw new Error(t('wallet.notConnected'));
             }
             
             const contract = this.getContract();
             if (!contract) {
-                throw new Error('Contract not initialized. Please set CONTRACT_ADDRESS in config.');
+                throw new Error(t('wallet.contractMissing'));
             }
             
             // Prepare score data struct (must include gameMode)
@@ -453,7 +453,7 @@ const Web3Manager = {
                 gasEstimate = await contract.finalizeScore.estimateGas(scoreDataStruct, signature);
             } catch (error) {
                 console.error('Gas estimation failed:', error);
-                throw new Error('Transaction would fail. Please check your score data.');
+                throw new Error(t('wallet.txWouldFail'));
             }
             
             // Submit transaction

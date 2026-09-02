@@ -24,7 +24,7 @@ const InfoManager = {
         }
 
         const textEl = document.getElementById('infoText');
-        if (textEl) textEl.textContent = infoData.text;
+        if (textEl) textEl.textContent = I18n.infoText(infoData);
 
         screen.style.display = 'flex';
         this.setupListeners();

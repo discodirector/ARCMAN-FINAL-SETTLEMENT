@@ -952,7 +952,7 @@ const Renderer = {
         ctx.font = `bold ${settlementFontSize}px monospace`;
         ctx.textAlign = 'center';
         ctx.textBaseline = 'middle';
-        ctx.fillText('SETTLEMENT', x + width/2, y + height/2);
+        ctx.fillText(t('hud.settlement'), x + width/2, y + height/2);
         
         ctx.shadowBlur = 0;
     },

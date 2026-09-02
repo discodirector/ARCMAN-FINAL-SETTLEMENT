@@ -153,7 +153,7 @@ const PlayerStatistics = {
         
         // Format completion times
         const formatTime = (seconds) => {
-            if (seconds === null || seconds === undefined) return 'N/A';
+            if (seconds === null || seconds === undefined) return t('stats.notAvailable');
             const mins = Math.floor(seconds / 60);
             const secs = seconds % 60;
             return `${mins}:${secs.toString().padStart(2, '0')}`;
@@ -193,8 +193,8 @@ const PlayerStatistics = {
             // Last game
             lastGameDate: stats.lastGameDate 
                 ? new Date(stats.lastGameDate).toLocaleDateString()
-                : 'Never',
-            lastGameMode: stats.lastGameMode || 'N/A',
+                : t('stats.never'),
+            lastGameMode: stats.lastGameMode ? I18n.gameModeLabel(stats.lastGameMode) : t('stats.notAvailable'),
             lastGameScore: stats.lastGameScore.toLocaleString()
         };
     },

@@ -333,7 +333,7 @@ const GameFlow = {
         
         if (bestLevelScoreEl) bestLevelScoreEl.textContent = GameState.bestLevelScore.toLocaleString();
         if (averageLevelScoreEl) averageLevelScoreEl.textContent = GameState.completionData.averageLevelScore.toLocaleString();
-        if (gameModeEl) gameModeEl.textContent = GameState.completionData.gameMode;
+        if (gameModeEl) gameModeEl.textContent = I18n.gameModeLabel(GameState.completionData.gameMode);
         
         // Show completion screen
         completionScreen.style.display = 'flex';
@@ -395,9 +395,9 @@ const GameFlow = {
         if (!communityCompletionPopup) {
             // If popup doesn't exist, create it dynamically or use alert as fallback
             if (typeof UI !== 'undefined' && UI.showNotification) {
-                UI.showNotification("You've completed all community-created levels. Come back later for new ones, superhero!", 10000);
+                UI.showNotification(t('community.text'), 10000);
             } else {
-                alert("You've completed all community-created levels. Come back later for new ones, superhero!");
+                alert(t('community.text'));
             }
             // Return to menu after a delay
             setTimeout(() => {
@@ -546,7 +546,7 @@ const GameFlow = {
             resetBtn.parentNode.replaceChild(newBtn, resetBtn);
             
             newBtn.addEventListener('click', () => {
-                if (confirm('Are you sure you want to reset all statistics? This cannot be undone.')) {
+                if (confirm(t('stats.resetConfirm'))) {
                     if (typeof PlayerStatistics !== 'undefined' && PlayerStatistics.resetStats) {
                         PlayerStatistics.resetStats();
                         // Refresh the display
@@ -724,7 +724,7 @@ const GameFlow = {
                 } else {
                     const placeholder = document.createElement('div');
                     placeholder.className = 'nft-placeholder';
-                    placeholder.textContent = 'NFT Preview';
+                    placeholder.textContent = t('nft.preview');
                     previewImageEl.appendChild(placeholder);
                 }
             }
@@ -753,12 +753,12 @@ const GameFlow = {
         const mintBtn = document.getElementById('nftMintButton');
         if (mintBtn) {
             mintBtn.disabled = false;
-            mintBtn.textContent = 'Mint NFT';
+            mintBtn.textContent = t('nft.mint');
         }
         
         const statusText = document.getElementById('nftStatusText');
         if (statusText) {
-            statusText.textContent = 'Ready to mint';
+            statusText.textContent = t('nft.readyToMint');
         }
         
         // Clear error/success messages
@@ -808,7 +808,7 @@ const GameFlow = {
                     console.log('Retrieved token ID:', tokenId, 'for game mode:', gameMode);
                     
                     if (existingTokenIdEl) {
-                        existingTokenIdEl.textContent = tokenId && tokenId !== '0' ? tokenId : 'N/A';
+                        existingTokenIdEl.textContent = tokenId && tokenId !== '0' ? tokenId : t('stats.notAvailable');
                     }
                     
                     if (viewTokenLink) {
@@ -860,7 +860,7 @@ const GameFlow = {
                     await this.updateNFTWalletStatus();
                 } catch (error) {
                     console.error('Error connecting wallet:', error);
-                    this.showNFTError('Failed to connect wallet: ' + error.message);
+                    this.showNFTError(t('nft.connectFailed', { error: error.message }));
                 }
             });
         }
@@ -897,12 +897,12 @@ const GameFlow = {
     // Mint completion NFT
     mintCompletionNFT: async function() {
         if (!Web3Manager.isConnected()) {
-            this.showNFTError('Please connect your wallet first');
+            this.showNFTError(t('errors.connectWalletFirst'));
             return;
         }
         
         if (!GameState.completionData) {
-            this.showNFTError('No completion data available');
+            this.showNFTError(t('errors.noCompletionData'));
             return;
         }
         
@@ -919,15 +919,15 @@ const GameFlow = {
         // Disable mint button and show status
         if (mintBtn) {
             mintBtn.disabled = true;
-            mintBtn.textContent = 'Minting...';
+            mintBtn.textContent = t('nft.minting');
         }
         if (statusText) {
-            statusText.textContent = 'Preparing transaction...';
+            statusText.textContent = t('nft.preparing');
         }
         
         try {
             // Estimate gas
-            if (statusText) statusText.textContent = 'Estimating gas...';
+            if (statusText) statusText.textContent = t('nft.estimatingGas');
             
             // Prepare game data for minting
             const gameData = {
@@ -942,7 +942,7 @@ const GameFlow = {
             await NFTManager.initializeContract();
             
             // Estimate gas (we'll do this inside mintNFT, but show status)
-            if (statusText) statusText.textContent = 'Minting NFT...';
+            if (statusText) statusText.textContent = t('nft.mintingNft');
             
             // Mint NFT
             const result = await NFTManager.mintNFT(gameData);
@@ -960,14 +960,14 @@ const GameFlow = {
                 if (tokenIdEl) tokenIdEl.textContent = result.tokenId;
                 if (txLink) {
                     txLink.href = NFTManager.getTransactionUrl(result.txHash);
-                    txLink.textContent = 'View Transaction';
+                    txLink.textContent = t('nft.viewTx');
                 }
             }
             
-            if (statusText) statusText.textContent = 'NFT minted successfully!';
+            if (statusText) statusText.textContent = t('nft.mintedSuccess');
             if (mintBtn) {
                 mintBtn.disabled = true;
-                mintBtn.textContent = 'Already Minted';
+                mintBtn.textContent = t('nft.alreadyMinted');
             }
             
             // Refresh wallet status to show already minted
@@ -976,13 +976,13 @@ const GameFlow = {
             
         } catch (error) {
             console.error('Error minting NFT:', error);
-            this.showNFTError(error.message || 'Failed to mint NFT');
+            this.showNFTError(error.message || t('nft.mintFailed'));
             
             if (mintBtn) {
                 mintBtn.disabled = false;
-                mintBtn.textContent = 'Mint NFT';
+                mintBtn.textContent = t('nft.mint');
             }
-            if (statusText) statusText.textContent = 'Ready to mint';
+            if (statusText) statusText.textContent = t('nft.readyToMint');
         }
     },
     
@@ -1112,7 +1112,7 @@ const GameFlow = {
         try {
             // Fetch leaderboard data
             if (typeof Leaderboard === 'undefined') {
-                throw new Error('Leaderboard module is not available');
+                throw new Error(t('errors.leaderboardUnavailable'));
             }
             
             await Leaderboard.fetchLeaderboard(count, gameMode);
@@ -1123,7 +1123,7 @@ const GameFlow = {
                 listEl.innerHTML = '';
                 
                 if (formatted.length === 0) {
-                    listEl.innerHTML = '<div style="text-align: center; color: #ff0; padding: 20px;">No players on leaderboard yet. Be the first!</div>';
+                    listEl.innerHTML = '<div style="text-align: center; color: #ff0; padding: 20px;">' + t('leaderboard.empty') + '</div>';
                 } else {
                     formatted.forEach(entry => {
                         const entryEl = document.createElement('div');
@@ -1142,7 +1142,7 @@ const GameFlow = {
                             <div class="leaderboard-rank ${rankClass}">#${entry.rank}</div>
                             <div class="leaderboard-info">
                                 <div class="leaderboard-address ${entry.isCurrentPlayer ? 'current-player' : ''}">${Leaderboard.formatAddress(entry.address)}</div>
-                                <div class="leaderboard-score">${Leaderboard.formatScore(entry.score)} points</div>
+                                <div class="leaderboard-score">${t('leaderboard.points', { score: Leaderboard.formatScore(entry.score) })}</div>
                             </div>
                         `;
                         
@@ -1162,7 +1162,7 @@ const GameFlow = {
         } catch (error) {
             console.error('Error loading leaderboard:', error);
             if (errorEl) {
-                errorEl.textContent = `Failed to load leaderboard: ${error.message}`;
+                errorEl.textContent = t('leaderboard.loadFailed', { error: error.message });
                 errorEl.style.display = 'block';
             }
         } finally {
@@ -1190,7 +1190,7 @@ const GameFlow = {
             levelsCompletedEl.textContent = GameState.completionData.levelsCompleted;
         }
         if (gameModeEl && GameState.completionData) {
-            gameModeEl.textContent = GameState.completionData.gameMode;
+            gameModeEl.textContent = I18n.gameModeLabel(GameState.completionData.gameMode);
         }
         
         // Reset UI state
@@ -1236,13 +1236,13 @@ const GameFlow = {
         const connectBtn = document.getElementById('onchainConnectWallet');
         if (connectBtn) {
             connectBtn.disabled = false;
-            connectBtn.textContent = 'Connect Wallet';
+            connectBtn.textContent = t('onchain.connectWallet');
         }
         
         const submitBtn = document.getElementById('onchainSubmitScore');
         if (submitBtn) {
             submitBtn.disabled = false;
-            submitBtn.textContent = 'Finalize Score On-Chain';
+            submitBtn.textContent = t('onchain.submit');
         }
         
         const statusText = document.getElementById('onchainStatusText');
@@ -1298,7 +1298,7 @@ const GameFlow = {
                     console.log('isWalletInstalled:', Web3Manager.isWalletInstalled());
                     
                     newBtn.disabled = true;
-                    newBtn.textContent = 'Connecting...';
+                    newBtn.textContent = t('onchain.connecting');
                     
                     // Check if wallet is installed first
                     if (!Web3Manager.isWalletInstalled()) {
@@ -1308,7 +1308,7 @@ const GameFlow = {
                             rabby: typeof window.rabby,
                             metamask: typeof window.metamask
                         });
-                        throw new Error('Wallet is not installed. Please install MetaMask or Rabby wallet.');
+                        throw new Error(t('wallet.noProvider'));
                     }
                     
                     console.log('Wallet detected, attempting connection...');
@@ -1317,10 +1317,10 @@ const GameFlow = {
                     this.updateOnchainWalletUI(account);
                 } catch (error) {
                     console.error('Wallet connection error:', error);
-                    const errorMessage = error.message || 'Failed to connect wallet. Please try again.';
+                    const errorMessage = error.message || t('wallet.connectFailed');
                     this.showOnchainError(errorMessage);
                     newBtn.disabled = false;
-                    newBtn.textContent = 'Connect Wallet';
+                    newBtn.textContent = t('onchain.connectWallet');
                 }
             });
         }
@@ -1360,12 +1360,12 @@ const GameFlow = {
     // Finalize score on-chain (uses session-based anti-cheat flow)
     finalizeScoreOnChain: async function() {
         if (!GameState.completionData) {
-            this.showOnchainError('No completion data available');
+            this.showOnchainError(t('errors.noCompletionData'));
             return;
         }
         
         if (!Web3Manager.isConnected()) {
-            this.showOnchainError('Wallet not connected');
+            this.showOnchainError(t('wallet.notConnected'));
             return;
         }
         
@@ -1375,25 +1375,22 @@ const GameFlow = {
         try {
             if (submitBtn) {
                 submitBtn.disabled = true;
-                submitBtn.textContent = 'Processing...';
+                submitBtn.textContent = t('onchain.processing');
             }
             
             const txSection = document.getElementById('onchainTransactionSection');
             if (txSection) txSection.style.display = 'block';
             if (statusText) {
-                statusText.textContent = 'Getting server signature...';
+                statusText.textContent = t('onchain.gettingSignature');
             }
             
             const account = await Web3Manager.getAccount();
             if (!account) {
-                throw new Error('No account connected');
+                throw new Error(t('errors.noAccount'));
             }
 
             if (!GameState.sessionId) {
-                throw new Error(
-                    'No game session found. This can happen if you started the game without a wallet connected.\n\n' +
-                    'Please connect your wallet, then play through all levels again to record your score.'
-                );
+                throw new Error(t('errors.noSession'));
             }
             
             // Verify correct network
@@ -1474,7 +1471,7 @@ const GameFlow = {
                 });
             } catch (fetchError) {
                 if (fetchError.name === 'AbortError') {
-                    throw new Error('Request timed out. The server may be slow or unavailable.');
+                    throw new Error(t('errors.requestTimeout'));
                 } else if (fetchError.message.includes('Failed to fetch') || fetchError.message.includes('ERR_CONNECTION_REFUSED')) {
                     throw new Error(
                         'Cannot connect to backend server. Please make sure the server is running:\n\n' +
@@ -1486,12 +1483,12 @@ const GameFlow = {
             }
             
             if (!response.ok) {
-                let errorMessage = 'Failed to get server signature';
+                let errorMessage = t('errors.signatureFailed');
                 try {
                     const error = await response.json();
                     errorMessage = error.error || errorMessage;
                 } catch (e) {
-                    errorMessage = `Server error: ${response.status} ${response.statusText}`;
+                    errorMessage = t('errors.serverError', { status: response.status, statusText: response.statusText });
                 }
                 throw new Error(errorMessage);
             }
@@ -1502,7 +1499,7 @@ const GameFlow = {
             const serverScore = BigInt(signed.score);
             
             if (statusText) {
-                statusText.textContent = 'Submitting transaction...';
+                statusText.textContent = t('onchain.submitting');
             }
             
             const scoreData = {
@@ -1519,10 +1516,10 @@ const GameFlow = {
             
         } catch (error) {
             console.error('Error finalizing on-chain:', error);
-            this.showOnchainError(error.message || 'Failed to finalize score on-chain');
+            this.showOnchainError(error.message || t('onchain.failed'));
             if (submitBtn) {
                 submitBtn.disabled = false;
-                submitBtn.textContent = 'Finalize Score On-Chain';
+                submitBtn.textContent = t('onchain.submit');
             }
         }
     },
@@ -1546,7 +1543,7 @@ const GameFlow = {
         const submitBtn = document.getElementById('onchainSubmitScore');
         if (submitBtn) {
             submitBtn.disabled = false;
-            submitBtn.textContent = 'Finalize Score On-Chain';
+            submitBtn.textContent = t('onchain.submit');
         }
     },
     
@@ -1813,7 +1810,7 @@ const GameFlow = {
                 walletButton.disabled = true;
                 const walletText = walletButton.querySelector('#menuWalletButtonText');
                 if (walletText) {
-                    walletText.textContent = 'Connecting...';
+                    walletText.textContent = t('wallet.connecting');
                 }
                 
                 // Check for file:// protocol first
@@ -1830,11 +1827,11 @@ const GameFlow = {
                     const diagnosis = Web3Manager.diagnoseWallet();
                     console.error('Wallet detection failed. Diagnosis:', diagnosis);
                     
-                    let errorMsg = 'Wallet is not detected. ';
+                    let errorMsg = t('wallet.notDetected');
                     if (diagnosis.hasEthereum) {
-                        errorMsg += 'window.ethereum exists but may not be a valid wallet provider. ';
+                        errorMsg += t('wallet.providerInvalid');
                     }
-                    errorMsg += 'Please:\n1. Make sure MetaMask or Rabby is installed and enabled\n2. Refresh the page\n3. Check browser console for details';
+                    errorMsg += t('wallet.installSteps');
                     
                     throw new Error(errorMsg);
                 }
@@ -1845,7 +1842,7 @@ const GameFlow = {
             }
         } catch (error) {
             console.error('Wallet connection error:', error);
-            const errorMessage = error.message || 'Failed to connect wallet. Please try again.';
+            const errorMessage = error.message || t('wallet.connectFailed');
             if (typeof UI !== 'undefined' && UI.showNotification) {
                 UI.showNotification(errorMessage, 3000);
             } else {
@@ -1873,7 +1870,7 @@ const GameFlow = {
             walletButton.classList.add('file-protocol-warning');
             walletButton.classList.remove('connected');
             if (walletText) {
-                walletText.textContent = '⚠️ Use HTTP Server';
+                walletText.textContent = t('wallet.useHttpServer');
                 walletText.style.display = 'block';
             }
             if (walletAddress) walletAddress.style.display = 'none';
@@ -1896,7 +1893,7 @@ const GameFlow = {
             // Wallet is not connected
             walletButton.classList.remove('connected');
             if (walletText) {
-                walletText.textContent = 'Connect Wallet';
+                walletText.textContent = t('wallet.connect');
                 walletText.style.display = 'block';
             }
             if (walletAddress) walletAddress.style.display = 'none';
@@ -2170,9 +2167,9 @@ const GameFlow = {
             if (GameState.levelManager.levels.length === 0) {
                 // No community levels available
                 if (typeof UI !== 'undefined' && UI.showNotification) {
-                    UI.showNotification('No community levels available yet. Check back later!', 5000);
+                    UI.showNotification(t('community.none'), 5000);
                 } else {
-                    alert('No community levels available yet. Check back later!');
+                    alert(t('community.none'));
                 }
                 this.showMainMenu();
                 return;
@@ -2220,8 +2217,8 @@ const GameFlow = {
         let mainText = '';
         let highlightText = '';
         if (mode === 'tournament') {
-            mainText = 'You are <span style="color: #0ff; text-shadow: 0 0 20px #0ff; font-weight: bold;">Arc Man</span>. Your mission: finalize the stablecoin transaction. Launch the token in an arc and hit the Settlement Zone.\n\nScore points, compete with others, climb the Leaderboard, and mint your final NFT.';
-            highlightText = 'You have 5 lives in this mode. Correct answers in the quiz restore them — and if you lose them all, one last quiz can put you back in.';
+            mainText = t('mode.tournamentText');
+            highlightText = t('mode.tournamentHighlight');
         }
         
         descriptionTextEl.innerHTML = mainText;

@@ -33,7 +33,7 @@ const LevelEditor = {
     createNewEditorLevel: function() {
         return {
             id: null,
-            name: 'New Level',
+            name: t('editor.newLevelName'),
             player: { x: 0.12, y: 0.75 },
             arcGates: [],
             slippageClouds: [],
@@ -107,15 +107,15 @@ const LevelEditor = {
                     try {
                         document.execCommand('copy');
                         if (typeof UI !== 'undefined' && UI.showNotification) {
-                            UI.showNotification('Code copied to clipboard!', 2000);
+                            UI.showNotification(t('editor.copied'), 2000);
                         } else {
-                            alert('Code copied to clipboard!');
+                            alert(t('editor.copied'));
                         }
                     } catch (err) {
                         if (typeof UI !== 'undefined' && UI.showNotification) {
-                            UI.showNotification('Failed to copy. Please select and copy manually.', 3000);
+                            UI.showNotification(t('editor.copyFailed'), 3000);
                         } else {
-                            alert('Failed to copy. Please select and copy manually.');
+                            alert(t('editor.copyFailed'));
                         }
                     }
                 }
@@ -862,7 +862,7 @@ const LevelEditor = {
         const settlementCount = document.getElementById('settlementCount');
         
         if (nameInput) nameInput.value = GameState.editorLevel.name;
-        if (idInput) idInput.value = GameState.editorLevel.id || 'New';
+        if (idInput) idInput.value = GameState.editorLevel.id || t('editor.idNew');
         if (gateCount) gateCount.textContent = GameState.editorLevel.arcGates.length;
         if (cloudCount) cloudCount.textContent = GameState.editorLevel.slippageClouds.length;
         if (lifeRestoreCount) lifeRestoreCount.textContent = GameState.editorLevel.lifeRestores ? GameState.editorLevel.lifeRestores.length : 0;
@@ -877,9 +877,9 @@ const LevelEditor = {
         // Ensure settlement zone exists
         if (!GameState.editorLevel.settlementZone) {
             if (typeof UI !== 'undefined' && UI.showNotification) {
-                UI.showNotification('Please add a Settlement Zone before saving!', 3000);
+                UI.showNotification(t('editor.needSettlementSave'), 3000);
             } else {
-                alert('Please add a Settlement Zone before saving!');
+                alert(t('editor.needSettlementSave'));
             }
             return;
         }
@@ -894,9 +894,9 @@ const LevelEditor = {
         
         this.updateLevelSelect();
         if (typeof UI !== 'undefined' && UI.showNotification) {
-            UI.showNotification('Level saved!', 2000);
+            UI.showNotification(t('editor.saved'), 2000);
         } else {
-            alert('Level saved!');
+            alert(t('editor.saved'));
         }
     },
     
@@ -904,14 +904,14 @@ const LevelEditor = {
     deleteEditorLevel: function() {
         if (!GameState.levelManager || !GameState.editorLevel || !GameState.editorLevel.id) {
             if (typeof UI !== 'undefined' && UI.showNotification) {
-                UI.showNotification('Cannot delete: This is a new level or a default level.', 3000);
+                UI.showNotification(t('editor.cannotDelete'), 3000);
             } else {
-                alert('Cannot delete: This is a new level or a default level.');
+                alert(t('editor.cannotDelete'));
             }
             return;
         }
         
-        if (confirm('Delete this level?')) {
+        if (confirm(t('editor.deleteConfirm'))) {
             GameState.levelManager.deleteLevel(GameState.editorLevel.id);
             GameState.editorLevel = this.createNewEditorLevel();
             this.updateEditorUI();
@@ -951,7 +951,7 @@ const LevelEditor = {
         allLevels.forEach(level => {
             const option = document.createElement('option');
             option.value = level.id;
-            option.textContent = `Level ${level.id}: ${level.name}`;
+            option.textContent = t('hud.levelName', { id: level.id, name: I18n.levelName(level) });
             levelSelect.appendChild(option);
         });
         
@@ -973,17 +973,17 @@ const LevelEditor = {
             } else {
                 // Fallback: show notification with code
                 if (typeof UI !== 'undefined' && UI.showNotification) {
-                    UI.showNotification('Export modal not found. Code logged to console.', 3000);
+                    UI.showNotification(t('editor.exportModalMissing'), 3000);
                     console.log('Export code:', code);
                 } else {
-                    alert('Export modal not found. Here is the code:\n\n' + code);
+                    alert(t('editor.exportModalMissingWithCode') + code);
                 }
             }
         } else {
             if (typeof UI !== 'undefined' && UI.showNotification) {
-                UI.showNotification('Export function not available. Make sure levels.js is loaded.', 3000);
+                UI.showNotification(t('editor.exportUnavailable'), 3000);
             } else {
-                alert('Export function not available. Make sure levels.js is loaded.');
+                alert(t('editor.exportUnavailable'));
             }
         }
     },
@@ -992,9 +992,9 @@ const LevelEditor = {
     submitLevel: function() {
         if (!GameState.editorLevel) {
             if (typeof UI !== 'undefined' && UI.showNotification) {
-                UI.showNotification('No level to submit!', 2000);
+                UI.showNotification(t('editor.nothingToSubmit'), 2000);
             } else {
-                alert('No level to submit!');
+                alert(t('editor.nothingToSubmit'));
             }
             return;
         }
@@ -1002,9 +1002,9 @@ const LevelEditor = {
         // Validate settlement zone exists
         if (!GameState.editorLevel.settlementZone) {
             if (typeof UI !== 'undefined' && UI.showNotification) {
-                UI.showNotification('Please add a Settlement Zone before submitting!', 3000);
+                UI.showNotification(t('editor.needSettlementSubmit'), 3000);
             } else {
-                alert('Please add a Settlement Zone before submitting!');
+                alert(t('editor.needSettlementSubmit'));
             }
             return;
         }
@@ -1018,9 +1018,9 @@ const LevelEditor = {
         
         if (!hasObjects) {
             if (typeof UI !== 'undefined' && UI.showNotification) {
-                UI.showNotification('Please add at least one object (gate, cloud, barrier, or life restore) before submitting!', 3000);
+                UI.showNotification(t('editor.needObjects'), 3000);
             } else {
-                alert('Please add at least one object (gate, cloud, barrier, or life restore) before submitting!');
+                alert(t('editor.needObjects'));
             }
             return;
         }
@@ -1039,7 +1039,7 @@ const LevelEditor = {
         
         // Show loading notification
         if (typeof UI !== 'undefined' && UI.showNotification) {
-            UI.showNotification('Submitting level...', 2000);
+            UI.showNotification(t('editor.submitting'), 2000);
         }
         
         // Send to server
@@ -1054,9 +1054,9 @@ const LevelEditor = {
         .then(data => {
             if (data.success) {
                 if (typeof UI !== 'undefined' && UI.showNotification) {
-                    UI.showNotification('Level submitted successfully! The developer will review it.', 4000);
+                    UI.showNotification(t('editor.submitted'), 4000);
                 } else {
-                    alert('Level submitted successfully! The developer will review it.');
+                    alert(t('editor.submitted'));
                 }
             } else {
                 throw new Error(data.error || 'Failed to submit level');
@@ -1065,9 +1065,9 @@ const LevelEditor = {
         .catch(error => {
             console.error('Error submitting level:', error);
             if (typeof UI !== 'undefined' && UI.showNotification) {
-                UI.showNotification('Failed to submit level. Please try again later.', 3000);
+                UI.showNotification(t('editor.submitFailed'), 3000);
             } else {
-                alert('Failed to submit level. Please try again later.');
+                alert(t('editor.submitFailed'));
             }
         });
     },
@@ -1076,9 +1076,9 @@ const LevelEditor = {
     launchLevel: function() {
         if (!GameState.editorLevel) {
             if (typeof UI !== 'undefined' && UI.showNotification) {
-                UI.showNotification('No level to launch!', 2000);
+                UI.showNotification(t('editor.nothingToLaunch'), 2000);
             } else {
-                alert('No level to launch!');
+                alert(t('editor.nothingToLaunch'));
             }
             return;
         }
@@ -1086,9 +1086,9 @@ const LevelEditor = {
         // Ensure settlement zone exists
         if (!GameState.editorLevel.settlementZone) {
             if (typeof UI !== 'undefined' && UI.showNotification) {
-                UI.showNotification('Please add a Settlement Zone before launching!', 3000);
+                UI.showNotification(t('editor.needSettlementLaunch'), 3000);
             } else {
-                alert('Please add a Settlement Zone before launching!');
+                alert(t('editor.needSettlementLaunch'));
             }
             return;
         }
@@ -1097,9 +1097,9 @@ const LevelEditor = {
         if (!GameState.editorLevel.id) {
             if (!GameState.levelManager) {
                 if (typeof UI !== 'undefined' && UI.showNotification) {
-                    UI.showNotification('Level manager not initialized!', 3000);
+                    UI.showNotification(t('editor.managerMissing'), 3000);
                 } else {
-                    alert('Level manager not initialized!');
+                    alert(t('editor.managerMissing'));
                 }
                 return;
             }
@@ -1107,7 +1107,7 @@ const LevelEditor = {
             GameState.editorLevel.id = GameState.levelManager.addLevel(GameState.editorLevel);
             this.updateLevelSelect();
             if (typeof UI !== 'undefined' && UI.showNotification) {
-                UI.showNotification('Level saved and launching...', 2000);
+                UI.showNotification(t('editor.savedAndLaunching'), 2000);
             }
         }
         
@@ -1118,9 +1118,9 @@ const LevelEditor = {
         const levelToLaunch = GameState.levelManager.getLevelById(GameState.editorLevel.id);
         if (!levelToLaunch) {
             if (typeof UI !== 'undefined' && UI.showNotification) {
-                UI.showNotification('Failed to load level for launch!', 3000);
+                UI.showNotification(t('editor.launchFailed'), 3000);
             } else {
-                alert('Failed to load level for launch!');
+                alert(t('editor.launchFailed'));
             }
             return;
         }

@@ -2153,9 +2153,9 @@
             position: absolute;
             top: clamp(15px, 3vw, 25px);
             left: clamp(15px, 3vw, 25px);
-            width: 140px;
+            min-width: 140px;
             height: 40px;
-            padding: 0;
+            padding: 0 12px;
             background: rgba(0, 255, 255, 0.2);
             border: 2px solid #0ff;
             color: #0ff;
@@ -2232,9 +2232,9 @@
             position: absolute;
             top: clamp(65px, 8vw, 75px); /* Positioned below wallet button */
             left: clamp(15px, 3vw, 25px);
-            width: 140px;
+            min-width: 140px;
             height: 40px;
-            padding: 0;
+            padding: 0 12px;
             background: rgba(39, 117, 202, 0.2); /* USDC blue */
             border: 2px solid #2775CA;
             color: #2775CA;
@@ -2263,6 +2263,92 @@
 
         .menu-faucet-button:active {
             transform: scale(0.95);
+        }
+
+        /* --- Language switcher (main menu, top right) --- */
+        .menu-language-switcher {
+            position: absolute;
+            top: clamp(15px, 3vw, 25px);
+            right: clamp(15px, 3vw, 25px);
+            min-width: 160px;
+            z-index: 300;
+        }
+
+        .menu-language-button {
+            width: 100%;
+            height: 40px;
+            padding: 0 10px;
+            background: rgba(255, 0, 255, 0.2);
+            border: 2px solid #f0f;
+            color: #f0f;
+            font-family: 'Courier New', monospace;
+            font-size: clamp(11px, 2vw, 14px);
+            font-weight: bold;
+            cursor: pointer;
+            box-shadow: 0 0 15px rgba(255, 0, 255, 0.5);
+            border-radius: 5px;
+            transition: all 0.3s;
+            white-space: nowrap;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 8px;
+            box-sizing: border-box;
+        }
+
+        .menu-language-button:hover {
+            background: rgba(255, 0, 255, 0.3);
+            box-shadow: 0 0 25px #f0f;
+        }
+
+        .menu-language-button:active {
+            transform: scale(0.97);
+        }
+
+        #languageCurrentLabel {
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .menu-language-caret {
+            font-size: 0.8em;
+            transition: transform 0.2s;
+        }
+
+        .menu-language-switcher.open .menu-language-caret {
+            transform: rotate(180deg);
+        }
+
+        .menu-language-list {
+            list-style: none;
+            margin: 6px 0 0;
+            padding: 0;
+            background: rgba(0, 0, 0, 0.95);
+            border: 2px solid #f0f;
+            border-radius: 5px;
+            box-shadow: 0 0 20px rgba(255, 0, 255, 0.6);
+            overflow: hidden;
+        }
+
+        .menu-language-list li {
+            padding: 10px 12px;
+            color: #f0f;
+            font-family: 'Courier New', monospace;
+            font-size: clamp(11px, 2vw, 14px);
+            font-weight: bold;
+            cursor: pointer;
+            white-space: nowrap;
+            transition: background 0.2s, color 0.2s;
+        }
+
+        .menu-language-list li:hover,
+        .menu-language-list li.focused {
+            background: rgba(255, 0, 255, 0.25);
+        }
+
+        .menu-language-list li[aria-selected="true"] {
+            background: #f0f;
+            color: #000;
         }
 
         #menuTitle {
@@ -2744,7 +2830,7 @@
             }
 
             .menu-wallet-button {
-                width: 110px;
+                min-width: 110px;
                 height: 32px;
             }
 
@@ -2754,10 +2840,23 @@
             }
 
             .menu-faucet-button {
-                width: 110px;
+                min-width: 110px;
                 height: 32px;
                 font-size: 10px;
                 top: clamp(52px, 7vw, 62px);
+            }
+
+            .menu-language-switcher {
+                min-width: 128px;
+            }
+
+            .menu-language-button {
+                height: 32px;
+            }
+
+            .menu-language-button,
+            .menu-language-list li {
+                font-size: 10px;
             }
 
             .completion-content,
@@ -2841,7 +2940,7 @@
             }
 
             .menu-wallet-button {
-                width: 100px;
+                min-width: 100px;
                 height: 28px;
                 top: 8px;
                 left: 8px;
@@ -2853,11 +2952,30 @@
             }
 
             .menu-faucet-button {
-                width: 100px;
+                min-width: 100px;
                 height: 28px;
                 font-size: 9px;
                 top: 40px;
                 left: 8px;
+            }
+
+            .menu-language-switcher {
+                min-width: 112px;
+                top: 8px;
+                right: 8px;
+            }
+
+            .menu-language-button {
+                height: 28px;
+            }
+
+            .menu-language-button,
+            .menu-language-list li {
+                font-size: 9px;
+            }
+
+            .menu-language-list li {
+                padding: 7px 9px;
             }
 
             /* Start screen text */
@@ -3118,107 +3236,107 @@
             <div id="score">Score: 0</div>
             <div id="levelCounter">Level 1/20</div>
         </div>
-        <button id="backToMenu" style="position: absolute; top: 10px; right: 10px; padding: 8px 12px; background: #f0f; color: #000; border: none; font-family: 'Courier New', monospace; font-size: 12px; font-weight: bold; cursor: pointer; box-shadow: 0 0 10px #f0f; z-index: 100; display: none;">Menu</button>
-        <button id="backToEditor" style="position: absolute; top: 10px; right: 10px; padding: 8px 12px; background: #0f0; color: #000; border: none; font-family: 'Courier New', monospace; font-size: 12px; font-weight: bold; cursor: pointer; box-shadow: 0 0 10px #0f0; z-index: 100; display: none;">Back to Editor</button>
+        <button id="backToMenu" style="position: absolute; top: 10px; right: 10px; padding: 8px 12px; background: #f0f; color: #000; border: none; font-family: 'Courier New', monospace; font-size: 12px; font-weight: bold; cursor: pointer; box-shadow: 0 0 10px #f0f; z-index: 100; display: none;" data-i18n="hud.menu">Menu</button>
+        <button id="backToEditor" style="position: absolute; top: 10px; right: 10px; padding: 8px 12px; background: #0f0; color: #000; border: none; font-family: 'Courier New', monospace; font-size: 12px; font-weight: bold; cursor: pointer; box-shadow: 0 0 10px #0f0; z-index: 100; display: none;" data-i18n="hud.backToEditor">Back to Editor</button>
         <div id="finalizedFlash"></div>
         
         <!-- Game Mode Description Popup (First Level Only, Before Tutorial) -->
         <div id="modeDescriptionPopup" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.95); z-index: 10001; padding: 20px; box-sizing: border-box; overflow-y: auto; -webkit-overflow-scrolling: touch; touch-action: auto;">
             <div class="mode-description-content" style="max-width: 800px; width: 100%; margin: auto; color: #0ff; font-family: 'Courier New', monospace; padding: 30px; background: rgba(0, 0, 0, 0.8); border: 3px solid #0ff; border-radius: 10px; box-shadow: 0 0 30px rgba(0, 255, 255, 0.8);">
-                <h2 style="color: #ff0; text-align: center; font-size: clamp(24px, 5vw, 36px); margin-bottom: 30px; text-shadow: 0 0 20px #ff0;">Mode Description</h2>
+                <h2 style="color: #ff0; text-align: center; font-size: clamp(24px, 5vw, 36px); margin-bottom: 30px; text-shadow: 0 0 20px #ff0;" data-i18n="mode.title">Mode Description</h2>
                 <div id="modeDescriptionText" style="color: #fff; font-size: clamp(14px, 2.5vw, 18px); line-height: 1.8; margin-bottom: 20px; white-space: pre-line; text-align: left;"></div>
                 <div id="modeDescriptionHighlight" style="color: #ff0; font-size: clamp(14px, 2.5vw, 18px); line-height: 1.8; margin-bottom: 30px; text-align: center; text-shadow: 0 0 20px #ff0; font-weight: bold;"></div>
-                <button id="modeDescriptionClose" style="display: block; margin: 30px auto 0; padding: 12px 30px; background: #0ff; color: #000; border: 2px solid #0ff; font-family: 'Courier New', monospace; font-size: clamp(14px, 2.5vw, 18px); font-weight: bold; cursor: pointer; box-shadow: 0 0 20px #0ff; border-radius: 5px; transition: all 0.3s;">I'm in</button>
+                <button id="modeDescriptionClose" style="display: block; margin: 30px auto 0; padding: 12px 30px; background: #0ff; color: #000; border: 2px solid #0ff; font-family: 'Courier New', monospace; font-size: clamp(14px, 2.5vw, 18px); font-weight: bold; cursor: pointer; box-shadow: 0 0 20px #0ff; border-radius: 5px; transition: all 0.3s;" data-i18n="mode.close">I'm in</button>
             </div>
         </div>
         
         <!-- Tutorial Popup (First Level Only) -->
         <div id="tutorialPopup" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.95); z-index: 10000; padding: 20px; box-sizing: border-box; overflow-y: auto; -webkit-overflow-scrolling: touch; touch-action: auto;">
             <div class="tutorial-content" style="max-width: 800px; width: 100%; margin: 0 auto; color: #0ff; font-family: 'Courier New', monospace; padding: 30px; background: rgba(0, 0, 0, 0.8); border: 3px solid #0ff; border-radius: 10px; box-shadow: 0 0 30px rgba(0, 255, 255, 0.8);">
-                <h2 style="color: #ff0; text-align: center; font-size: clamp(24px, 5vw, 36px); margin-bottom: 30px; text-shadow: 0 0 20px #ff0;">Game Objects Guide</h2>
+                <h2 style="color: #ff0; text-align: center; font-size: clamp(24px, 5vw, 36px); margin-bottom: 30px; text-shadow: 0 0 20px #ff0;" data-i18n="tutorial.title">Game Objects Guide</h2>
                 <div class="tutorial-items" style="display: flex; flex-direction: column; gap: 25px;">
                     <!-- Slippage Cloud -->
                     <div class="tutorial-item" style="display: flex; align-items: center; gap: 20px; padding: 15px; background: rgba(0, 255, 255, 0.1); border: 2px solid #0ff; border-radius: 8px;">
                         <canvas id="tutorialCloud" width="80" height="80" style="border: 2px solid #0ff; border-radius: 50%; background: rgba(0, 0, 0, 0.5); flex-shrink: 0;"></canvas>
                         <div style="flex: 1;">
-                            <h3 style="color: #0ff; font-size: clamp(16px, 3vw, 20px); margin-bottom: 8px; text-shadow: 0 0 10px #0ff;">Slippage Cloud</h3>
-                            <p style="color: #fff; font-size: clamp(12px, 2vw, 16px); line-height: 1.5; margin: 0;">A trap! It slows down finalization, changes the trajectory, and gives 10 points.</p>
+                            <h3 style="color: #0ff; font-size: clamp(16px, 3vw, 20px); margin-bottom: 8px; text-shadow: 0 0 10px #0ff;" data-i18n="tutorial.cloudName">Slippage Cloud</h3>
+                            <p style="color: #fff; font-size: clamp(12px, 2vw, 16px); line-height: 1.5; margin: 0;" data-i18n="tutorial.cloudText">A trap! It slows down finalization, changes the trajectory, and gives 10 points.</p>
                         </div>
                     </div>
                     <!-- Arc Gate -->
                     <div class="tutorial-item" style="display: flex; align-items: center; gap: 20px; padding: 15px; background: rgba(255, 0, 255, 0.1); border: 2px solid #f0f; border-radius: 8px;">
                         <canvas id="tutorialGate" width="80" height="80" style="border: 2px solid #f0f; background: rgba(0, 0, 0, 0.5); flex-shrink: 0;"></canvas>
                         <div style="flex: 1;">
-                            <h3 style="color: #f0f; font-size: clamp(16px, 3vw, 20px); margin-bottom: 8px; text-shadow: 0 0 10px #f0f;">Arc Gate</h3>
-                            <p style="color: #fff; font-size: clamp(12px, 2vw, 16px); line-height: 1.5; margin: 0;">Grants a 1.5× multiplier to your points for completing the level.</p>
+                            <h3 style="color: #f0f; font-size: clamp(16px, 3vw, 20px); margin-bottom: 8px; text-shadow: 0 0 10px #f0f;" data-i18n="tutorial.gateName">Arc Gate</h3>
+                            <p style="color: #fff; font-size: clamp(12px, 2vw, 16px); line-height: 1.5; margin: 0;" data-i18n="tutorial.gateText">Grants a 1.5× multiplier to your points for completing the level.</p>
                         </div>
                     </div>
                     <!-- Barrier -->
                     <div class="tutorial-item" style="display: flex; align-items: center; gap: 20px; padding: 15px; background: rgba(255, 255, 0, 0.1); border: 2px solid #ff0; border-radius: 8px;">
                         <canvas id="tutorialBarrier" width="80" height="80" style="border: 2px solid #ff0; background: rgba(0, 0, 0, 0.5); flex-shrink: 0;"></canvas>
                         <div style="flex: 1;">
-                            <h3 style="color: #ff0; font-size: clamp(16px, 3vw, 20px); margin-bottom: 8px; text-shadow: 0 0 10px #ff0;">Barrier</h3>
-                            <p style="color: #fff; font-size: clamp(12px, 2vw, 16px); line-height: 1.5; margin: 0;">Barrier — you’ve hit a compliance barrier! The transaction requires routing, the flight direction will change, and it gives 10 points.</p>
+                            <h3 style="color: #ff0; font-size: clamp(16px, 3vw, 20px); margin-bottom: 8px; text-shadow: 0 0 10px #ff0;" data-i18n="tutorial.barrierName">Barrier</h3>
+                            <p style="color: #fff; font-size: clamp(12px, 2vw, 16px); line-height: 1.5; margin: 0;" data-i18n="tutorial.barrierText">Barrier — you’ve hit a compliance barrier! The transaction requires routing, the flight direction will change, and it gives 10 points.</p>
                         </div>
                     </div>
                     <!-- Settlement Zone -->
                     <div class="tutorial-item" style="display: flex; align-items: center; gap: 20px; padding: 15px; background: rgba(0, 255, 0, 0.1); border: 2px solid #0f0; border-radius: 8px;">
                         <canvas id="tutorialSettlement" width="80" height="80" style="border: 2px solid #0f0; background: rgba(0, 0, 0, 0.5); flex-shrink: 0;"></canvas>
                         <div style="flex: 1;">
-                            <h3 style="color: #0f0; font-size: clamp(16px, 3vw, 20px); margin-bottom: 8px; text-shadow: 0 0 10px #0f0;">Settlement Zone</h3>
-                            <p style="color: #fff; font-size: clamp(12px, 2vw, 16px); line-height: 1.5; margin: 0;">This is the finish! Entering it finalizes the transaction.</p>
+                            <h3 style="color: #0f0; font-size: clamp(16px, 3vw, 20px); margin-bottom: 8px; text-shadow: 0 0 10px #0f0;" data-i18n="tutorial.settlementName">Settlement Zone</h3>
+                            <p style="color: #fff; font-size: clamp(12px, 2vw, 16px); line-height: 1.5; margin: 0;" data-i18n="tutorial.settlementText">This is the finish! Entering it finalizes the transaction.</p>
                         </div>
                     </div>
                 </div>
-                <button id="tutorialClose" style="display: block; margin: 30px auto 0; padding: 12px 30px; background: #0ff; color: #000; border: 2px solid #0ff; font-family: 'Courier New', monospace; font-size: clamp(14px, 2.5vw, 18px); font-weight: bold; cursor: pointer; box-shadow: 0 0 20px #0ff; border-radius: 5px; transition: all 0.3s;">Got It!</button>
+                <button id="tutorialClose" style="display: block; margin: 30px auto 0; padding: 12px 30px; background: #0ff; color: #000; border: 2px solid #0ff; font-family: 'Courier New', monospace; font-size: clamp(14px, 2.5vw, 18px); font-weight: bold; cursor: pointer; box-shadow: 0 0 20px #0ff; border-radius: 5px; transition: all 0.3s;" data-i18n="tutorial.close">Got It!</button>
             </div>
         </div>
 
         <!-- Level Completion Summary Screen -->
         <div id="levelSummary" style="display: none;">
             <div class="summary-content">
-                <h2>Transaction Finalized!</h2>
+                <h2 data-i18n="summary.title">Transaction Finalized!</h2>
                 <div class="summary-stats">
                     <div class="summary-stat">
-                        <div class="stat-label">Level Points</div>
+                        <div class="stat-label" data-i18n="summary.levelPoints">Level Points</div>
                         <div class="stat-value" id="summaryLevelPoints">0</div>
                     </div>
                     <div class="summary-stat">
-                        <div class="stat-label">Total Points</div>
+                        <div class="stat-label" data-i18n="summary.totalPoints">Total Points</div>
                         <div class="stat-value" id="summaryTotalPoints">0</div>
                     </div>
                     <div class="summary-stat">
-                        <div class="stat-label">Arc Gates Collected</div>
+                        <div class="stat-label" data-i18n="summary.gates">Arc Gates Collected</div>
                         <div class="stat-value" id="summaryGates">0</div>
                     </div>
                     <div class="summary-stat">
-                        <div class="stat-label">Slippage Clouds Passed</div>
+                        <div class="stat-label" data-i18n="summary.clouds">Slippage Clouds Passed</div>
                         <div class="stat-value" id="summaryClouds">0</div>
                     </div>
                     <div class="summary-stat">
-                        <div class="stat-label">Barrier Collisions</div>
+                        <div class="stat-label" data-i18n="summary.barriers">Barrier Collisions</div>
                         <div class="stat-value" id="summaryBarriers">0</div>
                     </div>
                 </div>
-                <button id="summaryContinue" class="summary-button">Continue</button>
-                <button id="summaryReturnToEditor" class="summary-button" style="background: #0f0; color: #000; box-shadow: 0 0 10px #0f0; display: none;">Return to Editor</button>
+                <button id="summaryContinue" class="summary-button" data-i18n="summary.continue">Continue</button>
+                <button id="summaryReturnToEditor" class="summary-button" style="background: #0f0; color: #000; box-shadow: 0 0 10px #0f0; display: none;" data-i18n="summary.returnToEditor">Return to Editor</button>
             </div>
         </div>
 
         <!-- Quiz Screen -->
         <div id="quizScreen" style="display: none;">
             <div class="quiz-content">
-                <h2>Play quiz, gain life</h2>
-                <div id="quizQuestion">Question will appear here</div>
+                <h2 data-i18n="quizUi.title">Play quiz, gain life</h2>
+                <div id="quizQuestion" data-i18n="quizUi.questionPlaceholder">Question will appear here</div>
                 <div class="quiz-answers">
-                    <button id="quizAnswer1" class="quiz-answer-button">Answer 1</button>
-                    <button id="quizAnswer2" class="quiz-answer-button">Answer 2</button>
-                    <button id="quizAnswer3" class="quiz-answer-button">Answer 3</button>
+                    <button id="quizAnswer1" class="quiz-answer-button" data-i18n="quizUi.answer1">Answer 1</button>
+                    <button id="quizAnswer2" class="quiz-answer-button" data-i18n="quizUi.answer2">Answer 2</button>
+                    <button id="quizAnswer3" class="quiz-answer-button" data-i18n="quizUi.answer3">Answer 3</button>
                 </div>
                 <div id="quizResultMessage" class="quiz-result"></div>
                 <div style="display: flex; justify-content: center; gap: 10px; flex-wrap: wrap;">
-                    <button id="quizSkip">Skip</button>
-                    <button id="quizContinue">Continue</button>
+                    <button id="quizSkip" data-i18n="quizUi.skip">Skip</button>
+                    <button id="quizContinue" data-i18n="quizUi.continue">Continue</button>
                 </div>
             </div>
         </div>
@@ -3226,20 +3344,20 @@
         <!-- Rescue quiz: one hint, three questions, one way back into the run -->
         <div id="rescueScreen" style="display: none;">
             <div class="quiz-content rescue-content">
-                <h2 id="rescueTitle">Out of lives</h2>
+                <h2 id="rescueTitle" data-i18n="rescue.title">Out of lives</h2>
                 <div id="rescueLead"></div>
                 <div id="rescueHint"></div>
                 <div id="rescueQuestionWrap" style="display: none;">
                     <div id="rescueProgress"></div>
                     <div id="rescueQuestion"></div>
                     <div class="quiz-answers">
-                        <button id="rescueAnswer1" class="quiz-answer-button">Answer 1</button>
-                        <button id="rescueAnswer2" class="quiz-answer-button">Answer 2</button>
-                        <button id="rescueAnswer3" class="quiz-answer-button">Answer 3</button>
+                        <button id="rescueAnswer1" class="quiz-answer-button" data-i18n="quizUi.answer1">Answer 1</button>
+                        <button id="rescueAnswer2" class="quiz-answer-button" data-i18n="quizUi.answer2">Answer 2</button>
+                        <button id="rescueAnswer3" class="quiz-answer-button" data-i18n="quizUi.answer3">Answer 3</button>
                     </div>
                 </div>
                 <div id="rescueResult" class="quiz-result"></div>
-                <button id="rescueButton">Continue</button>
+                <button id="rescueButton" data-i18n="rescue.continue">Continue</button>
             </div>
         </div>
 
@@ -3304,46 +3422,46 @@
         <!-- Info Screen -->
         <div id="infoScreen" style="display: none;">
             <div class="info-content">
-                <h2>Did you know?</h2>
+                <h2 data-i18n="infoUi.title">Did you know?</h2>
                 <div id="infoText"></div>
-                <button id="infoContinue">Continue</button>
+                <button id="infoContinue" data-i18n="infoUi.continue">Continue</button>
             </div>
         </div>
         
         <!-- Game Completion Screen -->
         <div id="gameCompletionScreen" style="display: none;">
             <div class="completion-content">
-                <h2>🎉 Game Completed! 🎉</h2>
+                <h2 data-i18n="completion.title">🎉 Game Completed! 🎉</h2>
                 <div class="completion-main-stat">
-                    <div class="completion-main-label">Final Score</div>
+                    <div class="completion-main-label" data-i18n="completion.finalScore">Final Score</div>
                     <div class="completion-main-value" id="completionFinalScore">0</div>
                 </div>
                 <div class="completion-stats">
                     <div class="completion-stat">
-                        <div class="completion-stat-label">Levels Completed</div>
+                        <div class="completion-stat-label" data-i18n="completion.levelsCompleted">Levels Completed</div>
                         <div class="completion-stat-value" id="completionLevelsCompleted">0</div>
                     </div>
                     <div class="completion-stat">
-                        <div class="completion-stat-label">Completion Time</div>
+                        <div class="completion-stat-label" data-i18n="completion.time">Completion Time</div>
                         <div class="completion-stat-value" id="completionTime">0:00</div>
                     </div>
                     <div class="completion-stat">
-                        <div class="completion-stat-label">Best Level Score</div>
+                        <div class="completion-stat-label" data-i18n="completion.bestLevelScore">Best Level Score</div>
                         <div class="completion-stat-value" id="completionBestLevelScore">0</div>
                     </div>
                     <div class="completion-stat">
-                        <div class="completion-stat-label">Average Level Score</div>
+                        <div class="completion-stat-label" data-i18n="completion.averageLevelScore">Average Level Score</div>
                         <div class="completion-stat-value" id="completionAverageLevelScore">0</div>
                     </div>
                     <div class="completion-stat">
-                        <div class="completion-stat-label">Game Mode</div>
-                        <div class="completion-stat-value" id="completionGameMode">Unknown</div>
+                        <div class="completion-stat-label" data-i18n="completion.gameMode">Game Mode</div>
+                        <div class="completion-stat-value" id="completionGameMode" data-i18n="mode.unknown">Unknown</div>
                     </div>
                 </div>
                 <div class="completion-buttons">
-                    <button id="completionFinalizeOnchain" class="completion-button primary">Finalize On-Chain</button>
-                    <button id="completionMintNFT" class="completion-button primary" style="background: #ff0; border-color: #ff0; color: #000; box-shadow: 0 0 20px #ff0;">Mint NFT</button>
-                    <button id="completionReturnToMenu" class="completion-button secondary">Return to Menu</button>
+                    <button id="completionFinalizeOnchain" class="completion-button primary" data-i18n="completion.finalizeOnchain">Finalize On-Chain</button>
+                    <button id="completionMintNFT" class="completion-button primary" style="background: #ff0; border-color: #ff0; color: #000; box-shadow: 0 0 20px #ff0;" data-i18n="completion.mintNft">Mint NFT</button>
+                    <button id="completionReturnToMenu" class="completion-button secondary" data-i18n="completion.returnToMenu">Return to Menu</button>
                 </div>
             </div>
         </div>
@@ -3351,11 +3469,11 @@
         <!-- Community Levels Completion Popup -->
         <div id="communityCompletionPopup" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.95); z-index: 10002; padding: 20px; box-sizing: border-box; overflow-y: auto; align-items: center; justify-content: center;">
             <div style="max-width: 600px; width: 100%; margin: 0 auto; color: #0ff; font-family: 'Courier New', monospace; text-align: center; padding: 40px 20px; display: flex; flex-direction: column; align-items: center; justify-content: center;">
-                <h2 style="color: #0ff; text-shadow: 0 0 20px #0ff; margin-bottom: 30px; font-size: 32px; margin-top: 0;">🎉 Congratulations! 🎉</h2>
-                <p style="font-size: 20px; line-height: 1.6; margin-bottom: 40px; color: #fff; margin-top: 0;">
+                <h2 style="color: #0ff; text-shadow: 0 0 20px #0ff; margin-bottom: 30px; font-size: 32px; margin-top: 0;" data-i18n="community.title">🎉 Congratulations! 🎉</h2>
+                <p style="font-size: 20px; line-height: 1.6; margin-bottom: 40px; color: #fff; margin-top: 0;" data-i18n="community.text">
                     You've completed all community-created levels. Come back later for new ones, superhero!
                 </p>
-                <button id="communityCompletionReturnToMenu" class="menu-button" style="background: #0ff; color: #000; border: 2px solid #0ff; padding: 15px 40px; font-size: 18px; cursor: pointer; box-shadow: 0 0 20px #0ff; text-shadow: none; margin-top: 0;">
+                <button id="communityCompletionReturnToMenu" class="menu-button" style="background: #0ff; color: #000; border: 2px solid #0ff; padding: 15px 40px; font-size: 18px; cursor: pointer; box-shadow: 0 0 20px #0ff; text-shadow: none; margin-top: 0;" data-i18n="community.returnToMenu">
                     Return to Menu
                 </button>
             </div>
@@ -3364,22 +3482,22 @@
         <!-- Statistics Screen -->
         <div id="statisticsScreen" style="display: none;">
             <div class="statistics-content">
-                <h2>Player Statistics</h2>
+                <h2 data-i18n="stats.title">Player Statistics</h2>
                 
                 <!-- Overview Section -->
                 <div class="statistics-section">
-                    <h3>Overview</h3>
+                    <h3 data-i18n="stats.overview">Overview</h3>
                     <div class="statistics-grid">
                         <div class="stat-item">
-                            <div class="stat-item-label">Games Played</div>
+                            <div class="stat-item-label" data-i18n="stats.gamesPlayed">Games Played</div>
                             <div class="stat-item-value" id="statsGamesPlayed">0</div>
                         </div>
                         <div class="stat-item">
-                            <div class="stat-item-label">Games Completed</div>
+                            <div class="stat-item-label" data-i18n="stats.gamesCompleted">Games Completed</div>
                             <div class="stat-item-value" id="statsGamesCompleted">0</div>
                         </div>
                         <div class="stat-item">
-                            <div class="stat-item-label">Completion Rate</div>
+                            <div class="stat-item-label" data-i18n="stats.completionRate">Completion Rate</div>
                             <div class="stat-item-value" id="statsCompletionRate">0%</div>
                         </div>
                     </div>
@@ -3387,22 +3505,22 @@
                 
                 <!-- Best Scores Section -->
                 <div class="statistics-section">
-                    <h3>Best Scores</h3>
+                    <h3 data-i18n="stats.bestScores">Best Scores</h3>
                     <div class="statistics-grid">
                         <div class="stat-item">
-                            <div class="stat-item-label">Best Final Score</div>
+                            <div class="stat-item-label" data-i18n="stats.bestFinalScore">Best Final Score</div>
                             <div class="stat-item-value" id="statsBestFinalScore">0</div>
                         </div>
                         <div class="stat-item">
-                            <div class="stat-item-label">Best Level Score</div>
+                            <div class="stat-item-label" data-i18n="stats.bestLevelScore">Best Level Score</div>
                             <div class="stat-item-value" id="statsBestLevelScore">0</div>
                         </div>
                         <div class="stat-item">
-                            <div class="stat-item-label">Average Final Score</div>
+                            <div class="stat-item-label" data-i18n="stats.averageFinalScore">Average Final Score</div>
                             <div class="stat-item-value" id="statsAverageFinalScore">0</div>
                         </div>
                         <div class="stat-item">
-                            <div class="stat-item-label">Total Lifetime Points</div>
+                            <div class="stat-item-label" data-i18n="stats.totalLifetimePoints">Total Lifetime Points</div>
                             <div class="stat-item-value" id="statsTotalLifetimePoints">0</div>
                         </div>
                     </div>
@@ -3410,45 +3528,45 @@
                 
                 <!-- Performance Section -->
                 <div class="statistics-section">
-                    <h3>Performance</h3>
+                    <h3 data-i18n="stats.performance">Performance</h3>
                     <div class="statistics-grid">
                         <div class="stat-item">
-                            <div class="stat-item-label">Total Levels Completed</div>
+                            <div class="stat-item-label" data-i18n="stats.totalLevels">Total Levels Completed</div>
                             <div class="stat-item-value" id="statsTotalLevels">0</div>
                         </div>
                         <div class="stat-item">
-                            <div class="stat-item-label">Avg Levels Per Game</div>
+                            <div class="stat-item-label" data-i18n="stats.avgLevelsPerGame">Avg Levels Per Game</div>
                             <div class="stat-item-value" id="statsAvgLevelsPerGame">0</div>
                         </div>
                         <div class="stat-item">
-                            <div class="stat-item-label">Fastest Completion</div>
-                            <div class="stat-item-value" id="statsFastestTime">N/A</div>
+                            <div class="stat-item-label" data-i18n="stats.fastestTime">Fastest Completion</div>
+                            <div class="stat-item-value" id="statsFastestTime" data-i18n="stats.notAvailable">N/A</div>
                         </div>
                         <div class="stat-item">
-                            <div class="stat-item-label">Average Time</div>
-                            <div class="stat-item-value" id="statsAvgTime">N/A</div>
+                            <div class="stat-item-label" data-i18n="stats.averageTime">Average Time</div>
+                            <div class="stat-item-value" id="statsAvgTime" data-i18n="stats.notAvailable">N/A</div>
                         </div>
                     </div>
                 </div>
                 
                 <!-- Achievements Section -->
                 <div class="statistics-section">
-                    <h3>Achievements</h3>
+                    <h3 data-i18n="stats.achievements">Achievements</h3>
                     <div class="statistics-grid">
                         <div class="stat-item">
-                            <div class="stat-item-label">Total Gates Passed</div>
+                            <div class="stat-item-label" data-i18n="stats.totalGates">Total Gates Passed</div>
                             <div class="stat-item-value" id="statsTotalGates">0</div>
                         </div>
                         <div class="stat-item">
-                            <div class="stat-item-label">Total Clouds Passed</div>
+                            <div class="stat-item-label" data-i18n="stats.totalClouds">Total Clouds Passed</div>
                             <div class="stat-item-value" id="statsTotalClouds">0</div>
                         </div>
                         <div class="stat-item">
-                            <div class="stat-item-label">Total Barriers Hit</div>
+                            <div class="stat-item-label" data-i18n="stats.totalBarriers">Total Barriers Hit</div>
                             <div class="stat-item-value" id="statsTotalBarriers">0</div>
                         </div>
                         <div class="stat-item">
-                            <div class="stat-item-label">Perfect Games</div>
+                            <div class="stat-item-label" data-i18n="stats.perfectGames">Perfect Games</div>
                             <div class="stat-item-value" id="statsPerfectGames">0</div>
                         </div>
                     </div>
@@ -3456,14 +3574,14 @@
                 
                 <!-- Game Mode Stats Section -->
                 <div class="statistics-section">
-                    <h3>Game Mode Stats</h3>
+                    <h3 data-i18n="stats.modeStats">Game Mode Stats</h3>
                     <div class="statistics-grid">
                         <div class="stat-item">
-                            <div class="stat-item-label">Tournament: Played</div>
+                            <div class="stat-item-label" data-i18n="stats.tournamentPlayed">Tournament: Played</div>
                             <div class="stat-item-value" id="statsTournamentPlayed">0</div>
                         </div>
                         <div class="stat-item">
-                            <div class="stat-item-label">Tournament: Completed</div>
+                            <div class="stat-item-label" data-i18n="stats.tournamentCompleted">Tournament: Completed</div>
                             <div class="stat-item-value" id="statsTournamentCompleted">0</div>
                         </div>
                     </div>
@@ -3471,26 +3589,26 @@
                 
                 <!-- Last Game Section -->
                 <div class="statistics-section">
-                    <h3>Last Game</h3>
+                    <h3 data-i18n="stats.lastGame">Last Game</h3>
                     <div class="statistics-grid">
                         <div class="stat-item">
-                            <div class="stat-item-label">Date</div>
-                            <div class="stat-item-value" id="statsLastGameDate">Never</div>
+                            <div class="stat-item-label" data-i18n="stats.date">Date</div>
+                            <div class="stat-item-value" id="statsLastGameDate" data-i18n="stats.never">Never</div>
                         </div>
                         <div class="stat-item">
-                            <div class="stat-item-label">Mode</div>
-                            <div class="stat-item-value" id="statsLastGameMode">N/A</div>
+                            <div class="stat-item-label" data-i18n="stats.mode">Mode</div>
+                            <div class="stat-item-value" id="statsLastGameMode" data-i18n="stats.notAvailable">N/A</div>
                         </div>
                         <div class="stat-item">
-                            <div class="stat-item-label">Score</div>
+                            <div class="stat-item-label" data-i18n="stats.score">Score</div>
                             <div class="stat-item-value" id="statsLastGameScore">0</div>
                         </div>
                     </div>
                 </div>
                 
                 <div class="statistics-buttons">
-                    <button id="statsReset" class="statistics-button danger">Reset Statistics</button>
-                    <button id="statsClose" class="statistics-button primary">Close</button>
+                    <button id="statsReset" class="statistics-button danger" data-i18n="stats.reset">Reset Statistics</button>
+                    <button id="statsClose" class="statistics-button primary" data-i18n="stats.close">Close</button>
                 </div>
             </div>
         </div>
@@ -3498,21 +3616,21 @@
         <!-- Leaderboard Screen -->
         <div id="leaderboardScreen" style="display: none;">
             <div class="leaderboard-content">
-                <h2>🏆 Leaderboard 🏆</h2>
+                <h2 data-i18n="leaderboard.title">🏆 Leaderboard 🏆</h2>
                 
                 <div class="leaderboard-filters">
-                    <button class="leaderboard-filter-btn active" data-count="10">Top 10</button>
-                    <button class="leaderboard-filter-btn" data-count="25">Top 25</button>
-                    <button class="leaderboard-filter-btn" data-count="50">Top 50</button>
-                    <button class="leaderboard-filter-btn" data-count="100">Top 100</button>
+                    <button class="leaderboard-filter-btn active" data-count="10" data-i18n="leaderboard.top10">Top 10</button>
+                    <button class="leaderboard-filter-btn" data-count="25" data-i18n="leaderboard.top25">Top 25</button>
+                    <button class="leaderboard-filter-btn" data-count="50" data-i18n="leaderboard.top50">Top 50</button>
+                    <button class="leaderboard-filter-btn" data-count="100" data-i18n="leaderboard.top100">Top 100</button>
                 </div>
                 
                 <div id="leaderboardPlayerRank" class="leaderboard-player-rank" style="display: none;">
-                    Your Rank: <span id="leaderboardPlayerRankValue"></span>
+                    <span data-i18n="leaderboard.yourRank">Your Rank:</span> <span id="leaderboardPlayerRankValue"></span>
                 </div>
                 
                 <div id="leaderboardLoading" class="leaderboard-loading" style="display: none;">
-                    Loading leaderboard...
+                    <span data-i18n="leaderboard.loading">Loading leaderboard...</span>
                 </div>
                 
                 <div id="leaderboardError" class="leaderboard-error" style="display: none;"></div>
@@ -3520,8 +3638,8 @@
                 <div id="leaderboardList" class="leaderboard-list"></div>
                 
                 <div class="leaderboard-buttons">
-                    <button id="leaderboardRefresh" class="leaderboard-button secondary">Refresh</button>
-                    <button id="leaderboardClose" class="leaderboard-button primary">Close</button>
+                    <button id="leaderboardRefresh" class="leaderboard-button secondary" data-i18n="leaderboard.refresh">Refresh</button>
+                    <button id="leaderboardClose" class="leaderboard-button primary" data-i18n="leaderboard.close">Close</button>
                 </div>
             </div>
         </div>
@@ -3529,21 +3647,21 @@
         <!-- On-Chain Finalization Screen -->
         <div id="onchainFinalizationScreen" style="display: none;">
             <div class="onchain-content">
-                <h2>Finalize Score On-Chain</h2>
+                <h2 data-i18n="onchain.title">Finalize Score On-Chain</h2>
                 
                 <div class="onchain-section">
                     <div class="onchain-info">
                         <div class="onchain-info-item">
-                            <div class="onchain-info-label">Final Score</div>
+                            <div class="onchain-info-label" data-i18n="onchain.finalScore">Final Score</div>
                             <div class="onchain-info-value" id="onchainFinalScore">0</div>
                         </div>
                         <div class="onchain-info-item">
-                            <div class="onchain-info-label">Levels Completed</div>
+                            <div class="onchain-info-label" data-i18n="onchain.levelsCompleted">Levels Completed</div>
                             <div class="onchain-info-value" id="onchainLevelsCompleted">0</div>
                         </div>
                         <div class="onchain-info-item">
-                            <div class="onchain-info-label">Game Mode</div>
-                            <div class="onchain-info-value" id="onchainGameMode">Unknown</div>
+                            <div class="onchain-info-label" data-i18n="onchain.gameMode">Game Mode</div>
+                            <div class="onchain-info-value" id="onchainGameMode" data-i18n="mode.unknown">Unknown</div>
                         </div>
                     </div>
                 </div>
@@ -3551,24 +3669,24 @@
                 <div class="onchain-section" id="onchainWalletSection">
                     <div class="onchain-status" id="onchainWalletStatus">
                         <div id="onchainWalletNotConnected">
-                            <p>Connect your wallet to finalize your score on-chain</p>
-                            <p style="font-size: clamp(10px, 1.8vw, 12px); margin-top: 10px; opacity: 0.8;">
+                            <p data-i18n="onchain.connectPrompt">Connect your wallet to finalize your score on-chain</p>
+                            <p style="font-size: clamp(10px, 1.8vw, 12px); margin-top: 10px; opacity: 0.8;" data-i18n="onchain.supportedWallets">
                                 Supported wallets: MetaMask, Rabby
                             </p>
                             <div style="margin: 15px 0; padding: 10px; background: rgba(255, 255, 0, 0.1); border: 1px solid #ff0; border-radius: 5px;">
                                 <p style="font-size: clamp(10px, 1.8vw, 12px); color: #ff0; margin-bottom: 8px;">
-                                    <strong>Don't have a wallet?</strong>
+                                    <strong data-i18n="onchain.noWalletTitle">Don't have a wallet?</strong>
                                 </p>
-                                <p style="font-size: clamp(9px, 1.6vw, 11px); color: #0ff; line-height: 1.4;">
+                                <p style="font-size: clamp(9px, 1.6vw, 11px); color: #0ff; line-height: 1.4;" data-i18n-html="onchain.noWalletText">
                                     Install <a href="https://metamask.io/download/" target="_blank" style="color: #0ff; text-decoration: underline;">MetaMask</a> or 
                                     <a href="https://rabby.io/" target="_blank" style="color: #0ff; text-decoration: underline;">Rabby</a> browser extension, then refresh this page.
                                 </p>
                             </div>
-                            <button id="onchainConnectWallet" class="onchain-button primary">Connect Wallet</button>
+                            <button id="onchainConnectWallet" class="onchain-button primary" data-i18n="onchain.connectWallet">Connect Wallet</button>
                         </div>
                         <div id="onchainWalletConnected" style="display: none;">
-                            <p>Connected: <span id="onchainWalletAddress"></span></p>
-                            <button id="onchainDisconnectWallet" class="onchain-button secondary">Disconnect</button>
+                            <p><span data-i18n="onchain.connected">Connected:</span> <span id="onchainWalletAddress"></span></p>
+                            <button id="onchainDisconnectWallet" class="onchain-button secondary" data-i18n="onchain.disconnect">Disconnect</button>
                         </div>
                     </div>
                 </div>
@@ -3576,36 +3694,36 @@
                 <div class="onchain-section" id="onchainTransactionSection" style="display: none;">
                     <div class="onchain-status">
                         <div id="onchainTransactionStatus">
-                            <p id="onchainStatusText">Preparing transaction...</p>
+                            <p id="onchainStatusText" data-i18n="onchain.preparing">Preparing transaction...</p>
                             <div id="onchainGasEstimate" style="display: none;">
-                                <p>Estimated Gas: <span id="onchainGasAmount"></span></p>
+                                <p><span data-i18n="onchain.estimatedGas">Estimated Gas:</span> <span id="onchainGasAmount"></span></p>
                             </div>
                         </div>
                     </div>
                 </div>
                 
                 <div class="onchain-section" id="onchainSubmitSection" style="display: none;">
-                    <button id="onchainSubmitScore" class="onchain-button primary large">Finalize Score On-Chain</button>
+                    <button id="onchainSubmitScore" class="onchain-button primary large" data-i18n="onchain.submit">Finalize Score On-Chain</button>
                 </div>
                 
                 <div class="onchain-section" id="onchainSuccessSection" style="display: none;">
                     <div class="onchain-success">
-                        <h3>✅ Score Finalized!</h3>
-                        <p>Your score has been successfully recorded on-chain.</p>
+                        <h3 data-i18n="onchain.successTitle">✅ Score Finalized!</h3>
+                        <p data-i18n="onchain.successText">Your score has been successfully recorded on-chain.</p>
                         <div class="onchain-tx-link">
-                            <a id="onchainTxLink" href="#" target="_blank">View Transaction on Etherscan</a>
+                            <a id="onchainTxLink" href="#" target="_blank" data-i18n="onchain.viewTx">View Transaction on Etherscan</a>
                         </div>
                     </div>
                 </div>
                 
                 <div class="onchain-section" id="onchainErrorSection" style="display: none;">
                     <div class="onchain-error">
-                        <h3>❌ Error</h3>
+                        <h3 data-i18n="onchain.errorTitle">❌ Error</h3>
                     </div>
                 </div>
                 
                 <div class="onchain-buttons">
-                    <button id="onchainClose" class="onchain-button secondary">Close</button>
+                    <button id="onchainClose" class="onchain-button secondary" data-i18n="onchain.close">Close</button>
                 </div>
             </div>
         </div>
@@ -3613,15 +3731,15 @@
         <!-- NFT Minting Screen -->
         <div id="nftMintingScreen" style="display: none;">
             <div class="nft-content">
-                <h2>🎨 Mint Completion NFT</h2>
+                <h2 data-i18n="nft.title">🎨 Mint Completion NFT</h2>
                 
                 <div class="nft-section">
                     <div class="nft-preview">
                         <div class="nft-preview-image" id="nftPreviewImage">
-                            <div class="nft-placeholder">NFT Preview</div>
+                            <div class="nft-placeholder" data-i18n="nft.preview">NFT Preview</div>
                         </div>
                         <div class="nft-preview-info">
-                            <h3 id="nftPreviewName">ARCMAN: Final Settlement - Completion Certificate</h3>
+                            <h3 id="nftPreviewName" data-i18n="nft.previewName">ARCMAN: Final Settlement - Completion Certificate</h3>
                             <div class="nft-attributes" id="nftAttributes">
                                 <!-- Attributes will be populated dynamically -->
                             </div>
@@ -3632,51 +3750,51 @@
                 <div class="nft-section" id="nftWalletSection">
                     <div class="nft-status" id="nftWalletStatus">
                         <div id="nftWalletNotConnected">
-                            <p>Connect your wallet to mint your completion NFT</p>
-                            <p style="font-size: clamp(10px, 1.8vw, 12px); margin-top: 10px; opacity: 0.8;">
+                            <p data-i18n="nft.connectPrompt">Connect your wallet to mint your completion NFT</p>
+                            <p style="font-size: clamp(10px, 1.8vw, 12px); margin-top: 10px; opacity: 0.8;" data-i18n="nft.supportedWallets">
                                 Supported wallets: MetaMask, Rabby
                             </p>
-                            <button id="nftConnectWallet" class="nft-button primary">Connect Wallet</button>
+                            <button id="nftConnectWallet" class="nft-button primary" data-i18n="nft.connectWallet">Connect Wallet</button>
                         </div>
                         <div id="nftWalletConnected" style="display: none;">
-                            <p>Connected: <span id="nftWalletAddress"></span></p>
+                            <p><span data-i18n="nft.connected">Connected:</span> <span id="nftWalletAddress"></span></p>
                             <div id="nftAlreadyMinted" style="display: none; margin-top: 15px; padding: 15px; background: rgba(255, 255, 0, 0.1); border: 2px solid #ff0; border-radius: 8px;">
-                                <p style="color: #ff0; font-weight: bold; margin-bottom: 10px;">✓ You already have a completion NFT!</p>
-                                <p style="color: #0ff; font-size: clamp(12px, 2vw, 14px);">Token ID: <span id="nftExistingTokenId"></span></p>
-                                <a id="nftViewTokenLink" href="#" target="_blank" style="color: #0ff; text-decoration: underline; font-size: clamp(12px, 2vw, 14px);">View on Block Explorer</a>
+                                <p style="color: #ff0; font-weight: bold; margin-bottom: 10px;" data-i18n="nft.alreadyHave">✓ You already have a completion NFT!</p>
+                                <p style="color: #0ff; font-size: clamp(12px, 2vw, 14px);"><span data-i18n="nft.tokenId">Token ID:</span> <span id="nftExistingTokenId"></span></p>
+                                <a id="nftViewTokenLink" href="#" target="_blank" style="color: #0ff; text-decoration: underline; font-size: clamp(12px, 2vw, 14px);" data-i18n="nft.viewOnExplorer">View on Block Explorer</a>
                             </div>
-                            <button id="nftDisconnectWallet" class="nft-button secondary" style="margin-top: 10px;">Disconnect</button>
+                            <button id="nftDisconnectWallet" class="nft-button secondary" style="margin-top: 10px;" data-i18n="nft.disconnect">Disconnect</button>
                         </div>
                     </div>
                 </div>
                 
                 <div class="nft-section" id="nftMintingSection" style="display: none;">
-                    <div class="nft-status-text" id="nftStatusText">Ready to mint</div>
+                    <div class="nft-status-text" id="nftStatusText" data-i18n="nft.readyToMint">Ready to mint</div>
                     <div class="nft-gas-info" id="nftGasInfo" style="display: none;">
-                        <p>Estimated gas: <span id="nftGasAmount">-</span></p>
+                        <p><span data-i18n="nft.estimatedGas">Estimated gas:</span> <span id="nftGasAmount">-</span></p>
                     </div>
-                    <button id="nftMintButton" class="nft-button primary">Mint NFT</button>
+                    <button id="nftMintButton" class="nft-button primary" data-i18n="nft.mint">Mint NFT</button>
                 </div>
                 
                 <div class="nft-section" id="nftSuccessSection" style="display: none;">
                     <div class="nft-success">
-                        <h3>🎉 NFT Minted Successfully! 🎉</h3>
-                        <p>Your completion certificate has been minted!</p>
+                        <h3 data-i18n="nft.successTitle">🎉 NFT Minted Successfully! 🎉</h3>
+                        <p data-i18n="nft.successText">Your completion certificate has been minted!</p>
                         <div class="nft-success-info">
-                            <p>Token ID: <span id="nftTokenId"></span></p>
-                            <p>Transaction: <a id="nftTxLink" href="#" target="_blank">View on Block Explorer</a></p>
+                            <p><span data-i18n="nft.tokenId">Token ID:</span> <span id="nftTokenId"></span></p>
+                            <p><span data-i18n="nft.transaction">Transaction:</span> <a id="nftTxLink" href="#" target="_blank" data-i18n="nft.viewOnExplorer">View on Block Explorer</a></p>
                         </div>
                     </div>
                 </div>
                 
                 <div class="nft-section" id="nftErrorSection" style="display: none;">
                     <div class="nft-error">
-                        <h3>❌ Error</h3>
+                        <h3 data-i18n="nft.errorTitle">❌ Error</h3>
                     </div>
                 </div>
                 
                 <div class="nft-buttons">
-                    <button id="nftClose" class="nft-button secondary">Close</button>
+                    <button id="nftClose" class="nft-button secondary" data-i18n="nft.close">Close</button>
                 </div>
             </div>
         </div>
@@ -3686,8 +3804,8 @@
     <div id="startScreen">
         <div class="scanline-overlay"></div>
         <div id="startScreenContent">
-            <div id="startScreenTitle">ARCMAN: Final Settlement</div>
-            <div id="startScreenSubtitle">Click to Start</div>
+            <div id="startScreenTitle" data-i18n="start.title">ARCMAN: Final Settlement</div>
+            <div id="startScreenSubtitle" data-i18n="start.subtitle">Click to Start</div>
         </div>
     </div>
 
@@ -3696,34 +3814,45 @@
         <div class="scanline-overlay"></div>
         <!-- Wallet Connection Button (Top Left) -->
         <button id="menuWalletButton" class="menu-wallet-button">
-            <span id="menuWalletButtonText">Connect Wallet</span>
+            <span id="menuWalletButtonText" data-i18n="wallet.connect">Connect Wallet</span>
             <span id="menuWalletButtonAddress" style="display: none;"></span>
         </button>
         <!-- USDC Faucet Button (Below Wallet Button) -->
-        <a href="https://faucet.circle.com/" target="_blank" class="menu-faucet-button" id="menuFaucetButton">
+        <a href="https://faucet.circle.com/" target="_blank" class="menu-faucet-button" id="menuFaucetButton" data-i18n="menu.faucet">
             USDC Faucet
         </a>
+        <!-- Language Switcher (Top Right) — options are built from I18n.LANGUAGES -->
+        <div id="languageSwitcher" class="menu-language-switcher">
+            <button type="button" id="languageToggle" class="menu-language-button"
+                    aria-haspopup="listbox" aria-expanded="false"
+                    data-i18n-title="language.select">
+                <span id="languageCurrentLabel">English</span>
+                <span class="menu-language-caret" aria-hidden="true">▼</span>
+            </button>
+            <ul id="languageList" class="menu-language-list" role="listbox"
+                aria-labelledby="languageToggle" hidden></ul>
+        </div>
         <div id="mainMenuContent">
-            <div id="menuTitle">ARCMAN: Final Settlement</div>
-            <div id="menuSubtitle">Arcade Game</div>
+            <div id="menuTitle" data-i18n="menu.title">ARCMAN: Final Settlement</div>
+            <div id="menuSubtitle" data-i18n="menu.subtitle">Arcade Game</div>
             <div id="menuButtons">
             <button class="menu-button tournament" id="menuTournament">
-                <span>TOURNAMENT MODE</span>
+                <span data-i18n="menu.tournament">TOURNAMENT MODE</span>
             </button>
             <button class="menu-button community" id="menuCommunity">
-                <span>COMMUNITY LEVELS</span>
+                <span data-i18n="menu.community">COMMUNITY LEVELS</span>
             </button>
             <button class="menu-button editor" id="menuEditor">
-                <span>LEVEL EDITOR</span>
+                <span data-i18n="menu.editor">LEVEL EDITOR</span>
             </button>
             <button class="menu-button statistics" id="menuStatistics">
-                <span>STATISTIC</span>
+                <span data-i18n="menu.statistics">STATISTIC</span>
             </button>
             <button class="menu-button leaderboard" id="menuLeaderboard">
-                <span>LEADERBOARD</span>
+                <span data-i18n="menu.leaderboard">LEADERBOARD</span>
             </button>
             <button class="menu-button audio" id="menuAudio">
-                <span>AUDIO OPTIONS</span>
+                <span data-i18n="menu.audio">AUDIO OPTIONS</span>
             </button>
         </div>
         </div>
@@ -3733,12 +3862,12 @@
     <div id="audioOptionsPanel" class="hidden">
         <div class="scanline-overlay"></div>
         <div id="audioOptionsContent">
-            <h2 style="color: #0ff; font-size: clamp(18px, 3vw, 24px); margin-bottom: 20px; text-shadow: 0 0 10px #0ff; font-family: 'Courier New', monospace;">AUDIO OPTIONS</h2>
+            <h2 style="color: #0ff; font-size: clamp(18px, 3vw, 24px); margin-bottom: 20px; text-shadow: 0 0 10px #0ff; font-family: 'Courier New', monospace;" data-i18n="audio.title">AUDIO OPTIONS</h2>
             
             <!-- Volume Controls -->
             <div id="volumeControls">
                 <div style="margin-bottom: 20px;">
-                    <label style="display: block; color: #0ff; font-size: clamp(12px, 1.5vw, 14px); margin-bottom: 8px; text-shadow: 0 0 5px #0ff; font-family: 'Courier New', monospace;">Music Volume</label>
+                    <label style="display: block; color: #0ff; font-size: clamp(12px, 1.5vw, 14px); margin-bottom: 8px; text-shadow: 0 0 5px #0ff; font-family: 'Courier New', monospace;" data-i18n="audio.musicVolume">Music Volume</label>
                     <input type="range" id="musicVolumeSlider" min="0" max="100" value="30" 
                         style="width: 100%; height: 6px; background: #000; outline: none; border: 1px solid #0ff; cursor: pointer;">
                     <div style="color: #0ff; font-size: clamp(10px, 1.2vw, 12px); text-align: center; margin-top: 5px; font-family: 'Courier New', monospace;">
@@ -3746,7 +3875,7 @@
                     </div>
                 </div>
                 <div style="margin-bottom: 20px;">
-                    <label style="display: block; color: #0ff; font-size: clamp(12px, 1.5vw, 14px); margin-bottom: 8px; text-shadow: 0 0 5px #0ff; font-family: 'Courier New', monospace;">Sound Effects Volume</label>
+                    <label style="display: block; color: #0ff; font-size: clamp(12px, 1.5vw, 14px); margin-bottom: 8px; text-shadow: 0 0 5px #0ff; font-family: 'Courier New', monospace;" data-i18n="audio.soundVolume">Sound Effects Volume</label>
                     <input type="range" id="soundVolumeSlider" min="0" max="100" value="50" 
                         style="width: 100%; height: 6px; background: #000; outline: none; border: 1px solid #0ff; cursor: pointer;">
                     <div style="color: #0ff; font-size: clamp(10px, 1.2vw, 12px); text-align: center; margin-top: 5px; font-family: 'Courier New', monospace;">
@@ -3756,7 +3885,7 @@
             </div>
             
             <button class="menu-button" id="audioOptionsClose" style="margin-top: 20px;">
-                <span>CLOSE</span>
+                <span data-i18n="audio.close">CLOSE</span>
             </button>
         </div>
     </div>
@@ -3765,66 +3894,66 @@
     <div id="levelEditor">
         <div id="editorPanel">
             <div class="editor-section">
-                <h3>Level Editor</h3>
-                <button class="editor-button" id="editorClose">Close Editor</button>
-                <button class="editor-button" id="editorNew">New Level</button>
-                <button class="editor-button" id="editorSave">Save Level</button>
-                <button class="editor-button danger" id="editorDelete">Delete Level</button>
-                <button class="editor-button" id="editorExport" style="background: #ff0; color: #000; box-shadow: 0 0 10px #ff0;">Export</button>
-                <button class="editor-button" id="editorSubmit" style="background: #0f0; color: #000; box-shadow: 0 0 10px #0f0; margin-top: 5px;">Submit Level</button>
+                <h3 data-i18n="editor.title">Level Editor</h3>
+                <button class="editor-button" id="editorClose" data-i18n="editor.close">Close Editor</button>
+                <button class="editor-button" id="editorNew" data-i18n="editor.new">New Level</button>
+                <button class="editor-button" id="editorSave" data-i18n="editor.save">Save Level</button>
+                <button class="editor-button danger" id="editorDelete" data-i18n="editor.delete">Delete Level</button>
+                <button class="editor-button" id="editorExport" style="background: #ff0; color: #000; box-shadow: 0 0 10px #ff0;" data-i18n="editor.export">Export</button>
+                <button class="editor-button" id="editorSubmit" style="background: #0f0; color: #000; box-shadow: 0 0 10px #0f0; margin-top: 5px;" data-i18n="editor.submit">Submit Level</button>
             </div>
 
             <div class="editor-section">
-                <h3>Level Info</h3>
-                <label>Level Name:</label>
+                <h3 data-i18n="editor.levelInfo">Level Info</h3>
+                <label data-i18n="editor.levelName">Level Name:</label>
                 <input type="text" id="editorLevelName" value="New Level">
-                <label>Level ID:</label>
+                <label data-i18n="editor.levelId">Level ID:</label>
                 <input type="number" id="editorLevelId" readonly>
             </div>
 
             <div class="editor-section">
-                <h3>Tools</h3>
+                <h3 data-i18n="editor.tools">Tools</h3>
                 <div id="editorToolbar">
-                    <button class="tool-button active" data-tool="select">Select</button>
-                    <button class="tool-button" data-tool="gate">Arc Gate</button>
-                    <button class="tool-button" data-tool="cloud">Slippage Cloud</button>
-                    <button class="tool-button" data-tool="life-restore">Life Restore</button>
-                    <button class="tool-button" data-tool="barrier-large">Barrier (Large)</button>
-                    <button class="tool-button" data-tool="barrier-medium">Barrier (Medium)</button>
-                    <button class="tool-button" data-tool="barrier-small">Barrier (Small)</button>
-                    <button class="tool-button" data-tool="settlement">Settlement Zone</button>
-                    <button class="tool-button" data-tool="player">Player Start</button>
-                    <button class="tool-button" data-tool="delete">Delete</button>
+                    <button class="tool-button active" data-tool="select" data-i18n="editor.toolSelect">Select</button>
+                    <button class="tool-button" data-tool="gate" data-i18n="editor.toolGate">Arc Gate</button>
+                    <button class="tool-button" data-tool="cloud" data-i18n="editor.toolCloud">Slippage Cloud</button>
+                    <button class="tool-button" data-tool="life-restore" data-i18n="editor.toolLifeRestore">Life Restore</button>
+                    <button class="tool-button" data-tool="barrier-large" data-i18n="editor.toolBarrierLarge">Barrier (Large)</button>
+                    <button class="tool-button" data-tool="barrier-medium" data-i18n="editor.toolBarrierMedium">Barrier (Medium)</button>
+                    <button class="tool-button" data-tool="barrier-small" data-i18n="editor.toolBarrierSmall">Barrier (Small)</button>
+                    <button class="tool-button" data-tool="settlement" data-i18n="editor.toolSettlement">Settlement Zone</button>
+                    <button class="tool-button" data-tool="player" data-i18n="editor.toolPlayer">Player Start</button>
+                    <button class="tool-button" data-tool="delete" data-i18n="editor.toolDelete">Delete</button>
                 </div>
                 <div style="margin-top: 10px;">
-                    <button class="editor-button" id="editorRotate" style="width: 100%;">Rotate Selected (R)</button>
+                    <button class="editor-button" id="editorRotate" style="width: 100%;" data-i18n="editor.rotate">Rotate Selected (R)</button>
                 </div>
             </div>
 
             <div class="editor-section">
-                <h3>Level Preview</h3>
+                <h3 data-i18n="editor.preview">Level Preview</h3>
                 <canvas id="editorCanvas" width="600" height="450"></canvas>
-                <div id="editorInstructions">Click to place objects. Select tool to select, then press R or click Rotate to rotate (15° steps).</div>
+                <div id="editorInstructions" data-i18n="editor.instructions">Click to place objects. Select tool to select, then press R or click Rotate to rotate (15° steps).</div>
             </div>
 
             <div class="editor-section">
-                <h3>Objects</h3>
+                <h3 data-i18n="editor.objects">Objects</h3>
                 <div id="editorObjects">
-                    <div>Arc Gates: <span id="gateCount">0</span></div>
-                    <div>Slippage Clouds: <span id="cloudCount">0</span></div>
-                    <div>Life Restores: <span id="lifeRestoreCount">0</span></div>
-                    <div>Barriers: <span id="barrierCount">0</span></div>
-                    <div>Settlement Zone: <span id="settlementCount">0</span></div>
+                    <div><span data-i18n="editor.gates">Arc Gates:</span> <span id="gateCount">0</span></div>
+                    <div><span data-i18n="editor.clouds">Slippage Clouds:</span> <span id="cloudCount">0</span></div>
+                    <div><span data-i18n="editor.lifeRestores">Life Restores:</span> <span id="lifeRestoreCount">0</span></div>
+                    <div><span data-i18n="editor.barriers">Barriers:</span> <span id="barrierCount">0</span></div>
+                    <div><span data-i18n="editor.settlementZone">Settlement Zone:</span> <span id="settlementCount">0</span></div>
                 </div>
             </div>
 
             <div class="editor-section">
-                <h3>Level List</h3>
+                <h3 data-i18n="editor.levelList">Level List</h3>
                 <select id="levelSelect" style="width: 100%; padding: 5px; background: #000; color: #0ff; border: 1px solid #0ff; font-family: 'Courier New', monospace;">
-                    <option>Loading levels...</option>
+                    <option data-i18n="editor.loadingLevels">Loading levels...</option>
                 </select>
-                <button class="editor-button" id="editorLoad">Load Level</button>
-                <button class="editor-button" id="editorLaunch" style="background: #0f0; color: #000; box-shadow: 0 0 10px #0f0; margin-top: 5px;">Launch Level</button>
+                <button class="editor-button" id="editorLoad" data-i18n="editor.load">Load Level</button>
+                <button class="editor-button" id="editorLaunch" style="background: #0f0; color: #000; box-shadow: 0 0 10px #0f0; margin-top: 5px;" data-i18n="editor.launch">Launch Level</button>
             </div>
         </div>
     </div>
@@ -3832,12 +3961,12 @@
     <!-- Export Modal -->
     <div id="exportModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.95); z-index: 1000; padding: 20px; box-sizing: border-box; overflow-y: auto;">
         <div style="max-width: 800px; margin: 0 auto; color: #0ff; font-family: 'Courier New', monospace;">
-            <h2 style="color: #ff0; text-shadow: 0 0 10px #ff0; margin-bottom: 20px;">Export DEFAULT_LEVELS</h2>
-            <p style="margin-bottom: 15px; color: #0ff;">Copy the code below and replace the DEFAULT_LEVELS array in levels.js:</p>
+            <h2 style="color: #ff0; text-shadow: 0 0 10px #ff0; margin-bottom: 20px;" data-i18n="editor.exportTitle">Export DEFAULT_LEVELS</h2>
+            <p style="margin-bottom: 15px; color: #0ff;" data-i18n="editor.exportHint">Copy the code below and replace the DEFAULT_LEVELS array in levels.js:</p>
             <textarea id="exportCode" readonly style="width: 100%; height: 500px; background: #000; color: #0ff; border: 2px solid #0ff; padding: 15px; font-family: 'Courier New', monospace; font-size: 12px; box-sizing: border-box; resize: vertical; box-shadow: 0 0 20px #0ff;"></textarea>
             <div style="margin-top: 15px;">
-                <button class="editor-button" id="exportCopy" style="width: 150px; margin-right: 10px;">Copy to Clipboard</button>
-                <button class="editor-button" id="exportClose" style="width: 150px; background: #f0f; color: #000; box-shadow: 0 0 10px #f0f;">Close</button>
+                <button class="editor-button" id="exportCopy" style="width: 150px; margin-right: 10px;" data-i18n="editor.copy">Copy to Clipboard</button>
+                <button class="editor-button" id="exportClose" style="width: 150px; background: #f0f; color: #000; box-shadow: 0 0 10px #f0f;" data-i18n="stats.close">Close</button>
             </div>
         </div>
     </div>
@@ -3847,6 +3976,12 @@
     <!-- External libraries -->
     <script src="https://cdn.jsdelivr.net/npm/ethers@6.9.0/dist/ethers.umd.min.js"></script>
     <!-- Game modules (load in dependency order) -->
+    <!-- i18n first: every module below reads its strings through I18n.t() -->
+    <script src="js/i18n.js"></script>
+    <script src="js/locales/en.js"></script>
+    <script src="js/locales/ru.js"></script>
+    <script src="js/locales/zh.js"></script>
+    <script src="js/locales/id.js"></script>
     <script src="js/config.js"></script>
     <script src="js/canvas.js"></script>
     <script src="js/audio.js"></script>

@@ -24,6 +24,8 @@ ARCMAN: Final Settlement is a browser-based arcade game in a retro pixel-art sty
 
 * `index.html` — main HTML, UI, styles, canvas, start screen, menus, level editor.
 * `js/` — modular game code (organized into focused modules):
+  * `i18n.js` — language engine (`I18n`, the `t()` shorthand) and the main-menu language dropdown
+  * `locales/en.js`, `locales/ru.js`, `locales/zh.js`, `locales/id.js` — language packs
   * `config.js` — game configuration & constants
   * `canvas.js` — canvas setup & responsive handling
   * `audio.js` — audio system management
@@ -85,6 +87,9 @@ ARCMAN: Final Settlement is a browser-based arcade game in a retro pixel-art sty
 ## Features
 
 - **Retro Pixel Art**: Classic arcade aesthetic with neon glow effects and scanline animations
+- **Four Languages**: English, Русский, 中文 and Bahasa Indonesia — including the level names,
+  info screens and every quiz. A dropdown in the top-right of the main menu switches instantly
+  and remembers the choice; see [Languages](#languages)
 - **Complete Audio System**: 
   - Background music for menu and gameplay
   - Sound effects for all game actions (launch, gates, settlement, miss)
@@ -416,6 +421,51 @@ The game uses a comprehensive blockchain integration system:
    - ERC-721 standard compatible
    - Prevents duplicate minting per game mode
 
+## Languages
+
+The game ships in English, Russian (Русский), Simplified Chinese (中文) and Indonesian
+(Bahasa Indonesia). A dropdown in the top-right corner of the main menu switches between
+them; the choice is saved to `localStorage` under `arcman_language`. On a first visit the
+browser's own language decides, falling back to English.
+
+Switching takes effect immediately — no reload — because every screen reads its text
+through `I18n.t()` at render time.
+
+### How it works
+
+`js/i18n.js` loads before every other module and exposes:
+
+* `I18n.t(key, params)` (aliased to the global `t()`) — dot-path lookup in the current
+  pack, falling back to English and then to the key itself, so an unfinished pack degrades
+  to English instead of blank UI. `{name}` placeholders are filled from `params`.
+* `I18n.setLanguage(code)` — swaps the pack, re-applies the markup, and notifies listeners
+  registered with `I18n.onChange()`.
+* `I18n.levelName(level)`, `I18n.infoText(info)`, `I18n.quiz(quiz)`,
+  `I18n.rescueTopic(topic)` — translated game content. The English source stays in
+  `levels.js`, `infoScreens.js`, `quizzes.js` and `rescueTopics.js`, which keep the ids,
+  the answer order and `correctIndex`; only the wording lives in the packs, so scoring
+  never depends on the language.
+* `I18n.gameModeLabel(mode)` — display label for a game mode. `'Tournament'` and
+  `'Community'` themselves are contract values and are never translated.
+
+Static markup is translated declaratively. Any element carrying `data-i18n="key"` has its
+`textContent` rewritten by `I18n.apply()`; `data-i18n-html`, `data-i18n-placeholder`,
+`data-i18n-value` and `data-i18n-title` cover the other cases.
+
+### Adding a language
+
+1. Copy `js/locales/en.js` to `js/locales/<code>.js`, change the `I18n.register` code, and
+   translate the values. Keep every key — the English pack is the canonical key set.
+2. Add the language to `I18n.LANGUAGES` in `js/i18n.js` (`{ code, label, short }`) and to
+   `I18n.detect()` if the browser tag should map to it.
+3. Add a `<script src="js/locales/<code>.js">` tag in `index.html`, next to the others.
+
+The dropdown builds itself from `I18n.LANGUAGES`, so no markup change is needed.
+
+Note: the retired Agent Shift markup in `index.html` (`#agentHud`, `#agentWallet` and
+friends) is not translated — no script loads those nodes and they render nothing.
+
+
 ## Player Statistics
 
 The game tracks comprehensive player statistics stored in browser localStorage:
@@ -563,6 +613,13 @@ Each quiz object contains:
 - `answers`: Array of 3 answer options
 - `correctIndex`: Index (0-2) of the correct answer in the answers array
 
+This file stays the source of truth for the ids, the answer order and `correctIndex`. The
+other languages carry only the wording, under `quiz.<id>` in each `js/locales/*.js` pack —
+so after editing a question here, update the same id in `ru.js`, `zh.js` and `id.js`,
+keeping the answers in the same order. An id with no translation falls back to the English
+text above rather than breaking. Level names (`levels.<id>`), info screens (`info.<id>`)
+and rescue topics (`rescueTopics.<id>`) work the same way; see [Languages](#languages).
+
 ## Development
 
 ### Code Organization
@@ -578,27 +635,29 @@ The project uses a **modular namespace pattern** for maintainability:
 Scripts must load in dependency order (handled automatically in `index.html`):
 1. `levels.js` - Level data (no dependencies)
 2. `communityLevels.js` - Community level data (depends on levels)
-3. `js/config.js` - Configuration (no dependencies)
-4. `js/canvas.js` - Canvas setup (depends on config)
-5. `js/audio.js` - Audio system (no dependencies)
-6. `js/state.js` - Game state (depends on config)
-7. `js/gameObjects.js` - Object management (depends on state, config)
-8. `js/physics.js` - Physics engine (depends on state, config, audio)
-9. `js/renderer.js` - Rendering (depends on state, config, canvas)
-10. `js/scoring.js` - Scoring (depends on state)
-11. `js/quizzes.js` - Quiz data (no dependencies)
-12. `js/quiz.js` - Quiz management (depends on state, config, quizzes)
-13. `js/infoScreens.js` - Info-screen data (no dependencies)
-14. `js/infoManager.js` - Info-screen management (depends on state, infoScreens)
-15. `js/ui.js` - UI updates (depends on state)
-16. `js/statistics.js` - Statistics management (depends on state)
-17. `js/web3.js` - Web3 integration (depends on config)
-18. `js/leaderboard.js` - Leaderboard (depends on web3)
-19. `js/nft.js` - NFT minting (depends on web3, config)
-20. `js/gameFlow.js` - Game flow (depends on all above)
-21. `js/levelEditor.js` - Level editor (depends on state, config)
-22. `js/input.js` - Input handling (depends on state, gameFlow)
-23. `js/main.js` - Main loop (depends on all modules)
+3. `js/i18n.js` - Language engine (no dependencies; every module below calls `t()`)
+4. `js/locales/*.js` - Language packs (depend on i18n)
+5. `js/config.js` - Configuration (no dependencies)
+6. `js/canvas.js` - Canvas setup (depends on config)
+7. `js/audio.js` - Audio system (no dependencies)
+8. `js/state.js` - Game state (depends on config)
+9. `js/gameObjects.js` - Object management (depends on state, config)
+10. `js/physics.js` - Physics engine (depends on state, config, audio)
+11. `js/renderer.js` - Rendering (depends on state, config, canvas)
+12. `js/scoring.js` - Scoring (depends on state)
+13. `js/quizzes.js` - Quiz data (no dependencies)
+14. `js/quiz.js` - Quiz management (depends on state, config, quizzes)
+15. `js/infoScreens.js` - Info-screen data (no dependencies)
+16. `js/infoManager.js` - Info-screen management (depends on state, infoScreens)
+17. `js/ui.js` - UI updates (depends on state)
+18. `js/statistics.js` - Statistics management (depends on state)
+19. `js/web3.js` - Web3 integration (depends on config)
+20. `js/leaderboard.js` - Leaderboard (depends on web3)
+21. `js/nft.js` - NFT minting (depends on web3, config)
+22. `js/gameFlow.js` - Game flow (depends on all above)
+23. `js/levelEditor.js` - Level editor (depends on state, config)
+24. `js/input.js` - Input handling (depends on state, gameFlow)
+25. `js/main.js` - Main loop (depends on all modules; calls `I18n.init()` first)
 
 > `ethers` (v6) is loaded from a CDN `<script>` before the `js/` modules. The order above is wired up in `index.html`.
 
