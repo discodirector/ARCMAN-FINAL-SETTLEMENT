@@ -1,680 +1,367 @@
-# ARCMAN: Final Settlement - Arcade Game
+# ARCMAN: Final Settlement
 
-A retro pixel-art space game with glowing neon effects, inspired by classic arcade shooters. Launch coins through space to reach the Settlement Zone! Features a complete audio system, multiple game modes, and blockchain integration.
+A neon pixel-art arcade game about the one thing a payment network has to get right: **settlement**.
+You play Arc Man, launching a USDC coin along a ballistic arc into the Settlement Zone — and between
+levels, the game teaches you how Arc, USDC and on-chain payments actually work.
 
-## Project Summary
+**Play it at [arcmangame.com](https://arcmangame.com)** · English · Русский · 中文 · Bahasa Indonesia
 
-### What the project is
+Scores are computed and signed by the server, finalized on **Arc Testnet**, and ranked on an on-chain
+leaderboard. Finish the run and you can mint an ERC-721 completion certificate.
 
-ARCMAN: Final Settlement is a browser-based arcade game in a retro pixel-art style with neon visuals. The player launches a "coin" along a ballistic trajectory, progresses through levels, and can finalize results on-chain. The project combines a frontend game with a complete audio system, a backend for score signing, smart contracts for verification and leaderboards, and NFT completion certificates. Features include player statistics tracking, game mode-specific leaderboards, and ERC-721 NFT minting.
+---
 
-### What problem it solves
+## Contents
 
-* Implements physics-based arcade gameplay (drag → launch).
-* Supports a multi-level system with progression and a built-in level editor.
-* Calculates and validates scoring with multipliers, bonuses, and penalties.
-* Tracks comprehensive player statistics (games played, best scores, completion times, achievements).
-* Signs results on the server and submits them to a smart contract for on-chain finalization.
-* Maintains an on-chain Tournament leaderboard.
-* Mints ERC-721 NFT completion certificates (one per game mode).
+- [How a run works](#how-a-run-works)
+- [Scoring](#scoring)
+- [Levels](#levels)
+- [Learning content](#learning-content)
+- [Languages](#languages)
+- [Architecture](#architecture)
+- [Anti-cheat and score signing](#anti-cheat-and-score-signing)
+- [Smart contracts](#smart-contracts)
+- [Running locally](#running-locally)
+- [Deploying](#deploying)
+- [Project notes](#project-notes)
 
-### Which files are involved
+---
 
-**Frontend**
+## How a run works
 
-* `index.html` — main HTML, UI, styles, canvas, start screen, menus, level editor.
-* `js/` — modular game code (organized into focused modules):
-  * `i18n.js` — language engine (`I18n`, the `t()` shorthand) and the main-menu language dropdown
-  * `locales/en.js`, `locales/ru.js`, `locales/zh.js`, `locales/id.js` — language packs
-  * `config.js` — game configuration & constants
-  * `canvas.js` — canvas setup & responsive handling
-  * `audio.js` — audio system management
-  * `state.js` — game state management
-  * `gameObjects.js` — object initialization & level loading
-  * `physics.js` — physics engine & collision detection
-  * `renderer.js` — all drawing/rendering functions
-  * `scoring.js` — scoring system
-  * `ui.js` — UI update functions
-  * `gameFlow.js` — game mode handlers & flow control
-  * `levelEditor.js` — level editor system
-  * `input.js` — input/event handlers
-  * `statistics.js` — player statistics management
-  * `web3.js` — Web3 wallet integration and contract interactions
-  * `leaderboard.js` — leaderboard data fetching and formatting
-  * `nft.js` — NFT minting functionality
-  * `quizzes.js` — quiz questions and answers data
-  * `rescueTopics.js` — rescue-quiz topics: a hint and three questions each
-  * `rescue.js` — the one second chance a run gets when the last life is lost
-  * `quiz.js` — quiz system management for Tournament mode
-  * `infoScreens.js` — educational info-screen content (Arc / USDC / Circle facts)
-  * `infoManager.js` — info-screen scheduling and display, and the hand-off to that level's quiz
-  * `main.js` — main game loop & initialization
-* `levels.js` — level structure, default levels, `LevelManager`, loading and saving custom levels.
-* `communityLevels.js` — bundled community-submitted levels (loaded alongside `levels.js`)
+The main mode is **Tournament**: 20 levels, 5 lives, one run.
 
-**Assets**
+1. **Aim and launch.** Drag to set direction and power — a glowing line traces the arc the coin
+   will fly — and release to launch.
+2. **Reach the Settlement Zone.** Fly out of bounds and you lose a life and replay the level.
+3. **Learn, then answer.** Every completed level is followed by a short info screen, then a quiz on
+   what that screen just said. A correct answer restores a life (up to 5).
+4. **Rescue quiz — once per run.** Lose your last life and you get one way back: a hint on a topic,
+   then three questions on it.
 
-* `audio/` — audio files directory (menu music, gameplay music, sound effects)
-* `images/` — image assets:
-  * Menu background (`menu-background.png`)
-  * Start screen background (`start-background.png`)
-  * Coin sprite (optional PNG, e.g., `coin.png`)
-  * Player animation frames (optional PNG sequences, e.g., `player/player-{n}.png`, `player/player-throw-{n}.png`)
+   | Correct answers | Result |
+   |---|---|
+   | 3 of 3 | Carry on from the same level with 3 lives |
+   | 2 of 3 | Carry on from the same level with 1 life |
+   | 0–1 | The run restarts from level 1 |
 
-**Backend**
+   The score, the level and the server session carry on through a rescue. A second loss in the same
+   run goes straight to a restart.
+5. **Finish.** After level 20: finalize the score on-chain, mint the completion NFT, and check the
+   leaderboard.
 
-* `server.js` — Express server with a **session-based anti-cheat** score flow (`/api/session/start` → `/api/session/event` → `/api/session/finalize`); the server computes the score from validated events and ECDSA-signs it for the smart contract (signature includes game mode). Also hosts `/api/submit-level` (Telegram notification for community levels) and `/api/health`.
-* `package.json` — dependencies and run scripts (`npm start`, `npm run dev`)
-* `.env` — environment variables: `PRIVATE_KEY` (server signer), optional `TELEGRAM_BOT_TOKEN` / `TELEGRAM_CHAT_ID` (level submissions), optional `PORT` (default 3000)
+A wallet (MetaMask, Rabby) is only needed for the on-chain steps — the game itself plays without one.
+Test USDC for gas comes from the [Circle faucet](https://faucet.circle.com/).
 
-**Blockchain**
+**Other menu entries**
 
-* `contract.sol` — Solidity contract for signature verification, best score storage, and game mode-specific leaderboards
-* `nftContract.sol` — ERC-721 NFT contract for minting game completion certificates
+- **Community Levels** — levels submitted by players and approved by the maintainers.
+- **Level Editor** — build a level, test it in place, export it, or submit it for review.
+- **Statistics** — games played and completed, best scores, times and totals, stored in the browser.
+- **Leaderboard** — top 10 / 25 / 50 / 100 from the contract, with your own rank.
 
-### Constraints
+---
 
-* All gameplay logic runs client-side; only the final result is recorded on-chain.
-* Level coordinates are defined in relative values (0–1) and scaled to the current screen size.
-* Custom levels are stored in `localStorage`.
-* Server-side signing uses ECDSA signing with ethers.js for secure score verification.
-* The **final score is computed by the server** from validated in-game events (not submitted by the client), with anti-cheat checks: per-level object caps, a minimum time per level, session IP binding, and a finalize cooldown.
-* Proper on-chain finalization requires the backend server to be running.
-* The game targets a fullscreen canvas and prefers landscape orientation on mobile devices.
-* Audio system requires user interaction to unlock (handled by start screen).
-* Audio files are optional - game continues gracefully if files are missing.
+## Scoring
 
-## Features
+Each level scores:
 
-- **Retro Pixel Art**: Classic arcade aesthetic with neon glow effects and scanline animations
-- **Four Languages**: English, Русский, 中文 and Bahasa Indonesia — including the level names,
-  info screens and every quiz. A dropdown in the top-right of the main menu switches instantly
-  and remembers the choice; see [Languages](#languages)
-- **Complete Audio System**: 
-  - Background music for menu and gameplay
-  - Sound effects for all game actions (launch, gates, settlement, miss)
-  - Automatic music switching between menu and gameplay
-- **Click to Start Screen**: Splash screen that unlocks audio on first interaction
-- **Physics-Based Gameplay**: Drag to aim, release to launch coins along curved trajectories
-- **Visual Effects**:
-  - **USDC Coin Design**: Blue coin with white dollar sign and curved lines, glowing blue trail
-  - **Enhanced Trail**: Multi-layer glowing trail that extends across the coin's trajectory
-  - **Trail Particles**: Small scattered particles that trail behind the coin during flight
-  - **PNG Sprite Support**: Optional PNG sprites for coin and player character
-- **Animated Player Character**: PNG sequence animation system supporting multiple animations (idle, throwing)
-- **Multi-Level System**: 20 default levels with automatic progression
-- **Game Modes**:
-  - **Tournament Mode**: Lives-based challenge (5 lives) with info screens and quizzes
-  - **Community Levels**: Play levels submitted by other players
-  - **Level Editor**: Create and edit custom levels
-- **Learn-then-check loop** (Tournament Mode): every level ends with an info screen followed by a quiz on what it just said
-  - **Educational Info Screens**: one short Arc / USDC / Circle / x402 explainer after each of the 20 levels
-    - Content is editable in `js/infoScreens.js`; scheduling lives in `js/infoManager.js`
-  - **Quiz System**: the quiz for a level appears right after that level's info screen
-    - Each quiz contains 1 question with 3 answer options
-    - Answer correctly to gain +1 life (up to maximum of 5)
-    - Skip quizzes if you have full lives or don't need them
-    - Topics run from Arc's architecture and USDC as gas to x402, agent wallets, CCTP and settlement
-    - Questions and answers are easily editable in `js/quizzes.js`
-- **Rescue Quiz** (Tournament Mode): losing the last life no longer ends the run outright
-  - A topic is drawn from `js/rescueTopics.js`: the hint comes first, then that topic's three questions
-  - 3 of 3 correct — carry on from the same level with 3 lives; 2 of 3 — with 1 life; fewer — the run restarts from level 1
-  - One rescue per run, and its questions never repeat the per-level quizzes
-- **Built-in Level Editor**: Create and edit custom levels with visual placement tools
-  - **Drag and Drop**: Move objects by clicking and dragging them with the Select tool
-  - **Launch Level**: Test levels directly from the editor without leaving
-- **Game Objects**:
-  - **Arc Gates**: Boost your multiplier (+0.5x) and trajectory
-  - **Slippage Clouds**: Slow down coins and reduce multiplier
-  - **Barriers**: Bounce physics with score bonuses
-  - **Life Restores**: Restore lives in tournament mode
-  - **Settlement Zone**: Final destination to complete the round
-- **Scoring System**: Base score (100) + bonuses for clouds passed (10 each) and barriers hit (10 each), multiplied by gate multiplier
-- **Final Score Calculation**: Comprehensive score tracking with level-by-level breakdown and game completion statistics
-- **Player Statistics**: 
-  - Track games played, completed, and abandoned
-  - Best scores (final and per-level)
-  - Completion times and rates
-  - Achievement tracking (gates, clouds, barriers, perfect games)
-  - Game mode breakdowns
-  - Persistent storage in browser localStorage
-- **Blockchain Integration**: 
-  - Server-signed score verification with smart contract storage
-  - On-chain score finalization with wallet connection (MetaMask, Rabby)
-  - On-chain Tournament leaderboard
-  - Top 10/25/50/100 leaderboard views
-  - Player rank tracking
-- **NFT Minting**: 
-  - ERC-721 completion certificates
-  - One NFT per player
-  - Game mode-specific images and metadata
-  - Completion date and game mode attributes
-
-## Installation
-
-1. Install dependencies:
-```bash
-npm install
+```
+level score = floor( (100 + 10 × clouds passed + 10 × barrier hits) × (1 + 0.5 × gates passed) )
 ```
 
-2. Add audio files (optional but recommended):
-   - Place audio files in the `audio/` directory:
-     - `menu-music.mp3` - Main menu background music
-     - `gameplay-music.mp3` - In-game background music
-     - `launch.mp3` - Coin launch sound effect
-     - `gate.mp3` - Arc Gate pass-through sound
-     - `settlement.mp3` - Settlement Zone entry sound
-     - `miss.mp3` - Boundary hit/miss sound
-   - The game will work without these files but will be silent.
+The run score is the sum of its level scores.
 
-3. Add background images (optional):
-   - `images/menu-background.png` - Main menu background
-   - `images/start-background.png` - Start screen background
-   - Fallback black backgrounds will be used if images are missing.
+| Object | What it does | Score effect |
+|---|---|---|
+| **Arc Gate** | Speeds the coin up horizontally as it passes | +0.5× multiplier |
+| **Slippage Cloud** | Slows the coin (×0.85) on entry | +10 |
+| **Barrier** | Bounces the coin — large at full speed, medium at half, small at a quarter | +10, once per barrier per shot |
+| **Life Restore** | Tournament only: +1 life, up to 5 | — |
+| **Settlement Zone** | Ends the level | Base 100 |
 
-4. Add sprite images (optional):
-   - **Coin sprite**: `images/coin.png` - Custom PNG sprite for the coin (configured in `js/config.js`)
-   - **Player animations**: PNG sequence frames for player character animations:
-     - `images/player/player-1.png`, `player-2.png`, etc. - Idle animation frames
-     - `images/player/player-throw-1.png`, `player-throw-2.png`, etc. - Throwing animation frames
-   - If sprite images are not provided, the game uses drawn graphics (USDC logo for coin, pixel-art character for player)
+The number on screen is for the player. The score that reaches the chain is recomputed by the server
+from validated in-game events — see [Anti-cheat and score signing](#anti-cheat-and-score-signing).
 
-5. Start the server:
-```bash
-npm start
-```
+---
 
-6. **IMPORTANT**: Open the game through a web server, NOT by double-clicking `index.html`!
+## Levels
 
-   **Option A - Using the backend server:**
-   ```bash
-   npm start
-   # Then open http://localhost:3000 in your browser
-   ```
-   
-   **Option B - Using Python (if you don't need the backend):**
-   ```bash
-   python -m http.server 8000
-   # Then open http://localhost:8000 in your browser
-   ```
-   
-   **Option C - Using Node.js http-server:**
-   ```bash
-   npx http-server -p 8000
-   # Then open http://localhost:8000 in your browser
-   ```
+Twenty levels in `levels.js`, in two acts. Levels 1–9 and 20 ("Final Settlement") are hand-built;
+levels 10–19 are the second act, each named after the info screen that follows it.
 
-   **Why?** Wallet extensions (MetaMask, Rabby) only work with `http://` or `https://` URLs, not `file://` protocol. Opening `index.html` directly won't allow wallet connections.
+### Design rules for the second act
 
-## Gameplay
+Levels 10–19 were built and checked against a headless re-implementation of the shot physics
+(`js/agent.js`, see [Project notes](#project-notes)). Every one of them meets these rules at 1440×900,
+1280×800, 1024×768, 844×390 and 390×844:
 
-1. **Start Screen**: Click anywhere on the start screen to begin (unlocks audio)
-2. **Main Menu**: Choose your game mode:
-   - **Tournament Mode**: Play through all levels with a lives system (5 lives)
-   - **Community Levels**: Play levels submitted by other players
-   - **Level Editor**: Create and edit custom levels
-3. **Aiming**: Click and drag from the player character to aim your shot (player switches to throwing animation while aiming)
-4. **Launching**: Release to launch the coin from the player's right side along the glowing arc trajectory
-5. **Gameplay**: 
-   - Pass through Arc Gates to increase multiplier (+0.5x each)
-   - Navigate through Slippage Clouds (they slow you down)
-   - Hit Barriers for bonus points (bounce physics)
-   - Collect Life Restores in tournament mode
-   - Reach the Settlement Zone to complete the level
-6. **Scoring**: 
-   - Base: 100 points per level
-   - Slippage Clouds passed: +10 points each
-   - Barrier collisions: +10 points each
-   - Final score = (100 + bonuses) × multiplier
-7. **Level Progression**: When a level is completed, the game automatically advances to the next level
-8. **Info Screen, then Quiz** (Tournament Mode only):
-   - After every level an info screen appears, followed by a quiz on what it just explained
-   - Answer the question correctly to gain +1 life
-   - Skip the quiz if you have full lives or prefer to continue
-   - Topics run from Arc's architecture and USDC as gas to x402, agent wallets, CCTP and settlement
-9. **Rescue Quiz** (Tournament Mode only):
-   - Run out of lives and a hint appears, followed by three questions on it
-   - Answer all three and you return to the same level with 3 lives; two of three returns you with 1 life
-   - One or none, and the run restarts from the first level. One rescue per run
-10. **Game Completion**: After completing all levels, view your final score, completion time, and statistics
-11. **On-Chain Finalization**: Click "Finalize On-Chain" to submit your score to the blockchain (requires wallet connection)
-12. **NFT Minting**: Click "Mint NFT" to mint a completion certificate NFT (one per player)
-13. **Leaderboard**: View top players and your rank on the Tournament leaderboard
-14. **Statistics**: Access detailed player statistics from the main menu, including games played, best scores, completion times, and achievements
+- **No free shot.** No winning shot reaches the Settlement Zone without touching an object — the
+  player has to fly the intended line.
+- **No decoration.** Every object is either met by at least a fifth of the winning shots, or removing
+  it opens a free lane or visibly changes the shot window.
+- **Everything on the field.** Rotated barriers are checked corner by corner; cloud extents account
+  for the aspect ratio.
+- **Every gate in one run.** Some single shot collects all the gates, so the top score is reachable.
+- **Life restores are a choice.** They sit off the straight line, on roughly a third of winning shots.
 
-## Level Editor
+New levels should meet the same bar.
 
-The game includes a built-in level editor for creating custom levels:
+### Level format
 
-1. **Open Editor**: Click the "Editor" button in the top-right corner
-2. **Select Tool**: Choose from the toolbar:
-   - **Select**: Click objects to select them (highlighted in yellow)
-   - **Arc Gate**: Click to place an arc gate
-   - **Slippage Cloud**: Click to place a slippage cloud
-   - **Life Restore**: Click to place a life restoration object
-   - **Barrier (Large/Medium/Small)**: Click to place barriers of different sizes
-   - **Settlement Zone**: Click to set the settlement zone (required!)
-   - **Player Start**: Click to set the player starting position
-   - **Delete**: Click objects to remove them
-3. **Move Objects**: 
-   - Select an object with the Select tool (it will highlight in yellow)
-   - Click and hold the left mouse button on the selected object
-   - Drag it to the desired position
-   - Release to drop it in place
-   - Works with all objects: gates, clouds, barriers, settlement zone, player, and life restores
-4. **Rotate Objects**: Select an object and press **R** or click "Rotate Selected" to rotate gates, barriers, and settlement zones (15° increments)
-5. **Edit Level Info**: Enter a level name and view the level ID
-6. **Save Level**: Click "Save Level" to save your custom level (stored in browser localStorage)
-7. **Launch Level**: Click "Launch Level" to test your level immediately:
-   - Saves the level automatically if not already saved
-   - Launches the level in test mode
-   - Play through the level to test gameplay
-   - Click "Back to Editor" or "Return to Editor" after completion to return to editing
-8. **Load Level**: Select a level from the dropdown and click "Load Level" to edit it
-9. **New Level**: Click "New Level" to start creating a fresh level
-10. **Delete Level**: Click "Delete Level" to remove a custom level (default levels cannot be deleted)
-11. **Export Levels**: Click "Export DEFAULT_LEVELS" to copy level data for use in `levels.js`
-
-### Level Requirements
-
-- Each level must have exactly **one Settlement Zone** (required to complete the level)
-- At least **one Player Start** position (defaults to bottom-left if not set)
-- Any number of Arc Gates and Slippage Clouds (optional)
-
-### Adding New Levels Programmatically
-
-To add levels in code, edit `levels.js` and add to the `DEFAULT_LEVELS` array:
+All coordinates are relative (0–1) and scaled to the canvas at load time.
 
 ```javascript
 {
-    id: 5,
-    name: "My Custom Level",
-    player: { x: 0.12, y: 0.75 },  // Relative coordinates (0-1)
+    id: 21,
+    name: "Level Name",
+    player: { x: 0.08, y: 0.78 },
     arcGates: [
-        { x: 0.5, y: 0.3, width: 0.05, height: 0.13, active: true }
+        { x: 0.40, y: 0.30, width: 0.05, height: 0.13, active: true, rotation: 0 }
     ],
     slippageClouds: [
-        { x: 0.7, y: 0.6, radius: 0.06 }
+        { x: 0.55, y: 0.40, radius: 0.06 }
     ],
-    settlementZone: { x: 0.85, y: 0.8, width: 0.1, height: 0.13 }
+    settlementZone: { x: 0.84, y: 0.60, width: 0.10, height: 0.13 },
+    barriers: [
+        { x: 0.60, y: 0.35, width: 0.01, height: 0.3, size: "large", rotation: 30 }
+    ],
+    lifeRestores: [
+        { x: 0.30, y: 0.45, radius: 0.022 }
+    ]
 }
 ```
 
-All coordinates are relative (0-1) for responsive scaling across different screen sizes.
+| Field | Anchor and units |
+|---|---|
+| `arcGates`, `settlementZone` | `x, y` is the top-left corner; `width` in fractions of canvas width, `height` of canvas height |
+| `slippageClouds`, `lifeRestores` | `x, y` is the centre; `radius` is a fraction of canvas **width** |
+| `barriers` | `x, y` is the top-left of the unrotated rectangle; `rotation` in degrees around its centre; `size` sets bounce strength (`large` 1.0, `medium` 0.5, `small` 0.25) |
 
-## Architecture
+### Adding a level
 
-> **Note**: The codebase is organized into a modular structure (21 modules in the `js/` directory) using the namespace pattern, instead of one monolithic file.
+1. Append the level to `DEFAULT_LEVELS` in `levels.js` with the next `id`.
+2. Add an info screen to `js/infoScreens.js` and a quiz to `js/quizzes.js` with **the same `id`**.
+3. Add the wording to every pack in `js/locales/` (English is the fallback until then).
+4. **Restart the backend.** `server.js` reads `levels.js` at startup to know how many levels a run has
+   and how many objects each level can report; a stale process rejects finalization of the new run.
 
-### Frontend Structure
+The Level Editor's **Export** writes out `DEFAULT_LEVELS` in this same format, so a level can be built
+visually and pasted in.
 
-The game uses a **modular namespace pattern** for better organization and maintainability:
+---
 
-**Core Modules:**
-- `js/config.js` - Game configuration, constants, and color definitions
-- `js/canvas.js` - Canvas initialization, responsive setup, and resize handling
-- `js/state.js` - Centralized game state management (all game variables)
-- `js/main.js` - Main game loop and initialization
+## Learning content
 
-**Game Systems:**
-- `js/audio.js` - Complete audio system (music and sound effects)
-- `js/physics.js` - Physics engine, collision detection, particle system, and coin trail particles
-- `js/renderer.js` - All drawing functions (includes coin rendering with USDC logo, trail effects, player animations)
-- `js/gameObjects.js` - Object initialization, level loading, star generation, sprite loading
-- `js/scoring.js` - Scoring calculations and level summary display
-- `js/ui.js` - UI update functions
+Everything the game teaches lives in three data files. They hold the English source, the ids, the
+answer order and `correctIndex`; translations carry wording only.
 
-**Game Flow:**
-- `js/gameFlow.js` - Game mode management (tournament, community, editor), level progression, round management, completion screens, statistics, leaderboard, NFT minting
-- `js/input.js` - Input handling (mouse, touch, keyboard events)
-- `js/levelEditor.js` - Complete level editor system
-- `js/quizzes.js` - Quiz questions and answers data (editable quiz content)
-- `js/quiz.js` - Quiz system management for Tournament mode (quiz display, answer handling, life rewards)
-- `js/rescueTopics.js` - Rescue-quiz topic base: each topic carries a hint and three questions
-- `js/rescue.js` - Rescue quiz: one hint and three questions when the last life is lost, once per run
-- `js/infoScreens.js` - Educational info-screen content (Arc / USDC / Circle facts)
-- `js/infoManager.js` - Info-screen scheduling and display (one after every level in Tournament mode), then hands off to that level's quiz
+| File | Shown | Contents |
+|---|---|---|
+| `js/infoScreens.js` | After every level | 20 short explainers — Arc, USDC as gas, finality, the ARC token, x402, agent wallets, CCTP, reserves, minting, EURC, FX settlement, confidential transfers, validators, cross-border payments, irreversibility, the road to mainnet |
+| `js/quizzes.js` | Right after that level's info screen | 20 questions, one per level, each checking the screen just read |
+| `js/rescueTopics.js` | When the last life is lost | 8 topics, each with a hint and three questions — none repeated from the level quizzes |
 
-**Blockchain & Statistics:**
-- `js/statistics.js` - Player statistics management and localStorage persistence
-- `js/web3.js` - Web3 wallet integration (MetaMask, Rabby), contract interactions, network management
-- `js/leaderboard.js` - Leaderboard data fetching, formatting, and display
-- `js/nft.js` - NFT minting functionality, metadata generation, token management
+Rules that keep this consistent:
 
-**Supporting Files:**
-- `index.html` - Main game page with start screen, menus, and level editor UI
-- `levels.js` - Level data structure, default levels, and level management (`LevelManager` class)
-- `communityLevels.js` - Bundled community-submitted levels, loaded alongside `levels.js`
+- An info screen and its quiz share the level's `id`.
+- Every quiz has exactly three answers and a `correctIndex` of 0–2.
+- Every rescue answer must be findable in its own hint — the rescue is meant to be won by reading.
+- A rescue topic is `{ id, title, hint, questions: [ …3… ] }`. Adding one to the array puts it in the
+  draw; add its wording to the packs in `js/locales/`, or it shows in English.
 
-### Module Organization
+Content was checked against Arc, Circle and x402 public materials as of September 2026. Arc is a
+public testnet; claims about mainnet, the validator set or the ARC token describe announced plans.
 
-The codebase is organized into **21 focused modules** (50-600 lines each) instead of one large file. Key modules and their dependencies:
-
-1. **Configuration** (`config.js`) - Pure constants, no dependencies
-2. **Canvas** (`canvas.js`) - Canvas operations, depends on `config.js`
-3. **Audio** (`audio.js`) - Self-contained audio system
-4. **State** (`state.js`) - Game state variables, depends on `config.js`
-5. **Game Objects** (`gameObjects.js`) - Object management, depends on `state.js`, `config.js`
-6. **Physics** (`physics.js`) - Physics engine, depends on `state.js`, `config.js`, `audio.js`
-7. **Renderer** (`renderer.js`) - Drawing functions, depends on `state.js`, `config.js`, `canvas.js`
-8. **Scoring** (`scoring.js`) - Scoring logic, depends on `state.js`
-9. **UI** (`ui.js`) - UI updates, depends on `state.js`
-10. **Game Flow** (`gameFlow.js`) - Game flow control, depends on all other modules
-11. **Level Editor** (`levelEditor.js`) - Editor system, depends on `state.js`, `config.js`
-12. **Input** (`input.js`) - Event handlers, depends on `state.js`, `gameFlow.js`
-13. **Main** (`main.js`) - Initialization and game loop, depends on all modules
-
-All modules use **namespace objects** (e.g., `GameState`, `Physics`, `Renderer`) to avoid global variable pollution.
-
-### Audio System
-The game includes a complete audio system managed by the `AudioManager` namespace (`js/audio.js`):
-- **Music**: Automatically switches between menu and gameplay music
-- **Sound Effects**: Launch, gate pass-through, settlement entry, and miss sounds
-- **Browser Compatibility**: Handles autoplay policies by unlocking audio on first user interaction
-- **Graceful Degradation**: Game continues to function if audio files are missing
-
-### Backend
-`server.js` is an Express server that serves the static game and runs a **session-based, server-authoritative scoring flow** (anti-cheat). The client reports gameplay events; the server validates them, computes the score itself, and ECDSA-signs it for the smart contract.
-
-API endpoints:
-- `POST /api/session/start` — begin a session. Body: `{ player, gameMode }` (`gameMode` = `Tournament`; `Immortal` is still accepted so sessions from an older cached client keep working). Returns `{ sessionId, totalLevels }`. Any previous session for the same player is invalidated.
-- `POST /api/session/event` — report an event. Body: `{ sessionId, eventType }`, where `eventType` ∈ `levelStart | gatePassed | cloudPassed | barrierHit | levelComplete`. The server enforces per-level object caps (from `DEFAULT_LEVELS`), a minimum time per level, and session IP binding.
-- `POST /api/session/finalize` — finish a session. Body: `{ sessionId, nonce }`. Validates that all levels were completed and minimum timings were met, computes the score `Σ floor((100 + clouds·10 + barriers·10) · (1 + gates·0.5))`, then returns `{ score, signature, signerAddress, timestamp }`. Rate-limited to one finalize per player per 60s.
-- `POST /api/submit-level` — submit a custom level for approval. Body: `{ level }`. Sends the level JSON to Telegram (if `TELEGRAM_BOT_TOKEN` / `TELEGRAM_CHAT_ID` are set). Returns `{ success, telegramSent }`.
-- `GET /api/health` — health check, returns `{ status: 'ok' }`.
-- `GET /` and static files are served from the project root.
-
-Anti-cheat parameters: 1-hour session expiry, ≥ 3 s per level, 60 s finalize cooldown per player. Environment: `PRIVATE_KEY` (server signer — required for valid signatures), optional `TELEGRAM_BOT_TOKEN` / `TELEGRAM_CHAT_ID`, optional `PORT` (default `3000`).
-
-### Smart Contracts
-- `contract.sol`: Solidity contract for score verification and leaderboard
-  - Uses server-signed validation with game mode support
-  - Stores best scores per player per game mode
-  - Maintains a top 100 leaderboard per game mode (the game now writes only to Tournament)
-  - Game mode is included in signature verification
-- `nftContract.sol`: ERC-721 NFT contract for completion certificates
-  - Allows players to mint one NFT per game mode
-  - Stores completion data (score, levels, time, game mode) on-chain
-  - Uses OpenZeppelin contracts for security
-
-## Blockchain Integration
-
-The game uses a comprehensive blockchain integration system:
-
-1. **Offchain Gameplay**: All game logic and physics run client-side
-2. **Onchain Verification**: After successful runs, scores are:
-   - Signed by the backend server (includes game mode in signature)
-   - Verified by the smart contract
-   - Stored on-chain with game mode-specific leaderboard support
-3. **Leaderboards**: 
-   - Tournament leaderboard read from the contract
-   - Toggle between game modes using mode selector buttons
-   - View top 10, 25, 50, or 100 players
-   - See your rank in each game mode
-   - Real-time updates from blockchain
-   - Player highlighting for your own entries
-4. **NFT Minting**:
-   - Mint completion certificate NFTs after finishing a game
-   - One NFT per player
-   - NFTs include completion date and game mode attributes
-   - Game mode-specific images (configurable in `js/config.js`)
-   - ERC-721 standard compatible
-   - Prevents duplicate minting per game mode
+---
 
 ## Languages
 
-The game ships in English, Russian (Русский), Simplified Chinese (中文) and Indonesian
-(Bahasa Indonesia). A dropdown in the top-right corner of the main menu switches between
-them; the choice is saved to `localStorage` under `arcman_language`. On a first visit the
-browser's own language decides, falling back to English.
+English, Russian, Simplified Chinese and Indonesian. A dropdown in the top-right corner of the menu
+switches language without a reload. The choice is stored in `localStorage` (`arcman_language`); on a
+first visit the browser language decides.
 
-Switching takes effect immediately — no reload — because every screen reads its text
-through `I18n.t()` at render time.
+`js/i18n.js` loads before every other module:
 
-### How it works
+- `I18n.t(key, params)` — also the global `t()` — looks the key up in the current pack, falls back to
+  English, then to the key itself, so an unfinished pack shows English rather than blank UI.
+- `I18n.levelName()`, `I18n.infoText()`, `I18n.quiz()`, `I18n.rescueTopic()` return translated game
+  content. They never translate `correctIndex`, so which answer is right cannot depend on the language.
+- Static markup uses `data-i18n` (plus `-html`, `-placeholder`, `-value`, `-title`) and is rewritten by
+  `I18n.apply()`; screens built in JavaScript re-render through `I18n.onChange()`.
+- `'Tournament'` and `'Community'` are contract values and are never translated.
 
-`js/i18n.js` loads before every other module and exposes:
+**Adding a language:** copy `js/locales/en.js` to `js/locales/<code>.js` and translate every value
+(English is the canonical key set), add `{ code, label, short }` to `I18n.LANGUAGES`, and add its
+`<script>` tag in `index.html` next to the others. The dropdown builds itself.
 
-* `I18n.t(key, params)` (aliased to the global `t()`) — dot-path lookup in the current
-  pack, falling back to English and then to the key itself, so an unfinished pack degrades
-  to English instead of blank UI. `{name}` placeholders are filled from `params`.
-* `I18n.setLanguage(code)` — swaps the pack, re-applies the markup, and notifies listeners
-  registered with `I18n.onChange()`.
-* `I18n.levelName(level)`, `I18n.infoText(info)`, `I18n.quiz(quiz)`,
-  `I18n.rescueTopic(topic)` — translated game content. The English source stays in
-  `levels.js`, `infoScreens.js`, `quizzes.js` and `rescueTopics.js`, which keep the ids,
-  the answer order and `correctIndex`; only the wording lives in the packs, so scoring
-  never depends on the language.
-* `I18n.gameModeLabel(mode)` — display label for a game mode. `'Tournament'` and
-  `'Community'` themselves are contract values and are never translated.
+---
 
-Static markup is translated declaratively. Any element carrying `data-i18n="key"` has its
-`textContent` rewritten by `I18n.apply()`; `data-i18n-html`, `data-i18n-placeholder`,
-`data-i18n-value` and `data-i18n-title` cover the other cases.
+## Architecture
 
-### Adding a language
-
-1. Copy `js/locales/en.js` to `js/locales/<code>.js`, change the `I18n.register` code, and
-   translate the values. Keep every key — the English pack is the canonical key set.
-2. Add the language to `I18n.LANGUAGES` in `js/i18n.js` (`{ code, label, short }`) and to
-   `I18n.detect()` if the browser tag should map to it.
-3. Add a `<script src="js/locales/<code>.js">` tag in `index.html`, next to the others.
-
-The dropdown builds itself from `I18n.LANGUAGES`, so no markup change is needed.
-
-Note: the retired Agent Shift markup in `index.html` (`#agentHud`, `#agentWallet` and
-friends) is not translated — no script loads those nodes and they render nothing.
-
-
-## Player Statistics
-
-The game tracks comprehensive player statistics stored in browser localStorage:
-
-- **Overview**: Games played, completed, abandoned, completion rate
-- **Best Scores**: Best final score, best level score, average final score, total lifetime points
-- **Performance**: Total levels completed, average levels per game, fastest completion time, average completion time
-- **Achievements**: Total gates passed, total clouds passed, total barriers hit, perfect games
-- **Game Mode Breakdown**: Tournament statistics
-- **Last Game**: Details about the most recent game session
-
-Access statistics from the main menu "Statistics" button. Statistics persist across browser sessions and can be reset if needed.
-
-## Configuration
-
-### Blockchain Configuration
-
-Contract addresses live in `js/config.js`. The current deployment (Arc Testnet) uses:
-
-```javascript
-BLOCKCHAIN: {
-    CONTRACT_ADDRESS: '0x1E880c3165f5f2ee6B4d00598C9B5e1BfAC6ED0f',     // Score / leaderboard contract
-    NFT_CONTRACT_ADDRESS: '0x6695B1B9d03fB3E94fdC7599abeB97DDF3E9a764', // NFT (ERC-721) contract
-    NETWORK: 'ArcTestnet',                  // Arc Testnet (chain ID 5042002)
-    API_URL: 'https://arcmangame.com'       // Backend server URL (use http://localhost:3000 locally)
-}
-```
-
-### NFT Image Configuration
-
-Configure different images for each game mode in `js/config.js`:
-
-```javascript
-NFT_IMAGES: {
-    Tournament: 'https://your-domain.com/images/nft-tournament.png'
-}
-```
-
-### Environment Setup
-
-Create a `.env` file in the project root:
+Plain JavaScript, no framework and no build step. Modules are loaded by `<script>` tags in
+`index.html`, in dependency order, and talk through global namespace objects (`GameState`,
+`GameConfig`, `Physics`, `Renderer`, …). The one external script is ethers.js from a CDN.
 
 ```
-PRIVATE_KEY=0x...              # server signer key (must match the signer the contract expects)
-# Optional — enables Telegram notifications for community level submissions:
-TELEGRAM_BOT_TOKEN=...
-TELEGRAM_CHAT_ID=...
-# Optional — server port (default 3000):
-PORT=3000
+index.html            markup, styles, canvas, every overlay and screen
+levels.js             DEFAULT_LEVELS and LevelManager (also read by server.js)
+communityLevels.js    approved community levels
+server.js             Express: static files, anti-cheat sessions, score signing, level submissions
+contract.sol          USDCLaunchScore — signature check, best scores, leaderboards
+nftContract.sol       ARCMANCompletionNFT — ERC-721 completion certificate
+js/
+  i18n.js             translation runtime            locales/   en, ru, zh, id packs
+  config.js           constants, chain and contract settings
+  canvas.js           canvas sizing and responsiveness
+  audio.js            music and sound effects
+  state.js            GameState — the single source of runtime state
+  gameObjects.js      level loading, sprites, player animation
+  physics.js          coin flight, collisions, life loss
+  renderer.js         all canvas drawing
+  scoring.js          level scoring and the level summary screen
+  ui.js               HUD updates
+  input.js            mouse and touch aiming
+  gameFlow.js         modes, level progression, completion, leaderboard and NFT screens
+  infoScreens.js      info screen content      infoManager.js   info screen display
+  quizzes.js          level quiz content       quiz.js          level quiz display and rewards
+  rescueTopics.js     rescue topic base        rescue.js        the rescue quiz
+  statistics.js       player statistics in localStorage
+  web3.js             wallet connection, network switching, contract calls
+  leaderboard.js      leaderboard fetching and formatting
+  nft.js              NFT metadata and minting
+  levelEditor.js      the level editor
+  main.js             game loop and initialisation
+  agent*.js           retired Agent Shift mode — not loaded, see Project notes
 ```
 
-`.env` is git-ignored and must never be committed. If `PRIVATE_KEY` is unset, the server generates a throwaway key on startup, so on-chain finalization will fail signature verification.
+Browser storage keys: `arcman_language`, `arcman_player_stats`, `usdc_launch_custom_levels`
+(levels saved from the editor).
 
-## Audio Files
+---
 
-The game supports the following audio files (all optional):
+## Anti-cheat and score signing
 
-**Music (looping):**
-- `audio/menu-music.mp3` - Plays in the main menu
-- `audio/gameplay-music.mp3` (plus `gameplay-music-1.mp3`, `gameplay-music-2.mp3`, `gameplay-music-3.mp3` variants) - Plays during gameplay
-- `audio/editor-music.mp3` - Plays in the level editor
+The client never submits a score. It reports what happened; the server decides what it was worth.
 
-**Sound Effects:**
-- `audio/launch.mp3` - Plays when coin is launched
-- `audio/gate.mp3` - Plays when passing through Arc Gates
-- `audio/settlement.mp3` - Plays when entering Settlement Zone
-- `audio/miss.mp3` - Plays when coin hits screen boundaries
-
-All audio files should be placed in the `audio/` directory. The game will work without these files but will be silent.
-
-## Customization
-
-### Coin Sprite
-
-The game supports custom PNG sprites for the coin. By default, it uses a drawn USDC logo (blue circle with white dollar sign and curved lines). To use a custom sprite:
-
-1. Place your coin sprite image in the `images/` directory (e.g., `images/coin.png`)
-2. Configure the path in `js/config.js`:
-   ```javascript
-   COIN_SPRITE_PATH: 'images/coin.png', // Set to null to use drawn USDC logo
-   ```
-
-### Player Animations
-
-The game supports PNG sequence animations for the player character. You can configure multiple animations (idle, throwing) in `js/config.js`:
-
-```javascript
-PLAYER_ANIMATION: {
-    idle: {
-        pathPattern: 'images/player/player-{n}.png',
-        frameCount: 8,
-        frameRate: 8,
-        numberingStyle: 'single' // 'single', 'double', or 'triple'
-    },
-    throwing: {
-        pathPattern: 'images/player/player-throw-{n}.png',
-        frameCount: 2,
-        frameRate: 8,
-        numberingStyle: 'single'
-    }
-}
+```
+POST /api/session/start     { player, gameMode }             -> { sessionId, totalLevels }
+POST /api/session/event     { sessionId, eventType }         levelStart | gatePassed | cloudPassed |
+                                                             barrierHit | levelComplete
+POST /api/session/finalize  { sessionId, nonce }             -> { score, signature, signerAddress }
+POST /api/submit-level      { level }                        community submission (Telegram notice)
+GET  /api/health                                             -> { status: "ok" }
 ```
 
-**File naming patterns:**
-- `{n}` - Single digit: `player-1.png`, `player-2.png`, etc.
-- `{nn}` - Double digit: `player-01.png`, `player-02.png`, etc. (set `numberingStyle: 'double'`)
-- `{nnn}` - Triple digit: `player-001.png`, `player-002.png`, etc. (set `numberingStyle: 'triple'`)
+Checks the server applies:
 
-**Animation behavior:**
-- **Idle animation**: Plays when the player is not actively aiming
-- **Throwing animation**: Plays when the player is actively dragging to aim (preparing to throw)
-- If animations are not configured, the game uses a drawn pixel-art character
+- one active session per player, bound to the IP that started it, expiring after an hour
+- events are capped per level by that level's real object counts in `levels.js`
+- no event within 0.5 s of a level starting, and no level completed in under 3 s
+- finalization needs every level completed, a total time of at least 3 s per level, and a 60 s
+  cooldown between finalizations per player
+- the score is recomputed from the recorded events with the formula in [Scoring](#scoring)
 
-### Player Size
+The server then signs
+`keccak256(abi.encodePacked(player, score, levelId, nonce, gameMode))` with the Ethereum signed-message
+prefix, where `levelId` is the number of levels completed. The contract recovers the signer and
+accepts the score only if it matches its configured server signer.
 
-Adjust the player character size in `js/config.js`:
+---
 
-```javascript
-PLAYER_SIZE_SCALE: 1.0, // 1.0 = default, 1.5 = 50% bigger, 2.0 = double size, etc.
-```
+## Smart contracts
 
-### Quiz Questions
+Deployed on **Arc Testnet** (chain id `5042002`, RPC `https://rpc.testnet.arc.network`).
 
-Edit quiz questions and answers in `js/quizzes.js`. The file contains one quiz per level (20 in total); each appears right after that level's info screen in Tournament mode:
+| Contract | Address |
+|---|---|
+| `USDCLaunchScore` (`contract.sol`) | `0x1E880c3165f5f2ee6B4d00598C9B5e1BfAC6ED0f` |
+| `ARCMANCompletionNFT` (`nftContract.sol`) | `0x6695B1B9d03fB3E94fdC7599abeB97DDF3E9a764` |
 
-```javascript
-const QUIZZES = [
-    {
-        id: 1, // For level 1 — checks the info screen with the same id
-        question: "What is Arc?",
-        answers: [
-            "A Layer-2 rollup that settles on Ethereum",
-            "An EVM-compatible Layer-1 built by Circle for stablecoin finance",
-            "A closed payment API with no blockchain behind it"
-        ],
-        correctIndex: 1 // Index of the correct answer (0, 1, or 2)
-    },
-    // ... more quizzes
-];
-```
+**USDCLaunchScore**
 
-Each quiz object contains:
-- `id`: The level this quiz follows — it must match the `id` of the info screen in `js/infoScreens.js` that sets it up
-- `question`: The question text
-- `answers`: Array of 3 answer options
-- `correctIndex`: Index (0-2) of the correct answer in the answers array
+- `finalizeScore(scoreData, signature)` — the caller must be the player; verifies the server
+  signature, keeps the player's best score per game mode and updates that mode's leaderboard.
+- `getLeaderboard(count, gameMode)`, `getPlayerScore(player, gameMode)` — read views.
+- Leaderboards hold the top 100 per game mode. The game finalizes to `Tournament`; records from the
+  retired Immortal mode remain on-chain and are no longer shown.
 
-This file stays the source of truth for the ids, the answer order and `correctIndex`. The
-other languages carry only the wording, under `quiz.<id>` in each `js/locales/*.js` pack —
-so after editing a question here, update the same id in `ru.js`, `zh.js` and `id.js`,
-keeping the answers in the same order. An id with no translation falls back to the English
-text above rather than breaking. Level names (`levels.<id>`), info screens (`info.<id>`)
-and rescue topics (`rescueTopics.<id>`) work the same way; see [Languages](#languages).
+**ARCMANCompletionNFT**
 
-## Development
+- `mintCompletionNFT(player, finalScore, levelsCompleted, completionTime, gameMode, tokenURI)` —
+  players can only mint for themselves, one certificate per game mode.
+- `hasCompletionNFT`, `getPlayerTokenId`, `getCompletionData`, `totalSupply` — read views.
+- Metadata is built client-side in `js/nft.js`; the image comes from `GameConfig.BLOCKCHAIN.NFT_IMAGES`.
 
-### Code Organization
+---
 
-The project uses a **modular namespace pattern** for maintainability:
-- Each module is self-contained with a clear purpose
-- Modules communicate through namespace objects (e.g., `GameState`, `Physics`, `Renderer`)
-- No build step required - works with simple `<script>` tags
-- Easy to navigate and modify individual systems
+## Running locally
 
-### Module Dependencies
+Requires Node.js (production runs v20).
 
-Scripts must load in dependency order (handled automatically in `index.html`):
-1. `levels.js` - Level data (no dependencies)
-2. `communityLevels.js` - Community level data (depends on levels)
-3. `js/i18n.js` - Language engine (no dependencies; every module below calls `t()`)
-4. `js/locales/*.js` - Language packs (depend on i18n)
-5. `js/config.js` - Configuration (no dependencies)
-6. `js/canvas.js` - Canvas setup (depends on config)
-7. `js/audio.js` - Audio system (no dependencies)
-8. `js/state.js` - Game state (depends on config)
-9. `js/gameObjects.js` - Object management (depends on state, config)
-10. `js/physics.js` - Physics engine (depends on state, config, audio)
-11. `js/renderer.js` - Rendering (depends on state, config, canvas)
-12. `js/scoring.js` - Scoring (depends on state)
-13. `js/quizzes.js` - Quiz data (no dependencies)
-14. `js/quiz.js` - Quiz management (depends on state, config, quizzes)
-15. `js/infoScreens.js` - Info-screen data (no dependencies)
-16. `js/infoManager.js` - Info-screen management (depends on state, infoScreens)
-17. `js/ui.js` - UI updates (depends on state)
-18. `js/statistics.js` - Statistics management (depends on state)
-19. `js/web3.js` - Web3 integration (depends on config)
-20. `js/leaderboard.js` - Leaderboard (depends on web3)
-21. `js/nft.js` - NFT minting (depends on web3, config)
-22. `js/gameFlow.js` - Game flow (depends on all above)
-23. `js/levelEditor.js` - Level editor (depends on state, config)
-24. `js/input.js` - Input handling (depends on state, gameFlow)
-25. `js/main.js` - Main loop (depends on all modules; calls `I18n.init()` first)
-
-> `ethers` (v6) is loaded from a CDN `<script>` before the `js/` modules. The order above is wired up in `index.html`.
-
-### Development Commands
-
-For development with auto-reload:
 ```bash
-npm run dev
+npm install
+npm start               # http://localhost:3000
 ```
 
-For production:
+Create a `.env` next to `server.js`:
+
 ```bash
-npm start
+PRIVATE_KEY=0x...            # server signer; must match the contract's serverSigner to finalize
+TELEGRAM_BOT_TOKEN=...       # optional: notifications for community level submissions
+TELEGRAM_CHAT_ID=...         # optional
+PORT=3000                    # optional
 ```
+
+Without `PRIVATE_KEY` the server generates a throwaway key on each start — the game runs, but
+finalization will be rejected by the deployed contract. `npm run get-address` prints the signer
+address for the key in `.env`.
+
+**Point the client at your backend.** `js/config.js` ships with `API_URL: 'https://arcmangame.com'`.
+For a local backend set it to `http://localhost:3000`, and do not commit that change.
+
+**Serve over HTTP, not `file://`.** Wallet extensions do not inject into local files. If you only need
+the game and not the backend, any static server works (`python3 -m http.server 8000`), but sessions
+and on-chain finalization will be unavailable.
+
+`npm run dev` runs the server under nodemon.
+
+---
+
+## Deploying
+
+The production site is `server.js` behind a reverse proxy: it serves the static files and the API from
+the same process.
+
+1. Copy the repository files to the server, **excluding** `.git/`, `node_modules/` and `.env`. The
+   server keeps its own `.env` with the signing key — never overwrite it and never commit it.
+2. Run `npm install` if `package.json` changed.
+3. **Restart the Node process** (for example `systemctl restart <service>`). Static files are picked up
+   immediately, but `levels.js` is read once at startup — a process that still believes the run has a
+   different number of levels rejects every finalization.
+4. Check `/api/health`, then load the site and confirm the new files are served. Browsers cache
+   `js/*.js` aggressively; test with a hard reload.
+
+Keep `API_URL` in `js/config.js` set to the production URL on `main`, so the repository can be
+deployed as it is.
+
+---
+
+## Project notes
+
+- **Arc is a testnet.** Everything on-chain here uses test USDC with no value.
+- **Retired modes.** Immortal mode was removed; Tournament is the only scored mode. The Agent Shift
+  mode was retired from the game, but `js/agent.js`, `agentShift.js`, `agentWallet.js`,
+  `agentOnboarding.js` and `agentMode.js` stay in the tree with their markup and styles. No script tag
+  loads them, and their markup is not translated.
+- **`js/agent.js` is a useful tool.** `AgentSolver` is a deterministic, headless copy of the shot
+  physics that runs in Node and the browser. `buildWorld(level)`, `simulate(world, shot)` and
+  `solve(world)` answer "is this level winnable, and how?" — it is how the second act was validated.
+  In the browser, inject it and hand its aim to `GameFlow.launchCoin()` to finish a level without
+  playing. Note that the live player bobs (`player.floatOffset`), which the solver ignores.
+- **Community levels** are played locally and are not finalized on-chain.
+- `PROJECT_DESCRIPTION.md` is an older long-form description and predates the current game.
 
 ## License
 
 MIT
-
-
