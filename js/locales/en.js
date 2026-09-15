@@ -391,161 +391,484 @@ I18n.register('en', {
 
     // --- Per-level quizzes (js/quizzes.js keeps the correct index) ---
     quiz: {
-        1: {
-            question: 'What is Arc?',
+        '1a': {
+            question: 'Which company is behind Arc?',
             answers: [
-                'A Layer-2 rollup that settles on Ethereum',
-                'An EVM-compatible Layer-1 built by Circle for stablecoin finance',
-                'A closed payment API with no blockchain behind it'
+                'Tether, the company that issues USDT',
+                'Coinbase, the company that runs Base',
+                'Circle, the company that issues USDC'
             ]
         },
-        2: {
-            question: 'Which asset do you pay gas with on Arc?',
-            answers: ['ETH', 'USDC', 'ARC']
-        },
-        3: {
-            question: 'How fast is finality on Arc?',
+        '1b': {
+            question: 'What is Arc purpose-built for?',
             answers: [
-                'About 10 minutes, like Bitcoin',
-                'A few minutes, once enough confirmations pile up',
-                'Sub-second and deterministic — finalized blocks are never reorged'
+                'NFT marketplaces',
+                'Anonymous trading',
+                'Finance built on stablecoins'
             ]
         },
-        4: {
-            question: 'How is ARC designed to relate to the fees paid on Arc?',
+        '1c': {
+            question: "Where do this game's scores and certificates settle?",
             answers: [
-                'Fees are converted into ARC for validators and stakers, and a portion is burned',
-                'ARC replaced USDC as the gas token when mainnet opened',
-                'Fees go straight to Circle as company revenue'
+                'On Ethereum mainnet, through a bridge contract',
+                'On Arc Testnet, where playing costs nothing',
+                'On Arc mainnet, paid for in real USDC'
             ]
         },
-        5: {
-            question: 'Which use case is Arc betting on most heavily?',
+        '2a': {
+            question: 'Roughly how much does an average transaction cost on Arc?',
             answers: [
-                'Gaming and metaverse worlds',
-                'The agentic economy — AI agents paying and settling with each other',
-                'Fully anonymous peer-to-peer transfers'
-            ]
-        }
-,
-        6: {
-            question: "In x402, what does a server's HTTP 402 response mean?",
-            answers: [
-                'The request failed and should not be retried',
-                'Here is the price — pay it in USDC and send the request again',
-                'The client must first register an account and add a card'
+                'About five dollars',
+                'About half a cent',
+                'About fifty cents'
             ]
         },
-        7: {
-            question: "Why can't card rails charge for a single API call?",
+        '2b': {
+            question: 'What does paying gas in USDC let people do?',
             answers: [
-                'Card networks are offline at night',
-                'A fixed fee per transaction costs more than the call is worth',
-                'Cards cannot process payments from software, only from people'
+                'Earn interest on the gas they pay',
+                'Budget fees like any ordinary cost',
+                'Skip fees on small transfers'
             ]
         },
-        8: {
-            question: 'What does an agent get when you give it a Circle wallet?',
+        '2c': {
+            question: 'What does Arc avoid by charging gas in USDC?',
             answers: [
-                'The private key, so it can move everything in the account',
-                'The right to spend inside the allowance you signed — never the key itself',
-                'A seed phrase it stores for you in plain text'
+                'Needing a wallet to send payments',
+                'Fees in a token whose price swings',
+                'Publishing transactions on a public ledger'
             ]
         },
-        9: {
-            question: 'How does USDC move between chains with CCTP?',
+        '3a': {
+            question: 'What is Malachite?',
             answers: [
-                'It is locked in a bridge and a wrapped copy is issued',
-                'It is burned on the source chain and minted natively on the destination',
-                "It is sold for the destination chain's own token and bought back"
+                'A Rust implementation of Tendermint BFT',
+                'A proof-of-work mining algorithm for Arc',
+                'The block explorer Circle runs for Arc'
             ]
         },
-        10: {
-            question: 'What sits behind every USDC in circulation?',
+        '3b': {
+            question: 'Which execution layer does Arc use?',
             answers: [
-                'A dollar of reserves — cash and short-dated Treasuries, attested monthly',
-                'A basket of other cryptocurrencies held by Circle',
-                'An algorithm that mints and burns to defend the price'
+                'The Solana runtime',
+                'Geth',
+                'Reth'
             ]
         },
-        11: {
-            question: 'How does new USDC come into existence?',
+        '3c': {
+            question: 'On Arc, when is a committed block final?',
             answers: [
-                'It is mined by validators as a block reward',
-                'Someone pays dollars to Circle and the same amount is minted; redeeming burns it',
-                'Traders buy it on an exchange until the supply grows'
+                'Immediately, with no confirmations to wait for',
+                'After a one-hour challenge window has passed',
+                'After six confirmations, as on Bitcoin'
             ]
         },
-        12: {
-            question: 'Does Circle issue anything other than a dollar stablecoin?',
+        '4a': {
+            question: 'Is ARC the token you pay gas with on Arc?',
             answers: [
-                'No — USDC is the only one',
-                'Yes — EURC, a euro stablecoin with the same reserve model',
-                'Yes, but only tokens pegged to gold'
+                'Only for large payments',
+                'Yes, since mainnet opened',
+                'No, gas stays payable in USDC'
             ]
         },
-        13: {
-            question: "What does Arc's FX engine settle inside a single contract?",
+        '4b': {
+            question: "Did Arc's mainnet launch with the ARC token?",
             answers: [
-                'Both legs of the currency swap, or neither',
-                'One leg now and the other at the end of the day',
-                'The trade fee, while the currencies move by wire'
+                'Yes, on the same day',
+                'Yes, for validators only',
+                'No, ARC has not launched yet'
             ]
         },
-        14: {
-            question: "What do Arc's confidential transfers hide?",
+        '4c': {
+            question: "Under ARC's design, where do the fees converted into ARC go?",
             answers: [
-                'Everything — the network keeps no record at all',
-                'The amount, while addresses stay visible and details can be disclosed on request',
-                "The sender's identity, while the amount is public"
+                'To validators and stakers, with a portion burned',
+                "To Circle's shareholders as a quarterly dividend",
+                'Back to the users who sent the transactions'
             ]
         },
-        15: {
-            question: 'Who validates blocks on Arc today?',
+        '5a': {
+            question: "What does 'the agentic economy' describe?",
             answers: [
-                'Anyone who stakes enough tokens, from day one',
-                'A permissioned set of known institutions, opening up over time',
-                'Circle alone, with no other validators planned'
+                'Banks replacing their back-office staff with accounting software',
+                'People hiring human agents to trade crypto on their behalf',
+                'AI agents paying for compute, data and services on their own'
             ]
         },
-        16: {
-            question: 'Why can a cross-border bank transfer take days?',
+        '5b': {
+            question: 'How small do agent payments need to be?',
             answers: [
-                'The money physically travels between countries',
-                'It hops through correspondent banks with their own cut-off times and weekends',
-                'Regulators manually approve every payment'
+                'At least a dollar',
+                'Smaller than a single cent',
+                'Ten dollars or more'
             ]
         },
-        17: {
-            question: 'Who used Arc before its public mainnet opened?',
+        '5c': {
+            question: 'Which open standard is named for settling agent payments?',
             answers: [
-                'Nobody — the network was switched on for the first time at launch',
-                'Over a hundred institutions and builders, on testnet and then a private mainnet',
-                'Only retail players in games like this one'
+                'x402',
+                'SWIFT MT103',
+                'ERC-721'
             ]
         },
-        18: {
-            question: 'You send USDC to the wrong address. What can be done?',
+        '6a': {
+            question: 'Which HTTP status code does x402 bring back into use?',
             answers: [
-                'Nothing — a settled transfer has no chargeback',
-                'Circle reverses it if you file a support ticket',
-                'Validators roll back the block on request'
+                '404 Not Found',
+                '402 Payment Required',
+                '500 Internal Server Error'
             ]
         },
-        19: {
-            question: 'What stage is Arc at right now?',
+        '6b': {
+            question: 'In an x402 exchange, who verifies the payment onchain?',
             answers: [
-                'Public mainnet since September 2026, with the ARC token still ahead',
-                'A testnet with no mainnet date announced',
-                'Mainnet running with ARC as its gas token'
+                'The server',
+                'The client',
+                'A facilitator'
             ]
         },
-        20: {
-            question: 'When is a payment actually settled?',
+        '6c': {
+            question: 'What does an x402 client do after paying?',
             answers: [
-                'When the sender clicks send',
-                'When the transaction shows up in the mempool',
-                'When it is final and can no longer be reversed'
+                'Repeats the original request',
+                'Opens an account with the server',
+                'Waits for an emailed receipt'
+            ]
+        },
+        '7a': {
+            question: 'What does a card network typically charge per transaction?',
+            answers: [
+                'A few cents plus a percentage',
+                'A flat monthly fee',
+                'Nothing under a dollar'
+            ]
+        },
+        '7b': {
+            question: 'What goes wrong when a card is used to collect a single cent?',
+            answers: [
+                'The money takes a month to arrive',
+                'The card is frozen as suspected fraud',
+                'Collecting it costs more than it earns'
+            ]
+        },
+        '7c': {
+            question: 'What makes pay-per-call pricing possible?',
+            answers: [
+                'Transfers priced in fractions of a cent',
+                'Monthly invoices sent out by email',
+                'Credit limits set by the card issuers'
+            ]
+        },
+        '8a': {
+            question: "How do Circle's programmable wallets protect the signing key?",
+            answers: [
+                'It is split across parties using MPC',
+                "It is emailed to the agent's owner",
+                'It is printed and kept in a bank vault'
+            ]
+        },
+        '8b': {
+            question: 'What sets the limit on what an agent can spend?',
+            answers: [
+                "The agent's own judgement",
+                'A daily cap set by the network',
+                'The allowance its owner signed'
+            ]
+        },
+        '8c': {
+            question: "Does the agent ever hold the wallet's private key?",
+            answers: [
+                'Yes, once trusted',
+                'Only mid-payment',
+                'No, never'
+            ]
+        },
+        '9a': {
+            question: 'What does CCTP do with USDC on the source chain?',
+            answers: [
+                'It burns the USDC',
+                'It locks it',
+                'It copies it'
+            ]
+        },
+        '9b': {
+            question: 'What does Circle Gateway give an agent?',
+            answers: [
+                'One balance across all chains',
+                'A separate wallet on every chain',
+                "A credit line at Circle's bank"
+            ]
+        },
+        '9c': {
+            question: 'Why is there no bridge token to trust with CCTP?',
+            answers: [
+                'USDC only ever exists on a single chain',
+                'Every wrapped token is insured by the bridge',
+                'Native USDC is minted on the destination'
+            ]
+        },
+        '10a': {
+            question: "What are USDC's reserves held in?",
+            answers: [
+                'Bitcoin, ether and other crypto',
+                'Shares of Circle and its partners',
+                'Cash and short-dated US Treasuries'
+            ]
+        },
+        '10b': {
+            question: 'How often is the reserve attestation published?',
+            answers: [
+                'Every decade',
+                'Every year',
+                'Every month'
+            ]
+        },
+        '10c': {
+            question: "Whose money are USDC's reserves kept apart from?",
+            answers: [
+                "The US Treasury's",
+                "The validators'",
+                "Circle's own"
+            ]
+        },
+        '11a': {
+            question: 'What happens to USDC when it is redeemed through Circle Mint?',
+            answers: [
+                'It is frozen until the next business day',
+                'It is passed on to the next buyer in line',
+                'It is burned as the dollars go out'
+            ]
+        },
+        '11b': {
+            question: 'When can USDC be minted and redeemed?',
+            answers: [
+                'Only during US banking hours',
+                'Around the clock, every day',
+                'Once a week, in batches'
+            ]
+        },
+        '11c': {
+            question: 'A business wires $1,000 into Circle Mint. How much USDC is minted?',
+            answers: [
+                'Exactly 1,000 USDC',
+                'The market decides',
+                'About 990 USDC'
+            ]
+        },
+        '12a': {
+            question: 'Which currency does EURC track?',
+            answers: [
+                'The euro',
+                'The yen',
+                'The pound'
+            ]
+        },
+        '12b': {
+            question: 'How is EURC backed?',
+            answers: [
+                'By a basket of European bank shares',
+                'With the same reserve model as USDC',
+                'By an algorithm that adjusts its supply'
+            ]
+        },
+        '12c': {
+            question: 'Why is Arc designed for several currencies at once?',
+            answers: [
+                'Dollar fees are too expensive for anyone outside the US',
+                'A one-currency network stops at the first border',
+                'Regulators require every chain to carry three currencies'
+            ]
+        },
+        '13a': {
+            question: "Where does Arc's FX engine produce its quotes?",
+            answers: [
+                'On-chain',
+                'In a wallet',
+                'Off-chain'
+            ]
+        },
+        '13b': {
+            question: 'Why do ordinary currency swaps go wrong?',
+            answers: [
+                'One side sends and is exposed while it waits',
+                'The exchange rate is fixed for a whole year',
+                'Both sides must hold the same currency first'
+            ]
+        },
+        '13c': {
+            question: 'If one leg of an Arc FX swap cannot settle, what happens to the other?',
+            answers: [
+                'It waits in a queue for a week',
+                'It does not happen either',
+                'It settles now and is refunded later'
+            ]
+        },
+        '14a': {
+            question: 'Are confidential transfers on Arc used for every transaction?',
+            answers: [
+                'Yes, every transfer is private',
+                'No, they are opt-in',
+                'Only for transfers above $10,000'
+            ]
+        },
+        '14b': {
+            question: 'In a confidential transfer, what stays visible?',
+            answers: [
+                'The addresses',
+                'Nothing at all',
+                'The amount'
+            ]
+        },
+        '14c': {
+            question: "Who can see a confidential transfer's details when required?",
+            answers: [
+                'Any competitor willing to pay a small fee',
+                'An auditor or regulator the parties disclose to',
+                'Nobody, not even the two parties involved'
+            ]
+        },
+        '15a': {
+            question: "Which of these is among Arc's founding validators?",
+            answers: [
+                'Binance',
+                'Mastercard',
+                'OpenAI'
+            ]
+        },
+        '15b': {
+            question: 'What job do validators do on Arc?',
+            answers: [
+                'They set the price of USDC',
+                'They approve new user accounts',
+                'They order the transactions'
+            ]
+        },
+        '15c': {
+            question: "What is planned for Arc's validator set later on?",
+            answers: [
+                'Handing it to a single company',
+                'A move to open staking',
+                'Replacing validators with miners'
+            ]
+        },
+        '16a': {
+            question: 'Why can a wire sent on a Friday sit idle until Monday?',
+            answers: [
+                'Banks settle wires only once a month',
+                'Correspondent banks have cut-off times',
+                'Every wire must be approved by a court'
+            ]
+        },
+        '16b': {
+            question: 'When can a stablecoin transfer settle?',
+            answers: [
+                'At any hour, weekends included',
+                'Only during banking hours',
+                'Only on business days'
+            ]
+        },
+        '16c': {
+            question: 'What does a stablecoin sender know before sending?',
+            answers: [
+                'The fee they will pay',
+                "Tomorrow's rate",
+                "The recipient's balance"
+            ]
+        },
+        '17a': {
+            question: "When did Arc's testnet start running?",
+            answers: [
+                'September 2026',
+                'October 2025',
+                'March 2024'
+            ]
+        },
+        '17b': {
+            question: "What came between Arc's testnet and its public launch?",
+            answers: [
+                'A token airdrop campaign',
+                'A second, paid testnet',
+                'A private mainnet'
+            ]
+        },
+        '17c': {
+            question: "Roughly how many builders worked on Arc's private mainnet?",
+            answers: [
+                'About ten',
+                'Over a hundred',
+                'Over a million'
+            ]
+        },
+        '18a': {
+            question: 'Can a support desk reverse a settled transfer sent to the wrong address?',
+            answers: [
+                'No, it cannot be pulled back',
+                'Yes, within thirty days',
+                'Yes, with proof of the mistake'
+            ]
+        },
+        '18b': {
+            question: 'What makes a mistake on a settled transfer permanent?',
+            answers: [
+                'The same finality that makes settlement fast',
+                'A rule that each wallet app sets for its users',
+                'A delay the network adds to every large transfer'
+            ]
+        },
+        '18c': {
+            question: 'Why do spending limits and test networks exist?',
+            answers: [
+                'So you can check before, because there is no after',
+                'So that transfers can be made cheaper for everyone',
+                'So that amounts can be hidden from the public'
+            ]
+        },
+        '19a': {
+            question: 'Which of these is still ahead for Arc?',
+            answers: [
+                'USDC as gas',
+                'The ARC token',
+                'Fast finality'
+            ]
+        },
+        '19b': {
+            question: 'Which transition is ARC meant to enable?',
+            answers: [
+                'From Proof-of-Stake to Proof-of-Work',
+                'From Proof-of-Authority to Proof-of-Stake',
+                'From a Layer-1 to a Layer-2 network'
+            ]
+        },
+        '19c': {
+            question: "What did Arc's public mainnet launch with?",
+            answers: [
+                'ARC gas and fully open staking from day one',
+                'Proof-of-work mining and gas paid in ETH',
+                'USDC gas and permissioned founding validators'
+            ]
+        },
+        '20a': {
+            question: 'According to this game, when is a payment done?',
+            answers: [
+                'When it is sent',
+                'When it is final',
+                'When the recipient sees it'
+            ]
+        },
+        '20b': {
+            question: 'What is settlement?',
+            answers: [
+                'The moment a payment is signed by the sender',
+                'The moment the network quotes the fee',
+                'The moment a payment can no longer be reversed'
+            ]
+        },
+        '20c': {
+            question: 'What lets settlement arrive at machine speed on Arc?',
+            answers: [
+                'Stablecoin gas and sub-second deterministic finality',
+                'Larger blocks and longer waits for confirmations',
+                'Card networks connected directly to the chain'
             ]
         }
     },
@@ -557,27 +880,43 @@ I18n.register('en', {
             hint: 'A stablecoin is a token that stands for money someone really holds. USDC is redeemable one-for-one: hand a token back to the issuer and you get a dollar. That promise, not trading, is what keeps the price at a dollar — and it is why holding USDC is a claim on a dollar, not a share of the company that issues it.',
             questions: [
                 {
-                    question: 'Why does USDC hold its price?',
+                    question: 'What does a stablecoin stand for?',
                     answers: [
-                        'Traders agree to keep it there',
-                        'Every token can be redeemed for a dollar from the issuer',
-                        'An algorithm buys and sells it to defend the peg'
+                        'Money someone really holds',
+                        'Computing power on a network',
+                        'A share in a technology company'
                     ]
                 },
                 {
-                    question: 'Is holding USDC an investment in Circle?',
+                    question: 'To get a dollar back for USDC, who do you hand it to?',
                     answers: [
-                        'No — it is a claim on a dollar, not a share of the company',
-                        "Yes, holders receive a cut of Circle's profits",
-                        'Yes, it works like a corporate bond'
+                        'Any validator',
+                        'An exchange',
+                        'The issuer of the token'
                     ]
                 },
                 {
-                    question: 'What does one-for-one redemption mean?',
+                    question: "What keeps USDC's price at a dollar?",
                     answers: [
-                        'One USDC always buys one of any other token',
-                        'New tokens are minted only when others are burned',
-                        'Hand back one token, receive one dollar'
+                        'Heavy trading volume every day',
+                        'A daily vote by all the holders',
+                        'The promise of one-for-one redemption'
+                    ]
+                },
+                {
+                    question: 'Holding USDC gives you a claim on what?',
+                    answers: [
+                        'Shares',
+                        'Profits',
+                        'A dollar'
+                    ]
+                },
+                {
+                    question: 'How many dollars does redeeming one USDC return?',
+                    answers: [
+                        'Exactly one',
+                        'One, minus fees',
+                        'Its last price'
                     ]
                 }
             ]
@@ -587,27 +926,43 @@ I18n.register('en', {
             hint: 'Gas is the fee the network charges to process your transaction. On most chains it is paid in a volatile token, so the cost in dollars moves while you are deciding. Arc charges gas in USDC, which turns an unpredictable cost into an ordinary line item — around half a cent per transaction.',
             questions: [
                 {
-                    question: 'What is gas?',
+                    question: 'Who charges gas?',
                     answers: [
-                        'A deposit returned once the transaction confirms',
-                        'The fee the network charges to process a transaction',
-                        'A charge collected by your wallet provider'
+                        'The network that processes the transaction',
+                        'The person receiving the payment',
+                        'The store that listed the wallet app'
                     ]
                 },
                 {
-                    question: 'Why does a business care that gas is paid in a stablecoin?',
+                    question: 'On most chains, what happens to the dollar cost of gas while you decide?',
                     answers: [
-                        'The cost stays predictable in dollars',
-                        'Transactions are processed faster',
-                        'It removes the need to hold a wallet'
+                        "It moves with the token's price",
+                        'It drops to zero overnight',
+                        'It is locked for an hour'
                     ]
                 },
                 {
-                    question: 'On a chain with a volatile gas token, what can happen to your fee while you wait?',
+                    question: 'What does Arc charge gas in?',
                     answers: [
-                        'Nothing — fees are fixed in dollars',
-                        'It is refunded if the price moves',
-                        "It moves with the token's price"
+                        'ARC',
+                        'ETH',
+                        'USDC'
+                    ]
+                },
+                {
+                    question: 'Roughly what does gas cost per transaction on Arc?',
+                    answers: [
+                        'Around fifty cents',
+                        'Around five cents',
+                        'Around half a cent'
+                    ]
+                },
+                {
+                    question: 'What does USDC gas turn an unpredictable cost into?',
+                    answers: [
+                        'A tradable asset',
+                        'An ordinary line item',
+                        'A tax deduction'
                     ]
                 }
             ]
@@ -617,27 +972,43 @@ I18n.register('en', {
             hint: "A transaction is final when it can no longer be undone. Some chains only make that likely, which is why you wait for confirmations — recently accepted blocks can still be replaced, and that replacement is called a reorg. Arc's consensus makes finality definite in under a second, so there is nothing to wait out.",
             questions: [
                 {
-                    question: 'What does finality mean?',
+                    question: 'When is a transaction final?',
                     answers: [
-                        'The transaction reached the mempool',
-                        'The transaction can no longer be reversed',
-                        'The fee has been paid in full'
+                        'When it can no longer be undone',
+                        'When the wallet displays it',
+                        'When its fee has been paid'
                     ]
                 },
                 {
-                    question: 'Why do people wait for confirmations on some chains?',
+                    question: 'On chains where finality is only likely, what do users wait for?',
                     answers: [
-                        'A recent block can still be replaced',
-                        'The network is slow to transmit the payment',
-                        'The wallet needs time to synchronise'
+                        'A daily report',
+                        'A support ticket',
+                        'More confirmations'
                     ]
                 },
                 {
-                    question: 'What is a reorg?',
+                    question: 'What is it called when recently accepted blocks are replaced?',
                     answers: [
-                        'A wallet re-sorting the tokens it holds',
-                        'Rewriting a deployed smart contract',
-                        'Recently accepted blocks being replaced by a different chain'
+                        'A rollback',
+                        'A fork',
+                        'A reorg'
+                    ]
+                },
+                {
+                    question: 'How long does Arc take to make finality definite?',
+                    answers: [
+                        'About ten minutes',
+                        'Under a second',
+                        'About an hour'
+                    ]
+                },
+                {
+                    question: 'On Arc, how many confirmations do you have to wait out?',
+                    answers: [
+                        'Thirty',
+                        'Six',
+                        'None'
                     ]
                 }
             ]
@@ -647,27 +1018,43 @@ I18n.register('en', {
             hint: 'A wallet does not hold money — it holds the key that authorises moving it, and whoever has the key has the funds. That is why no honest support desk will ever ask for your seed phrase, and why serious custody splits a key across parties so that neither of them can sign alone.',
             questions: [
                 {
-                    question: 'What does a wallet actually store?',
+                    question: 'Who controls the funds in a wallet?',
                     answers: [
-                        'The coins themselves',
-                        'A personal copy of the blockchain',
-                        'The key that authorises spending'
+                        'Whoever has the key',
+                        'The bank that verified the user',
+                        'Whoever built the wallet app'
                     ]
                 },
                 {
-                    question: 'Someone from support asks for your seed phrase. What is happening?',
+                    question: 'Which of these is true about a wallet?',
                     answers: [
-                        'An attempt to take your funds',
-                        'A routine identity check',
-                        'A standard wallet migration'
+                        'It stores a copy of the whole blockchain',
+                        'It keeps the coins in a local file',
+                        'It holds a key, not the money itself'
                     ]
                 },
                 {
-                    question: 'What is the point of splitting a signing key between two parties?',
+                    question: 'Who will ask you for your seed phrase?',
                     answers: [
-                        'Transactions become cheaper to send',
-                        'Neither party can move the funds alone',
-                        'The balance is insured twice over'
+                        'No honest support desk',
+                        "The network's validators",
+                        "Your wallet's support team"
+                    ]
+                },
+                {
+                    question: 'In serious custody, can one party sign alone?',
+                    answers: [
+                        'No, the key is split so neither can',
+                        'Yes, after a short waiting period',
+                        'Yes, the larger party always can'
+                    ]
+                },
+                {
+                    question: 'What does the key in a wallet authorise?',
+                    answers: [
+                        'Viewing the balance',
+                        'Moving the funds',
+                        'Changing network fees'
                     ]
                 }
             ]
@@ -677,27 +1064,43 @@ I18n.register('en', {
             hint: 'An agent is a program with a budget. It pays as it works — a search, a data feed, a call to a model — in amounts far too small for a card, where a fixed fee of a few cents would cost more than the thing being bought. What keeps it safe is not trust but the spending limit its owner signed.',
             questions: [
                 {
-                    question: "What makes an agent's payments different from a card payment?",
+                    question: 'In this sense, what is an agent?',
                     answers: [
-                        'The amounts are tiny and nobody is at the checkout',
-                        'They can be reversed at any time',
-                        'They must be approved at a bank branch'
+                        'A program with a budget',
+                        'A human broker working for you',
+                        "A bank's customer support bot"
                     ]
                 },
                 {
-                    question: 'What stops an agent from spending everything it can reach?',
+                    question: 'Which of these might an agent pay for as it works?',
                     answers: [
-                        'Nothing — an agent has to be trusted',
-                        'A daily phone call from the bank',
-                        'The spending limit its owner approved'
+                        'A call to a model',
+                        'A home mortgage',
+                        'A monthly salary'
                     ]
                 },
                 {
-                    question: 'Why do machine payments need fees measured in fractions of a cent?',
+                    question: "Why can't an agent pay for a single search by card?",
                     answers: [
-                        'Networks charge programs more than people',
-                        'A fee bigger than the payment makes the trade pointless',
-                        'Machines send far more transactions than people do'
+                        'A fee of a few cents costs more than the search',
+                        'Cards cannot be used to pay for anything online',
+                        'Searches are always free for software to run'
+                    ]
+                },
+                {
+                    question: 'Who signs the spending limit an agent works within?',
+                    answers: [
+                        'The validators',
+                        "The agent's owner",
+                        'The agent'
+                    ]
+                },
+                {
+                    question: 'When does an agent pay?',
+                    answers: [
+                        'As it works',
+                        'Only when its owner is online',
+                        'Once a year, in advance'
                     ]
                 }
             ]
@@ -707,27 +1110,43 @@ I18n.register('en', {
             hint: 'Chains do not share a ledger, so a token cannot simply travel between them. The old answer was to lock it on one chain and issue a copy — a wrapped token — on the other, leaving a pool of locked funds that has been the target of the largest hacks in crypto. Native transfer burns on one side and mints on the other, so there is no pool to steal.',
             questions: [
                 {
-                    question: 'What is a wrapped token?',
+                    question: "Why can't a token simply travel between chains?",
                     answers: [
-                        'A token locked on one chain and represented by a copy on another',
-                        'A token with its fee included in the transfer',
-                        'A token whose amount is hidden from the public'
+                        'Each chain bans foreign tokens',
+                        'Chains do not share a ledger',
+                        'Tokens are too large to move'
                     ]
                 },
                 {
-                    question: 'Why is burn-and-mint safer than a lock-and-wrap bridge?',
+                    question: 'What did the old lock-and-copy approach leave behind?',
                     answers: [
-                        'It is quicker to program',
-                        'Validators approve each transfer by hand',
-                        'There is no pool of locked funds to steal'
+                        'A permanent fee on every transfer',
+                        'A pool of locked funds',
+                        'A second copy of the whole chain'
                     ]
                 },
                 {
-                    question: 'You send USDC to an address on the wrong chain. What is the likely outcome?',
+                    question: 'What have pools of locked bridge funds attracted?',
                     answers: [
-                        'The network reroutes it to the right chain',
-                        'It may be gone for good',
-                        'It bounces back after a few blocks'
+                        'The largest hacks in crypto',
+                        'Government deposit insurance',
+                        'The highest staking yields'
+                    ]
+                },
+                {
+                    question: 'What does native transfer do on the destination chain?',
+                    answers: [
+                        'Burns the token',
+                        'Mints the token',
+                        'Locks the token'
+                    ]
+                },
+                {
+                    question: 'Why is there nothing to steal in a native transfer?',
+                    answers: [
+                        'No pool of locked funds exists',
+                        'The amounts are encrypted',
+                        'Every transfer is insured'
                     ]
                 }
             ]
@@ -737,27 +1156,43 @@ I18n.register('en', {
             hint: 'Two things have to hold at once. Reserves must be provable, so an independent accounting firm publishes a monthly attestation confirming they cover every token in circulation. And a business cannot have competitors reading its invoices, so confidential transfers hide the amount from the public while leaving it disclosable to an auditor.',
             questions: [
                 {
-                    question: 'What does a monthly attestation report confirm?',
+                    question: 'Who publishes the reserve attestation?',
                     answers: [
-                        'That the reserves cover the tokens in circulation',
-                        "Where the token's price is heading",
-                        'Who the largest holders are'
-                    ]
-                },
-                {
-                    question: 'Who prepares an attestation?',
-                    answers: [
-                        "The issuer's own finance team",
+                        "Circle's own marketing team",
                         'An independent accounting firm',
-                        'The blockchain, automatically'
+                        'The validators of the Arc network'
                     ]
                 },
                 {
-                    question: 'What do confidential transfers on Arc hide?',
+                    question: 'How often does the reserve attestation come out?',
                     answers: [
-                        'Everything — no record is kept at all',
-                        "Only the sender's identity",
-                        'The amount, which can still be disclosed to an auditor'
+                        'Every five years',
+                        'Every month',
+                        'Never'
+                    ]
+                },
+                {
+                    question: 'What problem do confidential transfers solve for a business?',
+                    answers: [
+                        'Gas fees that are too high',
+                        'Customers paying their bills late',
+                        'Competitors reading its invoices'
+                    ]
+                },
+                {
+                    question: 'A confidential transfer keeps the amount hidden from whom?',
+                    answers: [
+                        'The auditor',
+                        'The public',
+                        'The sender'
+                    ]
+                },
+                {
+                    question: "Can an auditor still see a confidential transfer's details?",
+                    answers: [
+                        'No, the amount is gone for good',
+                        'Yes, they stay disclosable to an auditor',
+                        'Only if the network votes to allow it'
                     ]
                 }
             ]
@@ -767,27 +1202,43 @@ I18n.register('en', {
             hint: "Arc is a Layer-1: it settles its own blocks rather than posting them to somebody else's chain. It is EVM-compatible, so contracts and tools written for Ethereum work on it unchanged. Its public mainnet opened in September 2026, but a testnet is still where apps rehearse — the real software with money that is worth nothing, which is exactly where you want to find the bugs.",
             questions: [
                 {
-                    question: 'What does EVM-compatible mean in practice?',
+                    question: 'Does Arc post its blocks to another chain?',
                     answers: [
-                        "It shares Ethereum's fees",
-                        'Contracts and tools built for Ethereum work on it',
-                        'Its blocks are validated by Ethereum'
+                        'Yes, it posts them to Ethereum',
+                        'No, it settles its own blocks',
+                        'Yes, it posts them to Bitcoin'
                     ]
                 },
                 {
-                    question: 'What is a testnet for?',
+                    question: 'Do Ethereum contracts need rewriting to run on Arc?',
                     answers: [
-                        'Running the real software with money that is worth nothing',
-                        'Making real transactions more cheaply',
-                        'Trying out wallet passwords safely'
+                        "Yes, into Arc's own language",
+                        'No, they work unchanged',
+                        'Yes, they must be ported to Rust'
                     ]
                 },
                 {
-                    question: 'Arc is a Layer-1. What does that mean?',
+                    question: "When did Arc's public mainnet open?",
                     answers: [
-                        'It is the first release of a Layer-2 network',
-                        'It supports only one token',
-                        'It settles its own blocks instead of posting them to another chain'
+                        'January 2025',
+                        'It has not opened yet',
+                        'September 2026'
+                    ]
+                },
+                {
+                    question: 'Where do apps rehearse before going live on Arc?',
+                    answers: [
+                        'On mainnet',
+                        'Nowhere',
+                        'On the testnet'
+                    ]
+                },
+                {
+                    question: 'What makes a testnet the right place to find bugs?',
+                    answers: [
+                        'It has no validators at all',
+                        'It runs completely different software',
+                        'The money on it is worth nothing'
                     ]
                 }
             ]

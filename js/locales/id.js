@@ -388,160 +388,484 @@ I18n.register('id', {
     },
 
     quiz: {
-        1: {
-            question: 'Apa itu Arc?',
+        '1a': {
+            question: 'Perusahaan mana yang berada di balik Arc?',
             answers: [
-                'Rollup Layer-2 yang menyelesaikan setelmen di Ethereum',
-                'Layer-1 kompatibel EVM buatan Circle untuk keuangan stablecoin',
-                'API pembayaran tertutup tanpa blockchain di belakangnya'
+                'Tether, perusahaan penerbit USDT',
+                'Coinbase, perusahaan pengelola Base',
+                'Circle, perusahaan penerbit USDC'
             ]
         },
-        2: {
-            question: 'Aset apa yang dipakai membayar gas di Arc?',
-            answers: ['ETH', 'USDC', 'ARC']
-        },
-        3: {
-            question: 'Seberapa cepat finalitas di Arc?',
+        '1b': {
+            question: 'Arc dibangun khusus untuk apa?',
             answers: [
-                'Sekitar 10 menit, seperti Bitcoin',
-                'Beberapa menit, setelah konfirmasi terkumpul cukup banyak',
-                'Di bawah satu detik dan deterministik — blok yang sudah final tidak pernah direorg'
+                'Marketplace NFT dan seni digital',
+                'Perdagangan anonim antarpengguna',
+                'Keuangan berbasis stablecoin'
             ]
         },
-        4: {
-            question: 'Bagaimana ARC dirancang berkaitan dengan biaya yang dibayar di Arc?',
+        '1c': {
+            question: 'Di mana skor dan sertifikat game ini diselesaikan?',
             answers: [
-                'Biaya dikonversi menjadi ARC untuk validator dan staker, dan sebagian dibakar',
-                'ARC menggantikan USDC sebagai token gas saat mainnet dibuka',
-                'Biaya dibayarkan langsung ke Circle sebagai pendapatan perusahaan'
+                'Di mainnet Ethereum, lewat kontrak jembatan',
+                'Di Arc Testnet, tempat bermain tidak memakan biaya',
+                'Di mainnet Arc, dibayar dengan USDC sungguhan'
             ]
         },
-        5: {
-            question: 'Kasus penggunaan mana yang paling dipertaruhkan Arc?',
+        '2a': {
+            question: 'Kira-kira berapa biaya rata-rata satu transaksi di Arc?',
             answers: [
-                'Dunia gaming dan metaverse',
-                'Ekonomi agentik — agen AI yang saling membayar dan menyelesaikan setelmen',
-                'Transfer antarpengguna yang sepenuhnya anonim'
+                'Sekitar lima dolar',
+                'Sekitar setengah sen',
+                'Sekitar lima puluh sen'
             ]
         },
-        6: {
-            question: 'Dalam x402, apa arti respons HTTP 402 dari server?',
+        '2b': {
+            question: 'Dengan gas dibayar dalam USDC, apa yang bisa dilakukan orang?',
             answers: [
-                'Permintaan gagal dan tidak perlu diulang',
-                'Ini harganya — bayar dalam USDC lalu kirim ulang permintaannya',
-                'Klien harus mendaftar akun dan menambahkan kartu terlebih dahulu'
+                'Mendapat bunga dari gas yang dibayar',
+                'Menganggarkan biaya seperti biaya biasa',
+                'Bebas biaya untuk transfer kecil'
             ]
         },
-        7: {
-            question: 'Mengapa jalur kartu tidak bisa menagih satu panggilan API?',
+        '2c': {
+            question: 'Apa yang dihindari Arc dengan menagih gas dalam USDC?',
             answers: [
-                'Jaringan kartu tidak beroperasi pada malam hari',
-                'Biaya tetap per transaksi lebih mahal daripada nilai panggilannya',
-                'Kartu hanya bisa memproses pembayaran dari manusia, bukan dari perangkat lunak'
+                'Keharusan punya dompet untuk mengirim pembayaran',
+                'Biaya dalam token yang harganya bergejolak',
+                'Pencatatan transaksi di buku besar publik'
             ]
         },
-        8: {
-            question: 'Apa yang didapat sebuah agen ketika Anda memberinya dompet Circle?',
+        '3a': {
+            question: 'Apa itu Malachite?',
             answers: [
-                'Kunci privat, sehingga ia bisa memindahkan seluruh isi akun',
-                'Hak membelanjakan dalam batas yang Anda tanda tangani — bukan kuncinya',
-                'Frasa pemulihan yang disimpannya untuk Anda dalam teks biasa'
+                'Implementasi Tendermint BFT dalam Rust',
+                'Algoritme penambangan proof-of-work untuk Arc',
+                'Block explorer yang dijalankan Circle untuk Arc'
             ]
         },
-        9: {
-            question: 'Bagaimana USDC berpindah antar-chain lewat CCTP?',
+        '3b': {
+            question: 'Lapisan eksekusi apa yang dipakai Arc?',
             answers: [
-                'Dikunci di jembatan lalu salinan terbungkusnya diterbitkan',
-                'Dibakar di chain asal dan dicetak secara asli di chain tujuan',
-                'Dijual untuk token asli chain tujuan lalu dibeli kembali'
+                'Runtime Solana',
+                'Geth',
+                'Reth'
             ]
         },
-        10: {
-            question: 'Apa yang berada di balik setiap USDC yang beredar?',
+        '3c': {
+            question: 'Di Arc, kapan blok yang sudah dikomit menjadi final?',
             answers: [
-                'Satu dolar cadangan — kas dan surat utang negara bertenor pendek, diatestasi bulanan',
-                'Sekeranjang kripto lain yang dipegang Circle',
-                'Algoritme yang mencetak dan membakar demi mempertahankan harga'
+                'Seketika, tanpa perlu menunggu konfirmasi',
+                'Setelah masa sanggah satu jam berlalu',
+                'Setelah enam konfirmasi, seperti di Bitcoin'
             ]
         },
-        11: {
-            question: 'Bagaimana USDC baru muncul?',
+        '4a': {
+            question: 'Apakah ARC token untuk membayar gas di Arc?',
             answers: [
-                'Ditambang oleh validator sebagai imbalan blok',
-                'Seseorang membayar dolar ke Circle dan jumlah yang sama dicetak; penebusan membakarnya',
-                'Trader membelinya di bursa sampai pasokannya bertambah'
+                'Hanya untuk pembayaran besar',
+                'Ya, sejak mainnet dibuka',
+                'Tidak, gas tetap dibayar dengan USDC'
             ]
         },
-        12: {
-            question: 'Apakah Circle menerbitkan sesuatu selain stablecoin dolar?',
+        '4b': {
+            question: 'Apakah mainnet Arc diluncurkan bersama token ARC?',
             answers: [
-                'Tidak — hanya USDC',
-                'Ya — EURC, stablecoin euro dengan model cadangan yang sama',
-                'Ya, tetapi hanya token yang dipatok ke emas'
+                'Ya, pada hari yang sama',
+                'Ya, khusus untuk validator',
+                'Tidak, ARC belum diluncurkan'
             ]
         },
-        13: {
-            question: 'Apa yang diselesaikan mesin FX Arc di dalam satu kontrak?',
+        '4c': {
+            question: 'Menurut rancangan ARC, ke mana biaya yang dikonversi menjadi ARC disalurkan?',
             answers: [
-                'Kedua kaki pertukaran mata uang, atau tidak sama sekali',
-                'Satu kaki sekarang dan satunya di akhir hari',
-                'Biaya transaksinya, sementara mata uangnya dikirim lewat transfer bank'
+                'Ke validator dan staker, dengan sebagian dibakar',
+                'Ke pemegang saham Circle sebagai dividen kuartalan',
+                'Kembali ke pengguna yang mengirim transaksinya'
             ]
         },
-        14: {
-            question: 'Apa yang disembunyikan transfer rahasia di Arc?',
+        '5a': {
+            question: "Apa yang dimaksud dengan 'ekonomi agentik'?",
             answers: [
-                'Segalanya — jaringan sama sekali tidak menyimpan catatan',
-                'Nominalnya, sementara alamat tetap terlihat dan detail bisa diungkap bila diminta',
-                'Identitas pengirim, sementara nominalnya publik'
+                'Bank yang mengganti staf back-office dengan perangkat lunak akuntansi',
+                'Orang yang menyewa agen manusia untuk memperdagangkan kripto bagi mereka',
+                'Agen AI yang membayar sendiri komputasi, data, dan layanan'
             ]
         },
-        15: {
-            question: 'Siapa yang memvalidasi blok di Arc saat ini?',
+        '5b': {
+            question: 'Seberapa kecil nominal pembayaran agen yang dibutuhkan?',
             answers: [
-                'Siapa pun yang men-staking cukup token, sejak hari pertama',
-                'Himpunan berizin berisi institusi yang dikenal, yang membuka diri seiring waktu',
-                'Circle sendirian, tanpa rencana menambah validator lain'
+                'Minimal satu dolar',
+                'Di bawah satu sen',
+                'Sepuluh dolar atau lebih'
             ]
         },
-        16: {
-            question: 'Mengapa transfer bank lintas negara bisa memakan waktu berhari-hari?',
+        '5c': {
+            question: 'Standar terbuka mana yang disebut untuk menyelesaikan pembayaran agen?',
             answers: [
-                'Uangnya berpindah secara fisik antarnegara',
-                'Ia melompat lewat bank koresponden dengan batas waktu dan akhir pekan masing-masing',
-                'Regulator menyetujui setiap pembayaran secara manual'
+                'x402',
+                'SWIFT MT103',
+                'ERC-721'
             ]
         },
-        17: {
-            question: 'Siapa yang memakai Arc sebelum mainnet publiknya dibuka?',
+        '6a': {
+            question: 'Kode status HTTP mana yang dihidupkan kembali oleh x402?',
             answers: [
-                'Tidak ada — jaringan baru dinyalakan pertama kali saat peluncuran',
-                'Lebih dari seratus institusi dan pembangun, di testnet lalu di mainnet privat',
-                'Hanya pemain ritel di game seperti ini'
+                '404 Not Found',
+                '402 Payment Required',
+                '500 Internal Server Error'
             ]
         },
-        18: {
-            question: 'Anda mengirim USDC ke alamat yang salah. Apa yang bisa dilakukan?',
+        '6b': {
+            question: 'Dalam alur x402, siapa yang memverifikasi pembayaran on-chain?',
             answers: [
-                'Tidak ada — transfer yang sudah tuntas tidak punya chargeback',
-                'Circle membatalkannya jika Anda mengajukan tiket dukungan',
-                'Validator memutar balik blok itu atas permintaan'
+                'Server',
+                'Klien',
+                'Fasilitator'
             ]
         },
-        19: {
-            question: 'Arc sedang berada di tahap apa sekarang?',
+        '6c': {
+            question: 'Apa yang dilakukan klien x402 setelah membayar?',
             answers: [
-                'Mainnet publik sejak September 2026, dengan token ARC yang masih di depan',
-                'Testnet tanpa tanggal mainnet yang diumumkan',
-                'Mainnet yang berjalan dengan ARC sebagai token gas'
+                'Mengulang permintaan awalnya',
+                'Membuka akun di server',
+                'Menunggu tanda terima lewat email'
             ]
         },
-        20: {
-            question: 'Kapan sebuah pembayaran benar-benar tuntas?',
+        '7a': {
+            question: 'Berapa biasanya biaya jaringan kartu per transaksi?',
             answers: [
-                'Ketika pengirim menekan tombol kirim',
-                'Ketika transaksinya muncul di mempool',
-                'Ketika ia final dan tidak lagi bisa dibatalkan'
+                'Beberapa sen ditambah persentase',
+                'Biaya bulanan yang tetap',
+                'Gratis di bawah satu dolar'
+            ]
+        },
+        '7b': {
+            question: 'Apa masalahnya jika kartu dipakai untuk menagih satu sen?',
+            answers: [
+                'Uangnya baru tiba sebulan kemudian',
+                'Kartunya dibekukan karena dicurigai penipuan',
+                'Biaya menagihnya lebih mahal daripada hasilnya'
+            ]
+        },
+        '7c': {
+            question: 'Apa yang membuat harga bayar-per-panggilan menjadi mungkin?',
+            answers: [
+                'Transfer yang dihargai dalam pecahan sen',
+                'Faktur bulanan yang dikirim lewat email',
+                'Batas kredit yang ditetapkan penerbit kartu'
+            ]
+        },
+        '8a': {
+            question: 'Bagaimana dompet terprogram Circle melindungi kunci penanda tangan?',
+            answers: [
+                'Kunci dipecah di antara beberapa pihak dengan MPC',
+                'Kunci dikirim lewat email ke pemilik agen',
+                'Kunci dicetak dan disimpan di brankas bank'
+            ]
+        },
+        '8b': {
+            question: 'Apa yang menentukan batas belanja sebuah agen?',
+            answers: [
+                'Penilaian agen itu sendiri',
+                'Plafon harian dari jaringan',
+                'Batas yang ditandatangani pemiliknya'
+            ]
+        },
+        '8c': {
+            question: 'Apakah agen pernah memegang kunci privat dompetnya?',
+            answers: [
+                'Ya, setelah dipercaya',
+                'Hanya saat membayar',
+                'Tidak, tidak pernah'
+            ]
+        },
+        '9a': {
+            question: 'Apa yang dilakukan CCTP terhadap USDC di chain asal?',
+            answers: [
+                'Membakarnya',
+                'Menguncinya',
+                'Menyalinnya'
+            ]
+        },
+        '9b': {
+            question: 'Apa yang diberikan Circle Gateway kepada agen?',
+            answers: [
+                'Satu saldo di semua chain',
+                'Dompet terpisah di setiap chain',
+                'Jalur kredit di bank Circle'
+            ]
+        },
+        '9c': {
+            question: 'Mengapa CCTP tidak memerlukan token jembatan yang harus dipercaya?',
+            answers: [
+                'USDC hanya pernah ada di satu chain',
+                'Setiap token terbungkus diasuransikan jembatan',
+                'USDC asli dicetak di chain tujuan'
+            ]
+        },
+        '10a': {
+            question: 'Dalam bentuk apa cadangan USDC disimpan?',
+            answers: [
+                'Bitcoin, ether, dan aset kripto lainnya',
+                'Saham Circle dan perusahaan mitranya',
+                'Kas dan surat utang AS bertenor pendek'
+            ]
+        },
+        '10b': {
+            question: 'Seberapa sering atestasi cadangan diterbitkan?',
+            answers: [
+                'Setiap dekade',
+                'Setiap tahun',
+                'Setiap bulan'
+            ]
+        },
+        '10c': {
+            question: 'Cadangan USDC disimpan terpisah dari uang milik siapa?',
+            answers: [
+                'Departemen Keuangan AS',
+                'Para validator',
+                'Circle sendiri'
+            ]
+        },
+        '11a': {
+            question: 'Apa yang terjadi pada USDC saat ditebus lewat Circle Mint?',
+            answers: [
+                'Dibekukan sampai hari kerja berikutnya',
+                'Diteruskan ke pembeli berikutnya dalam antrean',
+                'Dibakar sementara dolarnya keluar'
+            ]
+        },
+        '11b': {
+            question: 'Kapan USDC bisa dicetak dan ditebus?',
+            answers: [
+                'Hanya pada jam kerja bank AS',
+                'Sepanjang waktu, setiap hari',
+                'Seminggu sekali, secara berkelompok'
+            ]
+        },
+        '11c': {
+            question: 'Sebuah bisnis mentransfer $1.000 ke Circle Mint. Berapa USDC yang dicetak?',
+            answers: [
+                'Tepat 1.000 USDC',
+                'Ditentukan oleh pasar',
+                'Sekitar 990 USDC'
+            ]
+        },
+        '12a': {
+            question: 'Mata uang apa yang diikuti EURC?',
+            answers: [
+                'Euro',
+                'Yen',
+                'Pound'
+            ]
+        },
+        '12b': {
+            question: 'Apa yang mendukung EURC?',
+            answers: [
+                'Sekeranjang saham bank Eropa',
+                'Model cadangan yang sama dengan USDC',
+                'Algoritme yang menyesuaikan pasokannya'
+            ]
+        },
+        '12c': {
+            question: 'Mengapa Arc dirancang untuk beberapa mata uang sekaligus?',
+            answers: [
+                'Biaya dalam dolar terlalu mahal bagi siapa pun di luar AS',
+                'Jaringan satu mata uang berhenti di perbatasan pertama',
+                'Regulator mewajibkan setiap chain membawa tiga mata uang'
+            ]
+        },
+        '13a': {
+            question: 'Di mana mesin FX Arc menghasilkan kutipan harganya?',
+            answers: [
+                'Di dalam chain',
+                'Di dalam dompet',
+                'Di luar chain'
+            ]
+        },
+        '13b': {
+            question: 'Mengapa pertukaran mata uang biasa sering bermasalah?',
+            answers: [
+                'Satu pihak mengirim dan terekspos selagi menunggu',
+                'Kurs dipatok tetap selama setahun penuh',
+                'Kedua pihak harus memegang mata uang yang sama dulu'
+            ]
+        },
+        '13c': {
+            question: 'Jika satu kaki pertukaran FX di Arc tidak bisa diselesaikan, apa yang terjadi pada kaki lainnya?',
+            answers: [
+                'Menunggu dalam antrean selama seminggu',
+                'Kaki itu juga tidak terjadi sama sekali',
+                'Diselesaikan sekarang dan dikembalikan nanti'
+            ]
+        },
+        '14a': {
+            question: 'Apakah transfer rahasia di Arc dipakai untuk setiap transaksi?',
+            answers: [
+                'Ya, setiap transfer bersifat privat',
+                'Tidak, sifatnya opsional',
+                'Hanya untuk transfer di atas $10.000'
+            ]
+        },
+        '14b': {
+            question: 'Dalam transfer rahasia, apa yang tetap terlihat?',
+            answers: [
+                'Alamatnya',
+                'Tidak ada sama sekali',
+                'Nominalnya'
+            ]
+        },
+        '14c': {
+            question: 'Siapa yang bisa melihat detail transfer rahasia bila diperlukan?',
+            answers: [
+                'Pesaing mana pun yang mau membayar sedikit biaya',
+                'Auditor atau regulator yang diberi tahu para pihak',
+                'Tidak seorang pun, bahkan kedua pihak yang terlibat'
+            ]
+        },
+        '15a': {
+            question: 'Manakah yang termasuk validator pendiri Arc?',
+            answers: [
+                'Binance',
+                'Mastercard',
+                'OpenAI'
+            ]
+        },
+        '15b': {
+            question: 'Apa tugas validator di Arc?',
+            answers: [
+                'Menetapkan harga USDC',
+                'Menyetujui akun pengguna baru',
+                'Mengurutkan transaksi'
+            ]
+        },
+        '15c': {
+            question: 'Apa rencana untuk himpunan validator Arc ke depannya?',
+            answers: [
+                'Menyerahkannya ke satu perusahaan',
+                'Beralih ke staking terbuka',
+                'Mengganti validator dengan penambang'
+            ]
+        },
+        '16a': {
+            question: 'Mengapa transfer bank yang dikirim hari Jumat bisa menganggur sampai Senin?',
+            answers: [
+                'Bank menyelesaikan transfer hanya sebulan sekali',
+                'Bank koresponden punya batas waktu operasional',
+                'Setiap transfer harus disetujui pengadilan'
+            ]
+        },
+        '16b': {
+            question: 'Kapan transfer stablecoin bisa diselesaikan?',
+            answers: [
+                'Kapan saja, termasuk akhir pekan',
+                'Hanya pada jam kerja bank',
+                'Hanya pada hari kerja'
+            ]
+        },
+        '16c': {
+            question: 'Apa yang diketahui pengirim stablecoin sebelum mengirim?',
+            answers: [
+                'Biaya yang akan dibayarnya',
+                'Kurs tukar untuk besok',
+                'Saldo rekening penerima'
+            ]
+        },
+        '17a': {
+            question: 'Kapan testnet Arc mulai berjalan?',
+            answers: [
+                'September 2026',
+                'Oktober 2025',
+                'Maret 2024'
+            ]
+        },
+        '17b': {
+            question: 'Apa yang ada di antara testnet Arc dan peluncuran publiknya?',
+            answers: [
+                'Kampanye airdrop token',
+                'Testnet kedua yang berbayar',
+                'Mainnet privat'
+            ]
+        },
+        '17c': {
+            question: 'Kira-kira berapa banyak pembangun yang terlibat di mainnet privat Arc?',
+            answers: [
+                'Sekitar sepuluh',
+                'Lebih dari seratus',
+                'Lebih dari sejuta'
+            ]
+        },
+        '18a': {
+            question: 'Bisakah meja bantuan membatalkan transfer tuntas yang terkirim ke alamat yang salah?',
+            answers: [
+                'Tidak, tak bisa ditarik kembali',
+                'Ya, dalam tiga puluh hari',
+                'Ya, dengan bukti kesalahannya'
+            ]
+        },
+        '18b': {
+            question: 'Apa yang membuat kesalahan pada transfer yang sudah tuntas menjadi permanen?',
+            answers: [
+                'Finalitas yang sama yang membuat setelmen cepat',
+                'Aturan yang ditetapkan tiap aplikasi dompet',
+                'Penundaan yang ditambahkan jaringan pada transfer besar'
+            ]
+        },
+        '18c': {
+            question: 'Mengapa batas belanja dan jaringan uji itu ada?',
+            answers: [
+                'Agar Anda memeriksa sebelumnya, karena tidak ada sesudahnya',
+                'Agar transfer bisa lebih murah bagi semua orang',
+                'Agar nominal transfer bisa disembunyikan dari publik'
+            ]
+        },
+        '19a': {
+            question: 'Manakah yang masih di depan bagi Arc?',
+            answers: [
+                'USDC sebagai gas',
+                'Token ARC',
+                'Finalitas cepat'
+            ]
+        },
+        '19b': {
+            question: 'Peralihan apa yang hendak diwujudkan ARC?',
+            answers: [
+                'Dari Proof-of-Stake ke Proof-of-Work',
+                'Dari Proof-of-Authority ke Proof-of-Stake',
+                'Dari jaringan Layer-1 ke Layer-2'
+            ]
+        },
+        '19c': {
+            question: 'Dengan apa mainnet publik Arc diluncurkan?',
+            answers: [
+                'Gas ARC dan staking terbuka penuh sejak hari pertama',
+                'Penambangan proof-of-work dan gas dibayar dengan ETH',
+                'Gas USDC dan himpunan validator pendiri yang berizin'
+            ]
+        },
+        '20a': {
+            question: 'Menurut game ini, kapan sebuah pembayaran selesai?',
+            answers: [
+                'Ketika dikirim',
+                'Ketika sudah final',
+                'Ketika penerima melihatnya'
+            ]
+        },
+        '20b': {
+            question: 'Apa itu setelmen?',
+            answers: [
+                'Saat pembayaran ditandatangani pengirim',
+                'Saat jaringan mengutip biayanya',
+                'Saat pembayaran tidak lagi bisa dibatalkan'
+            ]
+        },
+        '20c': {
+            question: 'Apa yang membuat setelmen di Arc tiba dalam kecepatan mesin?',
+            answers: [
+                'Gas stablecoin dan finalitas deterministik di bawah satu detik',
+                'Blok lebih besar dan waktu tunggu konfirmasi lebih lama',
+                'Jaringan kartu yang terhubung langsung ke chain'
             ]
         }
     },
@@ -552,27 +876,43 @@ I18n.register('id', {
             hint: 'Stablecoin adalah token yang mewakili uang yang benar-benar dipegang seseorang. USDC bisa ditebus satu banding satu: serahkan kembali sebuah token kepada penerbitnya dan Anda mendapat satu dolar. Janji itulah — bukan perdagangan — yang menjaga harganya tetap satu dolar, dan itu pula sebabnya memegang USDC adalah klaim atas satu dolar, bukan kepemilikan saham perusahaan penerbitnya.',
             questions: [
                 {
-                    question: 'Mengapa harga USDC bertahan?',
+                    question: 'Apa yang diwakili sebuah stablecoin?',
                     answers: [
-                        'Para trader sepakat mempertahankannya di situ',
-                        'Setiap token bisa ditebus satu dolar dari penerbitnya',
-                        'Sebuah algoritme membeli dan menjualnya untuk mempertahankan patokan'
+                        'Uang yang benar-benar dipegang seseorang',
+                        'Daya komputasi di sebuah jaringan',
+                        'Saham di sebuah perusahaan teknologi'
                     ]
                 },
                 {
-                    question: 'Apakah memegang USDC berarti berinvestasi di Circle?',
+                    question: 'Untuk menukar USDC kembali menjadi dolar, kepada siapa Anda menyerahkannya?',
                     answers: [
-                        'Bukan — itu klaim atas satu dolar, bukan saham perusahaan',
-                        'Ya, pemegangnya menerima bagian dari laba Circle',
-                        'Ya, cara kerjanya seperti obligasi korporasi'
+                        'Validator mana pun',
+                        'Sebuah bursa',
+                        'Penerbit token itu'
                     ]
                 },
                 {
-                    question: 'Apa arti penebusan satu banding satu?',
+                    question: 'Apa yang menjaga harga USDC tetap satu dolar?',
                     answers: [
-                        'Satu USDC selalu bisa membeli satu token lain apa pun',
-                        'Token baru hanya dicetak ketika token lain dibakar',
-                        'Serahkan satu token, terima satu dolar'
+                        'Volume perdagangan tinggi setiap hari',
+                        'Pemungutan suara harian semua pemegang',
+                        'Janji penebusan satu banding satu'
+                    ]
+                },
+                {
+                    question: 'Memegang USDC memberi Anda klaim atas apa?',
+                    answers: [
+                        'Saham',
+                        'Laba',
+                        'Satu dolar'
+                    ]
+                },
+                {
+                    question: 'Berapa dolar yang Anda terima saat menebus satu USDC?',
+                    answers: [
+                        'Tepat satu dolar',
+                        'Satu, dikurangi biaya',
+                        'Harga terakhirnya'
                     ]
                 }
             ]
@@ -582,27 +922,43 @@ I18n.register('id', {
             hint: 'Gas adalah biaya yang dikenakan jaringan untuk memproses transaksi Anda. Di sebagian besar chain, gas dibayar dengan token yang bergejolak, sehingga biayanya dalam dolar berubah selagi Anda menimbang keputusan. Arc menagih gas dalam USDC, yang mengubah biaya tak terduga menjadi pos pengeluaran biasa — sekitar setengah sen per transaksi.',
             questions: [
                 {
-                    question: 'Apa itu gas?',
+                    question: 'Siapa yang mengenakan gas?',
                     answers: [
-                        'Deposit yang dikembalikan setelah transaksi terkonfirmasi',
-                        'Biaya yang dikenakan jaringan untuk memproses transaksi',
-                        'Pungutan yang ditarik penyedia dompet Anda'
+                        'Jaringan yang memproses transaksi',
+                        'Orang yang menerima pembayaran',
+                        'Toko yang menyediakan aplikasi dompet'
                     ]
                 },
                 {
-                    question: 'Mengapa bisnis peduli bahwa gas dibayar dengan stablecoin?',
+                    question: 'Di sebagian besar chain, apa yang terjadi pada biaya gas dalam dolar selagi Anda menimbang keputusan?',
                     answers: [
-                        'Biayanya tetap terprediksi dalam dolar',
-                        'Transaksi diproses lebih cepat',
-                        'Tidak perlu lagi memiliki dompet'
+                        'Berubah mengikuti harga token',
+                        'Turun ke nol dalam semalam',
+                        'Dikunci selama satu jam'
                     ]
                 },
                 {
-                    question: 'Di chain dengan token gas yang bergejolak, apa yang bisa terjadi pada biaya Anda selagi menunggu?',
+                    question: 'Arc menagih gas dalam apa?',
                     answers: [
-                        'Tidak ada — biaya dipatok dalam dolar',
-                        'Biayanya dikembalikan jika harga bergerak',
-                        'Biayanya ikut bergerak mengikuti harga token'
+                        'ARC',
+                        'ETH',
+                        'USDC'
+                    ]
+                },
+                {
+                    question: 'Kira-kira berapa biaya gas per transaksi di Arc?',
+                    answers: [
+                        'Sekitar lima puluh sen',
+                        'Sekitar lima sen',
+                        'Sekitar setengah sen'
+                    ]
+                },
+                {
+                    question: 'Gas dalam USDC mengubah biaya tak terduga menjadi apa?',
+                    answers: [
+                        'Aset yang bisa diperdagangkan',
+                        'Pos pengeluaran biasa',
+                        'Potongan pajak'
                     ]
                 }
             ]
@@ -612,27 +968,43 @@ I18n.register('id', {
             hint: 'Sebuah transaksi final ketika ia tidak lagi bisa dibatalkan. Sebagian chain hanya membuatnya "sangat mungkin", itulah sebabnya Anda menunggu konfirmasi — blok yang baru diterima masih bisa digantikan, dan penggantian itu disebut reorg. Konsensus Arc membuat finalitas menjadi pasti dalam kurang dari satu detik, jadi tidak ada yang perlu ditunggu.',
             questions: [
                 {
-                    question: 'Apa arti finalitas?',
+                    question: 'Kapan sebuah transaksi final?',
                     answers: [
-                        'Transaksinya sudah masuk mempool',
-                        'Transaksinya tidak lagi bisa dibatalkan',
-                        'Biayanya sudah dibayar penuh'
+                        'Ketika tidak lagi bisa dibatalkan',
+                        'Ketika dompet menampilkannya',
+                        'Ketika biayanya sudah dibayar'
                     ]
                 },
                 {
-                    question: 'Mengapa orang menunggu konfirmasi di sebagian chain?',
+                    question: 'Di chain yang finalitasnya hanya "sangat mungkin", apa yang ditunggu pengguna?',
                     answers: [
-                        'Blok yang baru saja dibuat masih bisa digantikan',
-                        'Jaringannya lambat meneruskan pembayaran',
-                        'Dompetnya butuh waktu untuk sinkronisasi'
+                        'Laporan harian',
+                        'Tiket dukungan',
+                        'Konfirmasi tambahan'
                     ]
                 },
                 {
-                    question: 'Apa itu reorg?',
+                    question: 'Apa sebutan untuk blok yang baru diterima lalu digantikan?',
                     answers: [
-                        'Dompet menyusun ulang token yang dipegangnya',
-                        'Menulis ulang kontrak pintar yang sudah dideploy',
-                        'Blok yang baru diterima digantikan oleh rantai yang berbeda'
+                        'Rollback',
+                        'Fork',
+                        'Reorg'
+                    ]
+                },
+                {
+                    question: 'Berapa lama Arc membuat finalitas menjadi pasti?',
+                    answers: [
+                        'Sekitar sepuluh menit',
+                        'Kurang dari satu detik',
+                        'Sekitar satu jam'
+                    ]
+                },
+                {
+                    question: 'Di Arc, berapa konfirmasi yang harus Anda tunggu?',
+                    answers: [
+                        'Tiga puluh',
+                        'Enam',
+                        'Tidak ada'
                     ]
                 }
             ]
@@ -642,27 +1014,43 @@ I18n.register('id', {
             hint: 'Dompet tidak menyimpan uang — ia menyimpan kunci yang mengizinkan uang itu dipindahkan, dan siapa pun yang memegang kuncinya memegang dananya. Itu sebabnya tidak ada meja bantuan yang jujur akan meminta frasa pemulihan Anda, dan sebabnya kustodian serius memecah kunci di antara beberapa pihak agar tidak ada satu pihak pun yang bisa menandatangani sendirian.',
             questions: [
                 {
-                    question: 'Apa yang sebenarnya disimpan sebuah dompet?',
+                    question: 'Siapa yang menguasai dana di sebuah dompet?',
                     answers: [
-                        'Koinnya sendiri',
-                        'Salinan pribadi dari blockchain',
-                        'Kunci yang mengizinkan pembelanjaan'
+                        'Siapa pun yang memegang kuncinya',
+                        'Bank yang memverifikasi pengguna',
+                        'Siapa pun yang membuat aplikasi dompetnya'
                     ]
                 },
                 {
-                    question: 'Seseorang dari "dukungan" meminta frasa pemulihan Anda. Apa yang sedang terjadi?',
+                    question: 'Manakah yang benar tentang dompet?',
                     answers: [
-                        'Upaya untuk mengambil dana Anda',
-                        'Pemeriksaan identitas rutin',
-                        'Migrasi dompet yang standar'
+                        'Menyimpan salinan seluruh blockchain',
+                        'Menyimpan koin dalam file lokal',
+                        'Menyimpan kunci, bukan uangnya'
                     ]
                 },
                 {
-                    question: 'Apa gunanya memecah kunci penanda tangan di antara dua pihak?',
+                    question: 'Siapa yang akan meminta frasa pemulihan Anda?',
                     answers: [
-                        'Biaya pengiriman transaksi jadi lebih murah',
-                        'Tidak ada pihak yang bisa memindahkan dana sendirian',
-                        'Saldonya diasuransikan dua kali lipat'
+                        'Tidak ada meja bantuan yang jujur',
+                        'Para validator di jaringan Arc',
+                        'Tim dukungan resmi dompet Anda'
+                    ]
+                },
+                {
+                    question: 'Pada kustodian serius, bisakah satu pihak menandatangani sendirian?',
+                    answers: [
+                        'Tidak, kuncinya dipecah agar tak ada yang bisa',
+                        'Ya, setelah masa tunggu yang singkat',
+                        'Ya, pihak yang lebih besar selalu bisa'
+                    ]
+                },
+                {
+                    question: 'Kunci di dalam dompet mengizinkan apa?',
+                    answers: [
+                        'Melihat saldo',
+                        'Memindahkan dana',
+                        'Mengubah biaya jaringan'
                     ]
                 }
             ]
@@ -672,27 +1060,43 @@ I18n.register('id', {
             hint: 'Agen adalah program dengan anggaran. Ia membayar sambil bekerja — sebuah pencarian, sebuah umpan data, sebuah panggilan ke model — dalam jumlah yang jauh terlalu kecil untuk kartu, di mana biaya tetap beberapa sen akan lebih mahal daripada barang yang dibeli. Yang menjaganya tetap aman bukan kepercayaan, melainkan batas belanja yang ditandatangani pemiliknya.',
             questions: [
                 {
-                    question: 'Apa yang membuat pembayaran agen berbeda dari pembayaran kartu?',
+                    question: 'Dalam konteks ini, apa itu agen?',
                     answers: [
-                        'Nominalnya sangat kecil dan tidak ada orang di meja kasir',
-                        'Pembayarannya bisa dibatalkan kapan saja',
-                        'Pembayarannya harus disetujui di kantor cabang bank'
+                        'Program dengan anggaran',
+                        'Pialang manusia yang bekerja untuk Anda',
+                        'Bot layanan pelanggan milik bank'
                     ]
                 },
                 {
-                    question: 'Apa yang mencegah agen membelanjakan semua yang bisa dijangkaunya?',
+                    question: 'Manakah yang mungkin dibayar agen sambil bekerja?',
                     answers: [
-                        'Tidak ada — agen memang harus dipercaya',
-                        'Telepon harian dari bank',
-                        'Batas belanja yang disetujui pemiliknya'
+                        'Panggilan ke model',
+                        'Kredit rumah',
+                        'Gaji bulanan'
                     ]
                 },
                 {
-                    question: 'Mengapa pembayaran antarmesin butuh biaya sekecil pecahan sen?',
+                    question: 'Mengapa agen tidak bisa membayar satu pencarian dengan kartu?',
                     answers: [
-                        'Jaringan menagih program lebih mahal daripada manusia',
-                        'Biaya yang lebih besar dari pembayarannya membuat transaksi itu sia-sia',
-                        'Mesin mengirim jauh lebih banyak transaksi daripada manusia'
+                        'Biaya beberapa sen lebih mahal daripada pencariannya',
+                        'Kartu tidak bisa dipakai membayar apa pun secara online',
+                        'Pencarian selalu gratis untuk dijalankan perangkat lunak'
+                    ]
+                },
+                {
+                    question: 'Siapa yang menandatangani batas belanja tempat agen bekerja?',
+                    answers: [
+                        'Para validator',
+                        'Pemilik agen',
+                        'Agen itu sendiri'
+                    ]
+                },
+                {
+                    question: 'Kapan agen membayar?',
+                    answers: [
+                        'Sambil bekerja',
+                        'Hanya saat pemiliknya online',
+                        'Setahun sekali, di muka'
                     ]
                 }
             ]
@@ -702,27 +1106,43 @@ I18n.register('id', {
             hint: 'Chain tidak berbagi satu buku besar, jadi sebuah token tidak bisa begitu saja berpindah di antaranya. Jawaban lama adalah menguncinya di satu chain dan menerbitkan salinan — token terbungkus — di chain lain, menyisakan kolam dana terkunci yang menjadi sasaran peretasan terbesar di kripto. Transfer asli membakar di satu sisi dan mencetak di sisi lain, jadi tidak ada kolam yang bisa dicuri.',
             questions: [
                 {
-                    question: 'Apa itu token terbungkus (wrapped token)?',
+                    question: 'Mengapa token tidak bisa begitu saja berpindah antar-chain?',
                     answers: [
-                        'Token yang dikunci di satu chain dan diwakili salinannya di chain lain',
-                        'Token yang biayanya sudah termasuk dalam transfer',
-                        'Token yang nominalnya disembunyikan dari publik'
+                        'Setiap chain melarang token asing',
+                        'Chain tidak berbagi satu buku besar',
+                        'Token terlalu besar untuk dipindahkan'
                     ]
                 },
                 {
-                    question: 'Mengapa bakar-dan-cetak lebih aman daripada jembatan kunci-dan-bungkus?',
+                    question: 'Apa yang ditinggalkan cara lama kunci-dan-salin?',
                     answers: [
-                        'Lebih cepat diprogram',
-                        'Validator menyetujui setiap transfer secara manual',
-                        'Tidak ada kolam dana terkunci yang bisa dicuri'
+                        'Biaya permanen pada setiap transfer',
+                        'Kolam berisi dana yang terkunci',
+                        'Salinan kedua dari seluruh chain'
                     ]
                 },
                 {
-                    question: 'Anda mengirim USDC ke alamat di chain yang salah. Apa hasil yang paling mungkin?',
+                    question: 'Kolam dana jembatan yang terkunci telah menarik apa?',
                     answers: [
-                        'Jaringan mengalihkannya ke chain yang benar',
-                        'Dananya bisa hilang selamanya',
-                        'Dananya kembali sendiri setelah beberapa blok'
+                        'Peretasan terbesar di kripto',
+                        'Asuransi simpanan dari pemerintah',
+                        'Imbal hasil staking tertinggi'
+                    ]
+                },
+                {
+                    question: 'Apa yang dilakukan transfer asli di chain tujuan?',
+                    answers: [
+                        'Membakar token',
+                        'Mencetak token',
+                        'Mengunci token'
+                    ]
+                },
+                {
+                    question: 'Mengapa tidak ada yang bisa dicuri dalam transfer asli?',
+                    answers: [
+                        'Tidak ada kolam dana terkunci',
+                        'Nominalnya dienkripsi',
+                        'Setiap transfer diasuransikan'
                     ]
                 }
             ]
@@ -732,27 +1152,43 @@ I18n.register('id', {
             hint: 'Dua hal harus berlaku sekaligus. Cadangan harus bisa dibuktikan, sehingga firma akuntansi independen menerbitkan atestasi bulanan yang memastikan cadangan menutupi seluruh token yang beredar. Dan sebuah bisnis tidak bisa membiarkan pesaing membaca fakturnya, sehingga transfer rahasia menyembunyikan nominal dari publik sambil tetap bisa diungkap kepada auditor.',
             questions: [
                 {
-                    question: 'Apa yang dipastikan oleh laporan atestasi bulanan?',
+                    question: 'Siapa yang menerbitkan atestasi cadangan?',
                     answers: [
-                        'Bahwa cadangan menutupi token yang beredar',
-                        'Ke mana arah harga token',
-                        'Siapa saja pemegang terbesarnya'
-                    ]
-                },
-                {
-                    question: 'Siapa yang menyusun atestasi?',
-                    answers: [
-                        'Tim keuangan penerbit itu sendiri',
+                        'Tim pemasaran Circle sendiri',
                         'Firma akuntansi independen',
-                        'Blockchain, secara otomatis'
+                        'Para validator jaringan Arc'
                     ]
                 },
                 {
-                    question: 'Apa yang disembunyikan transfer rahasia di Arc?',
+                    question: 'Seberapa sering atestasi cadangan terbit?',
                     answers: [
-                        'Segalanya — tidak ada catatan yang disimpan sama sekali',
-                        'Hanya identitas pengirimnya',
-                        'Nominalnya, yang tetap bisa diungkap kepada auditor'
+                        'Setiap lima tahun',
+                        'Setiap bulan',
+                        'Tidak pernah'
+                    ]
+                },
+                {
+                    question: 'Masalah apa yang diselesaikan transfer rahasia bagi sebuah bisnis?',
+                    answers: [
+                        'Biaya gas yang terlalu tinggi',
+                        'Pelanggan yang telat membayar tagihan',
+                        'Pesaing yang membaca fakturnya'
+                    ]
+                },
+                {
+                    question: 'Transfer rahasia menyembunyikan nominal dari siapa?',
+                    answers: [
+                        'Auditor',
+                        'Publik',
+                        'Pengirim'
+                    ]
+                },
+                {
+                    question: 'Bisakah auditor tetap melihat detail transfer rahasia?',
+                    answers: [
+                        'Tidak, nominalnya hilang selamanya',
+                        'Ya, detailnya tetap bisa diungkap kepada auditor',
+                        'Hanya jika jaringan memilih untuk mengizinkannya'
                     ]
                 }
             ]
@@ -762,27 +1198,43 @@ I18n.register('id', {
             hint: 'Arc adalah Layer-1: ia menyelesaikan setelmen bloknya sendiri alih-alih mengirimkannya ke chain milik orang lain. Ia kompatibel dengan EVM, jadi kontrak dan perkakas yang ditulis untuk Ethereum berjalan tanpa perubahan. Mainnet publiknya dibuka pada September 2026, tetapi aplikasi masih berlatih di testnet — perangkat lunak sungguhan dengan uang yang tak bernilai, dan justru di situlah Anda ingin menemukan bugnya.',
             questions: [
                 {
-                    question: 'Apa arti kompatibel dengan EVM dalam praktik?',
+                    question: 'Apakah Arc mengirimkan bloknya ke chain lain?',
                     answers: [
-                        'Ia berbagi biaya dengan Ethereum',
-                        'Kontrak dan perkakas yang dibuat untuk Ethereum berjalan di atasnya',
-                        'Bloknya divalidasi oleh Ethereum'
+                        'Ya, ia mengirimkannya ke Ethereum',
+                        'Tidak, ia menyelesaikan bloknya sendiri',
+                        'Ya, ia mengirimkannya ke Bitcoin'
                     ]
                 },
                 {
-                    question: 'Untuk apa sebuah testnet?',
+                    question: 'Apakah kontrak Ethereum perlu ditulis ulang agar berjalan di Arc?',
                     answers: [
-                        'Menjalankan perangkat lunak sungguhan dengan uang yang tak bernilai',
-                        'Melakukan transaksi nyata dengan lebih murah',
-                        'Mencoba-coba kata sandi dompet dengan aman'
+                        'Ya, ke dalam bahasa khusus Arc',
+                        'Tidak, berjalan tanpa perubahan',
+                        'Ya, harus di-porting ke Rust'
                     ]
                 },
                 {
-                    question: 'Arc adalah Layer-1. Apa artinya?',
+                    question: 'Kapan mainnet publik Arc dibuka?',
                     answers: [
-                        'Ia adalah rilis pertama dari sebuah jaringan Layer-2',
-                        'Ia hanya mendukung satu token',
-                        'Ia menyelesaikan setelmen bloknya sendiri alih-alih mengirimkannya ke chain lain'
+                        'Januari 2025',
+                        'Belum dibuka',
+                        'September 2026'
+                    ]
+                },
+                {
+                    question: 'Di mana aplikasi berlatih sebelum aktif di Arc?',
+                    answers: [
+                        'Di mainnet',
+                        'Tidak di mana pun',
+                        'Di testnet'
+                    ]
+                },
+                {
+                    question: 'Apa yang membuat testnet tempat yang tepat untuk menemukan bug?',
+                    answers: [
+                        'Tidak ada validator sama sekali',
+                        'Perangkat lunaknya sama sekali berbeda',
+                        'Uang di dalamnya tak bernilai'
                     ]
                 }
             ]

@@ -11,14 +11,15 @@
 // Once per run. The topics live in js/rescueTopics.js and are deliberately
 // not the ones asked between levels.
 //
-// The server runs the quiz: it draws the topic, shuffles each question's
-// answers, grades every answer and hands back the verdict and the lives. The
-// browser only shows the wording. If the server cannot be reached the rescue
-// cannot be graded, and the run restarts as it did before rescues existed.
+// The server runs the quiz: it draws the topic, picks three of its questions,
+// shuffles each question's answers, grades every answer and hands back the
+// verdict and the lives. The browser only shows the wording. If the server
+// cannot be reached the rescue cannot be graded, and the run restarts as it did
+// before rescues existed.
 
 const RescueManager = {
     active: false,
-    topic: null,          // translated topic: { id, title, hint, questions: [{ question, answers }] }
+    topic: null,          // translated topic, questions narrowed to the three the server picked
     orders: null,         // server order per question: orders[i][position] = source answer index
     index: 0,
     correct: 0,
@@ -60,15 +61,19 @@ const RescueManager = {
 
         const source = started.ok && started.data
             && RESCUE_TOPICS.find(topic => topic.id === started.data.topicId);
-        if (!source || !Array.isArray(started.data.orders)) {
+        const picked = source && started.data.questions;
+        if (!source || !Array.isArray(picked) || !Array.isArray(started.data.orders)
+            || picked.some(i => !source.questions[i])) {
             console.warn('Rescue could not be started:', started.data && started.data.error);
             screen.style.display = 'flex';
             this.showUnavailable();
             return false;
         }
 
-        // Translated once here; the order stays with the server's positions
-        this.topic = I18n.rescueTopic(source);
+        // Translated once here, then narrowed to the server's picks; each order
+        // refers to the answer positions of its picked question
+        const translated = I18n.rescueTopic(source);
+        this.topic = Object.assign({}, translated, { questions: picked.map(i => translated.questions[i]) });
         this.orders = started.data.orders;
         this.index = started.data.answered || 0;
 

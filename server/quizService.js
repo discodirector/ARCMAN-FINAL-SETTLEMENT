@@ -6,8 +6,10 @@
 //
 // Every quiz is bound to a game session:
 //   - a level quiz can only be opened once the session has completed that level,
-//     and answered once;
-//   - the rescue quiz can be taken once per session;
+//     and answered once. Each level has several question variants; the server
+//     picks one per session;
+//   - the rescue quiz can be taken once per session, and asks three of its
+//     topic's questions, picked by the server;
 //   - answers are shuffled per session, so a list of "the right answer is B"
 //     passed around between players does not work.
 //
@@ -25,6 +27,7 @@ const DEFAULT_KEY_PATH = path.join(ROOT, 'private', 'answer-key.json');
 
 // Rescue: correct answers -> lives handed back. Mirrors the rules shown to players.
 const RESCUE_REWARDS = { 3: 3, 2: 1 };
+const RESCUE_QUESTIONS = 3;   // asked per rescue, out of the topic's pool
 
 function shuffledOrder(length) {
     const order = Array.from({ length }, (_, i) => i);
@@ -35,20 +38,32 @@ function shuffledOrder(length) {
     return order;
 }
 
-// Build { level: { [id]: correctIndex }, rescue: { [topicId]: [correctIndex x3] } }
-// from the content files and the private key, checking that they agree.
+const pickDistinct = (count, from) => shuffledOrder(from).slice(0, count);
+
+// Build the grading index from the content files and the private key, checking
+// that they agree:
+//   question:      { [questionId]: correctIndex }
+//   levelVariants: { [level]: [questionId, ...] }
+//   rescue:        { [topicId]: [correctIndex for each question in the pool] }
 function loadAnswerIndex(keyPath) {
     const { QUIZZES } = require(path.join(ROOT, 'js', 'quizzes.js'));
     const { RESCUE_TOPICS } = require(path.join(ROOT, 'js', 'rescueTopics.js'));
     const key = JSON.parse(fs.readFileSync(keyPath, 'utf8'));
     const problems = [];
 
-    const level = {};
+    const question = {};
+    const answerCount = {};
+    const levelVariants = {};
     for (const quiz of QUIZZES) {
         const text = key.level && key.level[String(quiz.id)];
         const index = quiz.answers.indexOf(text);
-        if (index === -1) problems.push(`level quiz ${quiz.id}: key answer not among its answers`);
-        else level[quiz.id] = index;
+        if (index === -1) {
+            problems.push(`quiz ${quiz.id}: key answer not among its answers`);
+            continue;
+        }
+        question[quiz.id] = index;
+        answerCount[quiz.id] = quiz.answers.length;
+        (levelVariants[quiz.level] = levelVariants[quiz.level] || []).push(quiz.id);
     }
 
     const rescue = {};
@@ -62,6 +77,9 @@ function loadAnswerIndex(keyPath) {
         indexes.forEach((idx, i) => {
             if (idx === -1) problems.push(`rescue topic ${topic.id} question ${i + 1}: key answer not among its answers`);
         });
+        if (topic.questions.length < RESCUE_QUESTIONS) {
+            problems.push(`rescue topic ${topic.id}: needs at least ${RESCUE_QUESTIONS} questions`);
+        }
         rescue[topic.id] = indexes;
     }
 
@@ -69,9 +87,10 @@ function loadAnswerIndex(keyPath) {
         throw new Error('Answer key does not match the quiz content:\n  ' + problems.join('\n  '));
     }
     return {
-        level,
+        question,
+        answerCount,
+        levelVariants,
         rescue,
-        levelAnswerCount: Object.fromEntries(QUIZZES.map(q => [q.id, q.answers.length])),
         rescueTopics: RESCUE_TOPICS.map(t => ({ id: t.id, questionCount: t.questions.length, answerCount: t.questions.map(q => q.answers.length) })),
     };
 }
@@ -81,7 +100,9 @@ function registerQuizRoutes(app, { sessions, getIp, sessionExpiryMs, log = conso
     let answers = null;
     try {
         answers = loadAnswerIndex(keyPath);
-        log.log(`Quizzes ready: ${Object.keys(answers.level).length} level quizzes, ${answers.rescueTopics.length} rescue topics`);
+        const variants = Object.values(answers.levelVariants).reduce((n, list) => n + list.length, 0);
+        const pool = answers.rescueTopics.reduce((n, t) => n + t.questionCount, 0);
+        log.log(`Quizzes ready: ${variants} level questions over ${Object.keys(answers.levelVariants).length} levels, ${pool} rescue questions over ${answers.rescueTopics.length} topics`);
     } catch (error) {
         // The rest of the backend (sessions, score signing) keeps running;
         // quiz endpoints answer 503 and /api/health reports it.
@@ -129,7 +150,7 @@ function registerQuizRoutes(app, { sessions, getIp, sessionExpiryMs, log = conso
         if (!session) return;
 
         const levelId = Number(req.body.levelId);
-        if (!Number.isInteger(levelId) || !(levelId in answers.level)) {
+        if (!Number.isInteger(levelId) || !answers.levelVariants[levelId]) {
             return res.status(400).json({ error: 'Unknown level quiz' });
         }
 
@@ -143,10 +164,16 @@ function registerQuizRoutes(app, { sessions, getIp, sessionExpiryMs, log = conso
         if (existing && existing.answered) {
             return res.status(409).json({ error: 'Quiz already answered' });
         }
-        // Re-opening an unanswered quiz returns the same order
-        const quiz = existing || { order: shuffledOrder(answers.levelAnswerCount[levelId]), openedAt: Date.now(), answered: false };
-        session.quizzes[levelId] = quiz;
-        res.json({ order: quiz.order });
+        // One variant per session, picked here; re-opening an unanswered quiz
+        // returns the same question in the same order
+        let quiz = existing;
+        if (!quiz) {
+            const variants = answers.levelVariants[levelId];
+            const questionId = variants[crypto.randomInt(variants.length)];
+            quiz = { questionId, order: shuffledOrder(answers.answerCount[questionId]), openedAt: Date.now(), answered: false };
+            session.quizzes[levelId] = quiz;
+        }
+        res.json({ questionId: quiz.questionId, order: quiz.order });
     });
 
     app.post('/api/quiz/level/answer', (req, res) => {
@@ -163,7 +190,7 @@ function registerQuizRoutes(app, { sessions, getIp, sessionExpiryMs, log = conso
             return res.status(400).json({ error: 'Invalid choice' });
         }
 
-        const correctIndex = answers.level[levelId];
+        const correctIndex = answers.question[quiz.questionId];
         const correct = quiz.order[choice] === correctIndex;
         Object.assign(quiz, { answered: true, correct, answeredAt: Date.now() });
 
@@ -186,16 +213,18 @@ function registerQuizRoutes(app, { sessions, getIp, sessionExpiryMs, log = conso
             const list = pool.length ? pool : answers.rescueTopics;
             const topic = list[crypto.randomInt(list.length)];
             lastRescueTopicByIp.set(ip, topic.id);
+            const questions = pickDistinct(RESCUE_QUESTIONS, topic.questionCount);
             session.rescue = {
                 topicId: topic.id,
-                orders: topic.answerCount.map(count => shuffledOrder(count)),
+                questions,                                    // indexes into the topic's pool
+                orders: questions.map(q => shuffledOrder(topic.answerCount[q])),
                 results: [],
                 finished: false,
                 startedAt: Date.now(),
             };
         }
-        const { topicId, orders, results } = session.rescue;
-        res.json({ topicId, orders, answered: results.length });
+        const { topicId, questions, orders, results } = session.rescue;
+        res.json({ topicId, questions, orders, answered: results.length });
     });
 
     app.post('/api/quiz/rescue/answer', (req, res) => {
@@ -217,7 +246,7 @@ function registerQuizRoutes(app, { sessions, getIp, sessionExpiryMs, log = conso
             return res.status(400).json({ error: 'Invalid choice' });
         }
 
-        const correctIndex = answers.rescue[rescue.topicId][index];
+        const correctIndex = answers.rescue[rescue.topicId][rescue.questions[index]];
         const correct = order[choice] === correctIndex;
         rescue.results.push(correct);
 
@@ -234,4 +263,4 @@ function registerQuizRoutes(app, { sessions, getIp, sessionExpiryMs, log = conso
     return { isReady: () => answers !== null };
 }
 
-module.exports = { registerQuizRoutes, loadAnswerIndex, RESCUE_REWARDS };
+module.exports = { registerQuizRoutes, loadAnswerIndex, RESCUE_REWARDS, RESCUE_QUESTIONS };

@@ -1,15 +1,17 @@
 // Quiz Management Module
 //
 // The quiz after each level is graded by the server. The browser knows the
-// question and the wording of the answers, never which one is right:
-//   1. /api/quiz/level/start opens the quiz for a level this session completed
-//      and returns the order to show the answers in (shuffled per session);
+// questions and the wording of the answers, never which one is right:
+//   1. /api/quiz/level/start opens the quiz for a level this session completed,
+//      picks one of that level's question variants and returns it with the order
+//      to show its answers in (shuffled per session);
 //   2. /api/quiz/level/answer grades the chosen position and says which position
 //      was right, so the screen can show it.
 // If the server cannot be reached the quiz does not count: no life is given,
 // and the player simply continues.
 const QuizManager = {
-    currentQuiz: null,
+    currentQuiz: null,    // { level } — which level's quiz is on screen
+    question: null,       // the variant the server picked: { id, level, question, answers }
     quizAnswered: false,
     order: null,          // server order: order[position] = index into the source answers
     request: 0,           // bumped whenever the screen closes, so late responses are ignored
@@ -19,10 +21,11 @@ const QuizManager = {
         return GameState.tournamentMode && this.getQuizForLevel(levelId) !== null;
     },
 
-    // Get quiz data for a specific level — the quiz's id is the level it follows
+    // The quiz for a level, if that level has any question variants. Which
+    // variant is asked is up to the server, so this only names the level.
     getQuizForLevel: function(levelId) {
         if (typeof QUIZZES === 'undefined') return null;
-        return QUIZZES.find(quiz => quiz.id === levelId) || null;
+        return QUIZZES.some(quiz => quiz.level === levelId) ? { level: levelId } : null;
     },
 
     answerButtons: function() {
@@ -34,6 +37,7 @@ const QuizManager = {
         if (!quizData) return;
 
         this.currentQuiz = quizData;
+        this.question = null;
         this.quizAnswered = false;
         this.order = null;
         const request = ++this.request;
@@ -49,9 +53,8 @@ const QuizManager = {
         const continueBtn = document.getElementById('quizContinue');
         const resultMessage = document.getElementById('quizResultMessage');
 
-        // Wording comes from the active language pack, in source order
-        const text = I18n.quiz(quizData);
-        if (questionEl) questionEl.textContent = text.question;
+        // The question stays blank until the server says which variant to ask
+        if (questionEl) questionEl.textContent = '…';
 
         // Answers stay blank and locked until the server says in which order to show them
         this.answerButtons().forEach(btn => {
@@ -81,15 +84,20 @@ const QuizManager = {
         quizScreen.style.display = 'flex';
         this.setupQuizListeners();
 
-        const opened = await this.openOnServer(quizData.id);
+        const opened = await this.openOnServer(quizData.level);
         if (request !== this.request) return;   // the screen was closed meanwhile
 
-        if (!opened) {
+        const question = opened && QUIZZES.find(q => q.id === opened.questionId);
+        if (!question) {
             this.showUnavailable();
             return;
         }
 
+        // Wording comes from the active language pack, in source order
+        this.question = question;
         this.order = opened.order;
+        const text = I18n.quiz(question);
+        if (questionEl) questionEl.textContent = text.question;
         this.answerButtons().forEach((btn, position) => {
             if (!btn) return;
             btn.textContent = text.answers[this.order[position]];
@@ -107,7 +115,7 @@ const QuizManager = {
                 sessionId: GameState.sessionId,
                 levelId
             });
-            if (ok && data && Array.isArray(data.order)) return data;
+            if (ok && data && data.questionId && Array.isArray(data.order)) return data;
             if (status !== 409 || !data || !/not completed/i.test(data.error || '')) {
                 console.warn('Quiz could not be opened:', status, data && data.error);
                 return null;
@@ -145,11 +153,11 @@ const QuizManager = {
 
     // Handle quiz answer selection — position is the button as shown on screen
     handleQuizAnswer: async function(position) {
-        if (this.quizAnswered || !this.currentQuiz || !this.order) return;
+        if (this.quizAnswered || !this.currentQuiz || !this.question || !this.order) return;
 
         this.quizAnswered = true;
         const request = this.request;
-        const quiz = this.currentQuiz;
+        const question = this.question;
 
         const buttons = this.answerButtons();
         buttons.forEach(btn => {
@@ -163,7 +171,7 @@ const QuizManager = {
 
         const { ok, data } = await GameFlow.apiPost('/api/quiz/level/answer', {
             sessionId: GameState.sessionId,
-            levelId: quiz.id,
+            levelId: question.level,
             choice: position
         });
         if (request !== this.request) return;
@@ -194,7 +202,7 @@ const QuizManager = {
                 resultMessage.className = 'quiz-result correct-result';
                 this.awardLife();
             } else {
-                const correctText = I18n.quiz(quiz).answers[this.order[data.correctPosition]];
+                const correctText = I18n.quiz(question).answers[this.order[data.correctPosition]];
                 resultMessage.textContent = t('quizUi.incorrect', { answer: correctText });
                 resultMessage.className = 'quiz-result incorrect-result';
             }
@@ -262,6 +270,7 @@ const QuizManager = {
         }
         this.request++;
         this.currentQuiz = null;
+        this.question = null;
         this.quizAnswered = false;
         this.order = null;
     }

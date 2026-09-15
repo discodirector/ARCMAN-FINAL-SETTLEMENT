@@ -141,8 +141,9 @@ All coordinates are relative (0–1) and scaled to the canvas at load time.
 ### Adding a level
 
 1. Append the level to `DEFAULT_LEVELS` in `levels.js` with the next `id`.
-2. Add an info screen to `js/infoScreens.js` and a quiz to `js/quizzes.js` with **the same `id`**.
-3. Add the quiz's correct answer to `private/answer-key.json` on the server — see
+2. Add an info screen to `js/infoScreens.js` with **the same `id`**, and three question variants to
+   `js/quizzes.js` with `level` set to that id and ids `<level>a`, `<level>b`, `<level>c`.
+3. Add each variant's correct answer to `private/answer-key.json` on the server — see
    [Learning content](#learning-content).
 4. Add the wording to every pack in `js/locales/` (English is the fallback until then).
 5. **Restart the backend.** `server.js` reads `levels.js` at startup to know how many levels a run has
@@ -162,16 +163,23 @@ files ship to every browser. The server grades answers, see [Server-side quizzes
 | File | Shown | Contents |
 |---|---|---|
 | `js/infoScreens.js` | After every level | 20 short explainers — Arc, USDC as gas, finality, the ARC token, x402, agent wallets, CCTP, reserves, minting, EURC, FX settlement, confidential transfers, validators, cross-border payments, irreversibility, the mainnet launch |
-| `js/quizzes.js` | Right after that level's info screen | 20 questions, one per level, each checking the screen just read |
-| `js/rescueTopics.js` | When the last life is lost | 8 topics, each with a hint and three questions — none repeated from the level quizzes |
+| `js/quizzes.js` | Right after that level's info screen | 60 questions: three variants per level, one picked by the server per run, each answerable from the screen just read |
+| `js/rescueTopics.js` | When the last life is lost | 8 topics, each with a hint and five questions — the server asks three. None repeat the level quizzes |
 
 Rules that keep this consistent:
 
-- An info screen and its quiz share the level's `id`.
-- Every quiz has exactly three answers, and its correct answer is listed in `private/answer-key.json`.
+- A level quiz is `{ id: '7b', level: 7, question, answers: [ …3… ] }`. Every variant of a level must be
+  answerable from that level's info screen, and its correct answer is listed in
+  `private/answer-key.json` under its id.
 - Every rescue answer must be findable in its own hint — the rescue is meant to be won by reading.
-- A rescue topic is `{ id, title, hint, questions: [ …3… ] }`. Adding one to the array puts it in the
-  draw; add its wording to the packs in `js/locales/`, or it shows in English.
+- A rescue topic is `{ id, title, hint, questions: [ …at least 3… ] }`. Adding one to the array puts it
+  in the draw; add its wording to the packs in `js/locales/`, or it shows in English.
+- **Nothing about an answer's shape may give it away.** The right answer is not the longest, the
+  shortest, the most hedged or the only one naming a product; its position in the source array varies.
+  The source order is public even though the key is not, and the same rule applies to every
+  translation.
+- **Correct answers never enter git.** Questions whose answers were ever committed are burned and
+  should be replaced, not reused.
 
 Content was checked against Arc, Circle and x402 public materials as of September 2026. Arc's public
 mainnet opened on 16 September 2026; claims about the ARC token and the move to Proof-of-Stake
@@ -257,9 +265,9 @@ POST /api/session/event     { sessionId, eventType }         levelStart | gatePa
                                                              barrierHit | levelComplete
 POST /api/session/finalize  { sessionId, nonce }             -> { score, signature, signerAddress }
 POST /api/submit-level      { level }                        community submission (Telegram notice)
-POST /api/quiz/level/start  { sessionId, levelId }           -> { order }
+POST /api/quiz/level/start  { sessionId, levelId }           -> { questionId, order }
 POST /api/quiz/level/answer { sessionId, levelId, choice }   -> { correct, correctPosition }
-POST /api/quiz/rescue/start { sessionId }                    -> { topicId, orders }
+POST /api/quiz/rescue/start { sessionId }                    -> { topicId, questions, orders }
 POST /api/quiz/rescue/answer{ sessionId, index, choice }     -> { correct, correctPosition,
                                                                   done?, correctCount?, lives? }
 GET  /api/health                                             -> { status: "ok", quizzes: "ok" }
@@ -293,11 +301,12 @@ Only the game itself is served publicly — `index.html`, `levels.js`, `communit
 The browser knows every question and the wording of every answer, never which one is right.
 
 - **Level quiz.** `level/start` opens the quiz only for a level this session has completed on the
-  server, and returns the order to show its answers in. `level/answer` grades the chosen on-screen
-  position, once, and says which position was right. A correct answer restores a life.
-- **Rescue quiz.** The server draws the topic (never the same one twice in a row from an IP), shuffles
-  each question, grades the three answers in order and returns the verdict: 3 of 3 → 3 lives,
-  2 of 3 → 1, otherwise none. Once per session.
+  server, picks one of that level's variants and returns its `questionId` with the order to show its
+  answers in. `level/answer` grades the chosen on-screen position, once, and says which position was
+  right. A correct answer restores a life.
+- **Rescue quiz.** The server draws the topic (never the same one twice in a row from an IP), picks
+  three of its questions, shuffles each, grades the three answers in order and returns the verdict:
+  3 of 3 → 3 lives, 2 of 3 → 1, otherwise none. Once per session.
 - **Shuffled per session**, so "the right answer is the second one" does not travel between players.
 - **If the server is unreachable**, the level quiz does not count and the run continues; the rescue
   cannot be graded and the run restarts from level 1.
@@ -306,8 +315,8 @@ The answers live in `private/answer-key.json`, as the **exact English text** of 
 
 ```json
 {
-  "level":  { "1": "An EVM-compatible Layer-1 built by Circle for stablecoin finance", "...": "..." },
-  "rescue": { "stablecoin": ["…answer to question 1…", "…2…", "…3…"], "...": ["..."] }
+  "level":  { "1a": "…exact text of the right answer…", "1b": "…", "1c": "…", "...": "..." },
+  "rescue": { "stablecoin": ["…answer to question 1…", "…2…", "…3…", "…4…", "…5…"], "...": ["..."] }
 }
 ```
 
