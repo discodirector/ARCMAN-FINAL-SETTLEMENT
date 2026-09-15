@@ -363,10 +363,10 @@ I18n.register('id', {
     },
 
     info: {
-        1: 'Arc adalah blockchain Layer-1 terbuka dari Circle, perusahaan penerbit USDC. Arc kompatibel dengan EVM dan dibangun khusus untuk keuangan berbasis stablecoin. Saat ini Arc berjalan sebagai testnet publik — jaringan yang sama dengan tempat game ini dimainkan.',
+        1: 'Arc adalah blockchain Layer-1 terbuka dari Circle, perusahaan penerbit USDC. Arc kompatibel dengan EVM dan dibangun khusus untuk keuangan berbasis stablecoin. Mainnet publik Arc dibuka pada 16 September 2026; skor dan sertifikat game ini masih diselesaikan di Arc Testnet, tempat bermain tidak memakan biaya.',
         2: 'Di Arc, gas dibayar dengan USDC, bukan token yang harganya bergejolak. Biaya dikutip langsung dalam dolar dan rata-rata sekitar $0,005 per transaksi, sehingga siapa pun bisa menganggarkannya seperti biaya biasa.',
-        3: 'Arc memadukan Malachite — implementasi Tendermint BFT dalam Rust — dengan lapisan eksekusi Reth. Di testnet publik, blok muncul kira-kira setiap 0,5 detik, dan finalitasnya deterministik serta di bawah satu detik: tidak ada reorg, tidak perlu menunggu konfirmasi.',
-        4: 'ARC adalah token asli jaringan ini, tetapi bukan token gas. Biaya protokol yang dibayar dalam stablecoin dikonversi menjadi ARC secara otomatis, lalu dibagi antara imbalan staking dan pembakaran permanen. ARC belum diluncurkan.',
+        3: 'Arc memadukan Malachite — implementasi Tendermint BFT dalam Rust — dengan lapisan eksekusi Reth. Finalitasnya deterministik dan di bawah satu detik: begitu blok dikomit, blok itu final, tanpa reorg dan tanpa menunggu konfirmasi. Inilah salah satu sifat yang dibawa mainnet publik Arc saat dibuka.',
+        4: 'ARC adalah token koordinasi yang direncanakan untuk Arc — bukan token gas, karena gas tetap dibayar dengan USDC. Menurut rancangannya, biaya protokol dikonversi menjadi ARC dan disalurkan ke validator dan staker, dengan sebagian dibakar. Mainnet dibuka tanpanya: ARC belum diluncurkan, dan Circle menyebut rencana token apa pun masih bersifat eksploratif.',
         5: 'Taruhan terbesar Arc adalah ekonomi agentik — agen AI yang membayar sendiri komputasi, data, dan layanan. Itu memerlukan pembayaran di bawah satu sen, diselesaikan dalam USDC lewat standar terbuka seperti x402.',
         6: 'x402 adalah standar terbuka tersebut. Ia menghidupkan kembali kode status HTTP 402, "Payment Required": alih-alih galat, server menjawab dengan harga. Klien membayar dalam USDC lalu mengulang permintaannya, dan sebuah fasilitator memverifikasi pembayaran on-chain. Tanpa akun, tanpa kartu, tanpa manusia di tengahnya.',
         7: 'Jalur kartu tidak bisa menetapkan harga untuk satu panggilan API. Mereka mengenakan biaya tetap per transaksi — kira-kira beberapa sen ditambah persentase — sehingga sesuatu yang bernilai satu sen lebih mahal untuk ditagih daripada hasilnya. Jalur stablecoin menghargai satu transfer dalam pecahan sen, dan itulah yang membuat bayar-per-panggilan menjadi mungkin.',
@@ -377,11 +377,11 @@ I18n.register('id', {
         12: 'Stablecoin tidak harus berupa dolar. Circle juga menerbitkan EURC, token euro dengan model cadangan yang sama, dan Arc dirancang untuk beberapa mata uang sekaligus — karena jaringan pembayaran yang hanya bicara satu mata uang akan berhenti di perbatasan pertama.',
         13: 'Pertukaran mata uang adalah titik di mana pembayaran biasanya patah: satu pihak mengirim lalu menunggu, terekspos, menanti pihak lain. Mesin FX Arc mengutip harga di luar chain dan menyelesaikan kedua kaki transaksi di dalam satu kontrak, sehingga kedua transfer terjadi atau tidak sama sekali. Tidak ada kaki yang menggantung.',
         14: 'Buku besar publik adalah masalah bagi bisnis — pesaing bisa membaca setiap faktur. Jawaban Arc adalah transfer rahasia yang bersifat opsional: nominal dienkripsi sementara alamat tetap terlihat, dan para pihak dapat mengungkap detailnya kepada auditor atau regulator bila diperlukan. Tertutup dari pesaing, tidak dari hukum.',
-        15: 'Seseorang harus mengurutkan transaksi. Arc dimulai dengan himpunan validator berizin — institusi yang dikenal dan bisa dimintai pertanggungjawaban — lalu membuka diri seiring waktu. Ini pertukaran yang disengaja: lebih sedikit validator di awal, ditukar dengan nama-nama yang bisa Anda mintai tanggung jawab.',
+        15: 'Seseorang harus mengurutkan transaksi. Mainnet Arc dibuka dengan himpunan validator pendiri yang berizin — di antaranya Visa, Mastercard, BlackRock, DTCC, dan Standard Chartered. Ini pertukaran yang disengaja: lebih sedikit validator di awal, ditukar dengan nama-nama yang bisa Anda mintai tanggung jawab, dengan peralihan ke staking terbuka yang direncanakan belakangan.',
         16: 'Transfer lintas negara melompat lewat bank koresponden, masing-masing dengan batas waktu operasionalnya sendiri, sehingga uang bisa menganggur berhari-hari saat akhir pekan. Jalur stablecoin tidak mengenal jam kantor: transfer yang sama selesai dalam hitungan detik, kapan saja, dengan biaya yang sudah diketahui sebelum Anda mengirim.',
-        17: 'Testnet Arc tidak kosong. Lebih dari seratus institusi — bank, perusahaan pembayaran, manajer aset — telah menjalankan alur transaksi di sana sejak dibuka pada Oktober 2025. Begitulah seharusnya sebuah jaringan pembayaran diuji: dengan proses nyata milik orang lain, sebelum uang nyata siapa pun masuk.',
+        17: 'Arc tidak dibuka begitu saja. Testnet-nya berjalan sejak Oktober 2025, lalu mainnet privat dengan lebih dari seratus pembangun dari institusi dan ekosistem, sebelum peluncuran publik pada September 2026. Begitulah seharusnya sebuah jaringan pembayaran diuji: dengan proses nyata milik orang lain, sebelum uang nyata siapa pun masuk.',
         18: 'Tidak ada chargeback untuk transfer yang sudah tuntas. Salah kirim alamat dan tidak ada meja bantuan yang bisa menariknya kembali — finalitas yang membuat setelmen cepat juga membuat kesalahan menjadi permanen. Karena itulah batas belanja, izin nominal, dan jaringan uji ada: Anda memeriksa sebelumnya, karena tidak ada sesudahnya.',
-        19: 'Arc masih berupa testnet publik. Beta mainnet akan datang setelah pengujian dan pekerjaan regulasi rampung, himpunan validator melebar dari sana, dan token ARC pun masih di depan. Anda selama ini bermain di jaringan yang sedang dibangun — dan hanya pada saat itulah Anda bisa menyaksikan sebuah jaringan dibangun.',
+        19: 'Mainnet publik Arc aktif pada 16 September 2026: gas dalam USDC, finalitas di bawah satu detik, dan himpunan validator pendiri yang berizin. Yang masih di depan adalah token ARC dan peralihan dari Proof-of-Authority ke Proof-of-Stake yang hendak diwujudkannya. Anda menempuh jalan ini di Arc Testnet selagi jaringannya dibangun — dan jalan itu berakhir tepat di tempat mainnet dimulai.',
         20: 'Seluruh game ini adalah satu gagasan: sebuah pembayaran belum selesai ketika dikirim, ia selesai ketika sudah final. Setelmen adalah saat ia tidak lagi bisa dibatalkan. Gas berbasis stablecoin ditambah finalitas deterministik di bawah satu detik itulah yang membuat saat tersebut tiba dalam kecepatan mesin — dan persis itulah yang selama ini Anda bidik.'
     },
 
@@ -407,11 +407,11 @@ I18n.register('id', {
             ]
         },
         4: {
-            question: 'Apa yang terjadi pada biaya yang Anda bayar di Arc?',
+            question: 'Bagaimana ARC dirancang berkaitan dengan biaya yang dibayar di Arc?',
             answers: [
-                'Dikonversi menjadi ARC di tingkat protokol, lalu sebagian dibakar',
-                'Dibayarkan langsung ke Circle sebagai pendapatan perusahaan',
-                'Dikembalikan ke pengirim di akhir setiap blok'
+                'Biaya dikonversi menjadi ARC untuk validator dan staker, dan sebagian dibakar',
+                'ARC menggantikan USDC sebagai token gas saat mainnet dibuka',
+                'Biaya dibayarkan langsung ke Circle sebagai pendapatan perusahaan'
             ]
         },
         5: {
@@ -511,10 +511,10 @@ I18n.register('id', {
             ]
         },
         17: {
-            question: 'Siapa yang memakai testnet Arc sejak dibuka?',
+            question: 'Siapa yang memakai Arc sebelum mainnet publiknya dibuka?',
             answers: [
-                'Tidak ada — itu demo privat di dalam Circle',
-                'Lebih dari seratus institusi yang menjalankan alur pembayaran nyata dengan uang uji',
+                'Tidak ada — jaringan baru dinyalakan pertama kali saat peluncuran',
+                'Lebih dari seratus institusi dan pembangun, di testnet lalu di mainnet privat',
                 'Hanya pemain ritel di game seperti ini'
             ]
         },
@@ -529,9 +529,9 @@ I18n.register('id', {
         19: {
             question: 'Arc sedang berada di tahap apa sekarang?',
             answers: [
-                'Testnet publik, dengan beta mainnet yang masih di depan',
-                'Mainnet yang sepenuhnya diluncurkan dengan token ARC yang sudah diperdagangkan',
-                'Sebuah whitepaper tanpa jaringan yang berjalan'
+                'Mainnet publik sejak September 2026, dengan token ARC yang masih di depan',
+                'Testnet tanpa tanggal mainnet yang diumumkan',
+                'Mainnet yang berjalan dengan ARC sebagai token gas'
             ]
         },
         20: {
@@ -757,7 +757,7 @@ I18n.register('id', {
         },
         network: {
             title: 'Jaringan macam apa Arc itu',
-            hint: 'Arc adalah Layer-1: ia menyelesaikan setelmen bloknya sendiri alih-alih mengirimkannya ke chain milik orang lain. Ia kompatibel dengan EVM, jadi kontrak dan perkakas yang ditulis untuk Ethereum berjalan tanpa perubahan. Dan ia masih berupa testnet publik — perangkat lunak sungguhan yang berjalan dengan uang yang tak bernilai, dan justru saat itulah Anda ingin menemukan bugnya.',
+            hint: 'Arc adalah Layer-1: ia menyelesaikan setelmen bloknya sendiri alih-alih mengirimkannya ke chain milik orang lain. Ia kompatibel dengan EVM, jadi kontrak dan perkakas yang ditulis untuk Ethereum berjalan tanpa perubahan. Mainnet publiknya dibuka pada September 2026, tetapi aplikasi masih berlatih di testnet — perangkat lunak sungguhan dengan uang yang tak bernilai, dan justru di situlah Anda ingin menemukan bugnya.',
             questions: [
                 {
                     question: 'Apa arti kompatibel dengan EVM dalam praktik?',

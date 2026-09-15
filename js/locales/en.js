@@ -365,10 +365,10 @@ I18n.register('en', {
 
     // --- Educational screens (js/infoScreens.js) ---
     info: {
-        1: 'Arc is an open Layer-1 blockchain from Circle, the company that issues USDC. It is EVM-compatible and purpose-built for stablecoin finance. Today Arc runs as a public testnet — the same network this game is played on.',
+        1: "Arc is an open Layer-1 blockchain from Circle, the company that issues USDC. It is EVM-compatible and purpose-built for stablecoin finance. Its public mainnet opened on 16 September 2026; this game's scores and certificates still settle on Arc Testnet, where playing costs nothing.",
         2: 'On Arc, gas is paid in USDC instead of a volatile token. Fees are quoted directly in dollars and average around $0.005 per transaction, so anyone can budget them like a normal cost.',
-        3: 'Arc pairs Malachite — a Rust implementation of Tendermint BFT — with a Reth execution layer. On the public testnet blocks land roughly every 0.5 seconds, and finality is deterministic and sub-second: no reorgs, no waiting for confirmations.',
-        4: "ARC is the network's native token, but it is not the gas token. Protocol fees paid in stablecoins are converted into ARC automatically, then split between staking rewards and a permanent burn. ARC has not launched yet.",
+        3: "Arc pairs Malachite — a Rust implementation of Tendermint BFT — with a Reth execution layer. Finality is deterministic and sub-second: once a block is committed it is final, with no reorgs and no confirmations to wait for. It is one of the properties Arc's public mainnet opened with.",
+        4: "ARC is Arc's planned coordination token — not its gas, which stays payable in USDC. By design, protocol fees are converted into ARC and routed to validators and stakers, with a portion burned. Mainnet opened without it: ARC has not launched, and Circle describes any token plans as exploratory.",
         5: "Arc's biggest bet is the agentic economy — AI agents paying for compute, data and services on their own. That needs payments smaller than a cent, settled in USDC over open standards like x402.",
         6: "x402 is that open standard. It revives HTTP status code 402, 'Payment Required': instead of an error, the server answers with a price. The client pays in USDC and repeats the request, and a facilitator verifies the payment onchain. No account, no card, no human in the loop.",
         7: 'Card rails cannot price a single API call. They charge a fixed fee per transaction — roughly a few cents plus a percentage — so anything worth a cent costs more to collect than it earns. Stablecoin rails price a transfer in fractions of a cent, which is what makes pay-per-call possible.',
@@ -379,11 +379,11 @@ I18n.register('en', {
         12: 'A stablecoin does not have to be a dollar. Circle also issues EURC, a euro token with the same reserve model, and Arc is designed for several currencies at once — because a payment network that only speaks one currency stops at the first border.',
         13: "Swapping currencies is where payments usually break: one side sends and then waits, exposed, for the other. Arc's FX engine quotes off-chain and settles both legs inside a single contract, so either both transfers happen or neither does. No leg is ever left hanging.",
         14: "A public ledger is a problem for a business — competitors can read every invoice. Arc's answer is opt-in confidential transfers: amounts are encrypted while addresses stay visible, and the parties can disclose the details to an auditor or regulator when required. Private from rivals, not from the law.",
-        15: 'Someone has to order the transactions. Arc starts with a permissioned validator set — known, accountable institutions running the nodes — and opens up over time. It is a deliberate trade: fewer validators at the start, in exchange for names you can hold responsible.',
+        15: "Someone has to order the transactions. Arc's mainnet opened with a permissioned set of founding validators — among them Visa, Mastercard, BlackRock, DTCC and Standard Chartered. It is a deliberate trade: fewer validators at the start, in exchange for names you can hold responsible, with a move to open staking planned later.",
         16: 'A cross-border wire hops through correspondent banks, each with its own cut-off time, so money can sit idle for days over a weekend. Stablecoin rails do not keep office hours: the same transfer settles in seconds, at any hour, with the fee known before you send.',
-        17: "Arc's testnet is not empty. Over a hundred institutions — banks, payment firms, asset managers — have been running flows on it since it opened in October 2025, which is how a payment network is supposed to be tested: with other people's real processes, before anyone's real money.",
+        17: "Arc did not open cold. Its testnet ran from October 2025, then a private mainnet with over a hundred institutional and ecosystem builders, before the public launch in September 2026. That is how a payment network should be tested: with other people's real processes, before anyone's real money.",
         18: 'There is no chargeback on a settled transfer. Send to the wrong address and no support desk can pull it back — the same finality that makes settlement fast makes mistakes permanent. That is why spending limits, allowances and test networks exist: you check before, because there is no after.',
-        19: 'Arc is still a public testnet. Mainnet beta comes when the testing and the regulatory work are done, the validator set widens from there, and the ARC token is still ahead. You have been playing on the network while it is being built — which is the only time you can watch one being built.',
+        19: "Arc's public mainnet went live on 16 September 2026: gas in USDC, sub-second finality, and a permissioned set of founding validators. Still ahead are the ARC token and the move from Proof-of-Authority to Proof-of-Stake it is meant to enable. You walked this road on Arc Testnet while the network was being built — and it ends where mainnet begins.",
         20: 'This whole game is one idea: a payment is not done when it is sent, it is done when it is final. Settlement is the moment it can no longer be reversed. Stablecoin gas plus sub-second deterministic finality is what lets that moment arrive at machine speed — which is exactly what you have been aiming at.'
     },
 
@@ -410,11 +410,11 @@ I18n.register('en', {
             ]
         },
         4: {
-            question: 'What happens to the fees you pay on Arc?',
+            question: 'How is ARC designed to relate to the fees paid on Arc?',
             answers: [
-                'They are converted into ARC at the protocol level, then partly burned',
-                'They are paid straight to Circle as company revenue',
-                'They are refunded to the sender at the end of each block'
+                'Fees are converted into ARC for validators and stakers, and a portion is burned',
+                'ARC replaced USDC as the gas token when mainnet opened',
+                'Fees go straight to Circle as company revenue'
             ]
         },
         5: {
@@ -515,10 +515,10 @@ I18n.register('en', {
             ]
         },
         17: {
-            question: 'Who has been using the Arc testnet since it opened?',
+            question: 'Who used Arc before its public mainnet opened?',
             answers: [
-                'Nobody — it is a private demo inside Circle',
-                'Over a hundred institutions running real payment flows with test money',
+                'Nobody — the network was switched on for the first time at launch',
+                'Over a hundred institutions and builders, on testnet and then a private mainnet',
                 'Only retail players in games like this one'
             ]
         },
@@ -533,9 +533,9 @@ I18n.register('en', {
         19: {
             question: 'What stage is Arc at right now?',
             answers: [
-                'A public testnet, with mainnet beta still ahead',
-                'Fully launched mainnet with the ARC token trading',
-                'A whitepaper with no running network'
+                'Public mainnet since September 2026, with the ARC token still ahead',
+                'A testnet with no mainnet date announced',
+                'Mainnet running with ARC as its gas token'
             ]
         },
         20: {
@@ -762,7 +762,7 @@ I18n.register('en', {
         },
         network: {
             title: 'What kind of network Arc is',
-            hint: 'Arc is a Layer-1: it settles its own blocks rather than posting them to somebody else’s chain. It is EVM-compatible, so contracts and tools written for Ethereum work on it unchanged. And it is still a public testnet — the real software running with money that is worth nothing, which is exactly when you want to find the bugs.',
+            hint: "Arc is a Layer-1: it settles its own blocks rather than posting them to somebody else's chain. It is EVM-compatible, so contracts and tools written for Ethereum work on it unchanged. Its public mainnet opened in September 2026, but a testnet is still where apps rehearse — the real software with money that is worth nothing, which is exactly where you want to find the bugs.",
             questions: [
                 {
                     question: 'What does EVM-compatible mean in practice?',
