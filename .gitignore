@@ -24,3 +24,7 @@ build/
 
 # Quiz answer key — deployed to the server like .env, never committed
 private/
+
+# Contract toolchain build output
+chain/artifacts/
+chain/cache/
