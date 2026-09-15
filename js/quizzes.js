@@ -38,11 +38,11 @@ const QUIZZES = [
     },
     {
         id: 4, // For level 4
-        question: "What happens to the fees you pay on Arc?",
+        question: "How is ARC designed to relate to the fees paid on Arc?",
         answers: [
-            "They are converted into ARC at the protocol level, then partly burned",
-            "They are paid straight to Circle as company revenue",
-            "They are refunded to the sender at the end of each block"
+            "Fees are converted into ARC for validators and stakers, and a portion is burned",
+            "ARC replaced USDC as the gas token when mainnet opened",
+            "Fees go straight to Circle as company revenue"
         ]
     },
     {
@@ -155,10 +155,10 @@ const QUIZZES = [
     },
     {
         id: 17, // For level 17
-        question: "Who has been using the Arc testnet since it opened?",
+        question: "Who used Arc before its public mainnet opened?",
         answers: [
-            "Nobody — it is a private demo inside Circle",
-            "Over a hundred institutions running real payment flows with test money",
+            "Nobody — the network was switched on for the first time at launch",
+            "Over a hundred institutions and builders, on testnet and then a private mainnet",
             "Only retail players in games like this one"
         ]
     },
@@ -175,9 +175,9 @@ const QUIZZES = [
         id: 19, // For level 19
         question: "What stage is Arc at right now?",
         answers: [
-            "A public testnet, with mainnet beta still ahead",
-            "Fully launched mainnet with the ARC token trading",
-            "A whitepaper with no running network"
+            "Public mainnet since September 2026, with the ARC token still ahead",
+            "A testnet with no mainnet date announced",
+            "Mainnet running with ARC as its gas token"
         ]
     },
     {

@@ -6,7 +6,7 @@
 const INFO_SCREENS = [
     {
         id: 1, // After level 1
-        text: "Arc is an open Layer-1 blockchain from Circle, the company that issues USDC. It is EVM-compatible and purpose-built for stablecoin finance. Today Arc runs as a public testnet — the same network this game is played on."
+        text: "Arc is an open Layer-1 blockchain from Circle, the company that issues USDC. It is EVM-compatible and purpose-built for stablecoin finance. Its public mainnet opened on 16 September 2026; this game's scores and certificates still settle on Arc Testnet, where playing costs nothing."
     },
     {
         id: 2, // After level 2
@@ -14,11 +14,11 @@ const INFO_SCREENS = [
     },
     {
         id: 3, // After level 3
-        text: "Arc pairs Malachite — a Rust implementation of Tendermint BFT — with a Reth execution layer. On the public testnet blocks land roughly every 0.5 seconds, and finality is deterministic and sub-second: no reorgs, no waiting for confirmations."
+        text: "Arc pairs Malachite — a Rust implementation of Tendermint BFT — with a Reth execution layer. Finality is deterministic and sub-second: once a block is committed it is final, with no reorgs and no confirmations to wait for. It is one of the properties Arc's public mainnet opened with."
     },
     {
         id: 4, // After level 4
-        text: "ARC is the network's native token, but it is not the gas token. Protocol fees paid in stablecoins are converted into ARC automatically, then split between staking rewards and a permanent burn. ARC has not launched yet."
+        text: "ARC is Arc's planned coordination token — not its gas, which stays payable in USDC. By design, protocol fees are converted into ARC and routed to validators and stakers, with a portion burned. Mainnet opened without it: ARC has not launched, and Circle describes any token plans as exploratory."
     },
     {
         id: 5, // After level 5
@@ -62,7 +62,7 @@ const INFO_SCREENS = [
     },
     {
         id: 15, // After level 15
-        text: "Someone has to order the transactions. Arc starts with a permissioned validator set — known, accountable institutions running the nodes — and opens up over time. It is a deliberate trade: fewer validators at the start, in exchange for names you can hold responsible."
+        text: "Someone has to order the transactions. Arc's mainnet opened with a permissioned set of founding validators — among them Visa, Mastercard, BlackRock, DTCC and Standard Chartered. It is a deliberate trade: fewer validators at the start, in exchange for names you can hold responsible, with a move to open staking planned later."
     },
     {
         id: 16, // After level 16
@@ -70,7 +70,7 @@ const INFO_SCREENS = [
     },
     {
         id: 17, // After level 17
-        text: "Arc's testnet is not empty. Over a hundred institutions — banks, payment firms, asset managers — have been running flows on it since it opened in October 2025, which is how a payment network is supposed to be tested: with other people's real processes, before anyone's real money."
+        text: "Arc did not open cold. Its testnet ran from October 2025, then a private mainnet with over a hundred institutional and ecosystem builders, before the public launch in September 2026. That is how a payment network should be tested: with other people's real processes, before anyone's real money."
     },
     {
         id: 18, // After level 18
@@ -78,7 +78,7 @@ const INFO_SCREENS = [
     },
     {
         id: 19, // After level 19
-        text: "Arc is still a public testnet. Mainnet beta comes when the testing and the regulatory work are done, the validator set widens from there, and the ARC token is still ahead. You have been playing on the network while it is being built — which is the only time you can watch one being built."
+        text: "Arc's public mainnet went live on 16 September 2026: gas in USDC, sub-second finality, and a permissioned set of founding validators. Still ahead are the ARC token and the move from Proof-of-Authority to Proof-of-Stake it is meant to enable. You walked this road on Arc Testnet while the network was being built — and it ends where mainnet begins."
     },
     {
         id: 20, // After level 20

@@ -234,7 +234,7 @@ const RESCUE_TOPICS = [
     {
         id: 'network',
         title: 'What kind of network Arc is',
-        hint: "Arc is a Layer-1: it settles its own blocks rather than posting them to somebody else's chain. It is EVM-compatible, so contracts and tools written for Ethereum work on it unchanged. And it is still a public testnet — the real software running with money that is worth nothing, which is exactly when you want to find the bugs.",
+        hint: "Arc is a Layer-1: it settles its own blocks rather than posting them to somebody else's chain. It is EVM-compatible, so contracts and tools written for Ethereum work on it unchanged. Its public mainnet opened in September 2026, but a testnet is still where apps rehearse — the real software with money that is worth nothing, which is exactly where you want to find the bugs.",
         questions: [
             {
                 question: "What does EVM-compatible mean in practice?",

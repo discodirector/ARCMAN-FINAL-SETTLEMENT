@@ -161,7 +161,7 @@ files ship to every browser. The server grades answers, see [Server-side quizzes
 
 | File | Shown | Contents |
 |---|---|---|
-| `js/infoScreens.js` | After every level | 20 short explainers — Arc, USDC as gas, finality, the ARC token, x402, agent wallets, CCTP, reserves, minting, EURC, FX settlement, confidential transfers, validators, cross-border payments, irreversibility, the road to mainnet |
+| `js/infoScreens.js` | After every level | 20 short explainers — Arc, USDC as gas, finality, the ARC token, x402, agent wallets, CCTP, reserves, minting, EURC, FX settlement, confidential transfers, validators, cross-border payments, irreversibility, the mainnet launch |
 | `js/quizzes.js` | Right after that level's info screen | 20 questions, one per level, each checking the screen just read |
 | `js/rescueTopics.js` | When the last life is lost | 8 topics, each with a hint and three questions — none repeated from the level quizzes |
 
@@ -173,8 +173,9 @@ Rules that keep this consistent:
 - A rescue topic is `{ id, title, hint, questions: [ …3… ] }`. Adding one to the array puts it in the
   draw; add its wording to the packs in `js/locales/`, or it shows in English.
 
-Content was checked against Arc, Circle and x402 public materials as of September 2026. Arc is a
-public testnet; claims about mainnet, the validator set or the ARC token describe announced plans.
+Content was checked against Arc, Circle and x402 public materials as of September 2026. Arc's public
+mainnet opened on 16 September 2026; claims about the ARC token and the move to Proof-of-Stake
+describe announced plans — ARC has not launched.
 
 ---
 
@@ -401,7 +402,8 @@ the same process.
 
 ## Project notes
 
-- **Arc is a testnet.** Everything on-chain here uses test USDC with no value.
+- **The game runs on Arc Testnet.** Arc's public mainnet opened on 16 September 2026, but the game's
+  contracts are still on testnet, so everything on-chain here uses test USDC with no value.
 - **Retired modes.** Immortal mode was removed; Tournament is the only scored mode. The Agent Shift
   mode was retired from the game, but `js/agent.js`, `agentShift.js`, `agentWallet.js`,
   `agentOnboarding.js` and `agentMode.js` stay in the tree with their markup and styles. No script tag
