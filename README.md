@@ -142,8 +142,10 @@ All coordinates are relative (0–1) and scaled to the canvas at load time.
 
 1. Append the level to `DEFAULT_LEVELS` in `levels.js` with the next `id`.
 2. Add an info screen to `js/infoScreens.js` and a quiz to `js/quizzes.js` with **the same `id`**.
-3. Add the wording to every pack in `js/locales/` (English is the fallback until then).
-4. **Restart the backend.** `server.js` reads `levels.js` at startup to know how many levels a run has
+3. Add the quiz's correct answer to `private/answer-key.json` on the server — see
+   [Learning content](#learning-content).
+4. Add the wording to every pack in `js/locales/` (English is the fallback until then).
+5. **Restart the backend.** `server.js` reads `levels.js` at startup to know how many levels a run has
    and how many objects each level can report; a stale process rejects finalization of the new run.
 
 The Level Editor's **Export** writes out `DEFAULT_LEVELS` in this same format, so a level can be built
@@ -153,8 +155,9 @@ visually and pasted in.
 
 ## Learning content
 
-Everything the game teaches lives in three data files. They hold the English source, the ids, the
-answer order and `correctIndex`; translations carry wording only.
+Everything the game teaches lives in three data files. They hold the English source, the ids and the
+answer order; translations carry wording only. **Which answer is right is not in any of them** — those
+files ship to every browser. The server grades answers, see [Server-side quizzes](#server-side-quizzes).
 
 | File | Shown | Contents |
 |---|---|---|
@@ -165,7 +168,7 @@ answer order and `correctIndex`; translations carry wording only.
 Rules that keep this consistent:
 
 - An info screen and its quiz share the level's `id`.
-- Every quiz has exactly three answers and a `correctIndex` of 0–2.
+- Every quiz has exactly three answers, and its correct answer is listed in `private/answer-key.json`.
 - Every rescue answer must be findable in its own hint — the rescue is meant to be won by reading.
 - A rescue topic is `{ id, title, hint, questions: [ …3… ] }`. Adding one to the array puts it in the
   draw; add its wording to the packs in `js/locales/`, or it shows in English.
@@ -186,7 +189,8 @@ first visit the browser language decides.
 - `I18n.t(key, params)` — also the global `t()` — looks the key up in the current pack, falls back to
   English, then to the key itself, so an unfinished pack shows English rather than blank UI.
 - `I18n.levelName()`, `I18n.infoText()`, `I18n.quiz()`, `I18n.rescueTopic()` return translated game
-  content. They never translate `correctIndex`, so which answer is right cannot depend on the language.
+  content — wording only, always in source order, since the server's shuffled order refers to those
+  positions.
 - Static markup uses `data-i18n` (plus `-html`, `-placeholder`, `-value`, `-title`) and is rewritten by
   `I18n.apply()`; screens built in JavaScript re-render through `I18n.onChange()`.
 - `'Tournament'` and `'Community'` are contract values and are never translated.
@@ -207,7 +211,9 @@ Plain JavaScript, no framework and no build step. Modules are loaded by `<script
 index.html            markup, styles, canvas, every overlay and screen
 levels.js             DEFAULT_LEVELS and LevelManager (also read by server.js)
 communityLevels.js    approved community levels
-server.js             Express: static files, anti-cheat sessions, score signing, level submissions
+server.js             Express: public files, anti-cheat sessions, score signing, level submissions
+server/quizService.js server-side quiz grading
+private/              answer-key.json — never committed, deployed to the server like .env
 contract.sol          USDCLaunchScore — signature check, best scores, leaderboards
 nftContract.sol       ARCMANCompletionNFT — ERC-721 completion certificate
 js/
@@ -245,17 +251,28 @@ Browser storage keys: `arcman_language`, `arcman_player_stats`, `usdc_launch_cus
 The client never submits a score. It reports what happened; the server decides what it was worth.
 
 ```
-POST /api/session/start     { player, gameMode }             -> { sessionId, totalLevels }
+POST /api/session/start     { player?, gameMode }            -> { sessionId, totalLevels }
 POST /api/session/event     { sessionId, eventType }         levelStart | gatePassed | cloudPassed |
                                                              barrierHit | levelComplete
 POST /api/session/finalize  { sessionId, nonce }             -> { score, signature, signerAddress }
 POST /api/submit-level      { level }                        community submission (Telegram notice)
-GET  /api/health                                             -> { status: "ok" }
+POST /api/quiz/level/start  { sessionId, levelId }           -> { order }
+POST /api/quiz/level/answer { sessionId, levelId, choice }   -> { correct, correctPosition }
+POST /api/quiz/rescue/start { sessionId }                    -> { topicId, orders }
+POST /api/quiz/rescue/answer{ sessionId, index, choice }     -> { correct, correctPosition,
+                                                                  done?, correctCount?, lives? }
+GET  /api/health                                             -> { status: "ok", quizzes: "ok" }
 ```
+
+Every tournament run gets a session. A wallet is optional; only a session started with one can be
+finalized.
 
 Checks the server applies:
 
-- one active session per player, bound to the IP that started it, expiring after an hour
+- one active session per wallet; walletless runs are capped at 20 per IP, the oldest dropped first
+- every session is bound to the IP that started it and expires after an hour. The server trusts
+  `X-Forwarded-For` only from a loopback proxy, so behind the reverse proxy `req.ip` is the player's
+  address and cannot be spoofed by a direct request
 - events are capped per level by that level's real object counts in `levels.js`
 - no event within 0.5 s of a level starting, and no level completed in under 3 s
 - finalization needs every level completed, a total time of at least 3 s per level, and a 60 s
@@ -266,6 +283,38 @@ The server then signs
 `keccak256(abi.encodePacked(player, score, levelId, nonce, gameMode))` with the Ethereum signed-message
 prefix, where `levelId` is the number of levels completed. The contract recovers the signer and
 accepts the score only if it matches its configured server signer.
+
+Only the game itself is served publicly — `index.html`, `levels.js`, `communityLevels.js`, `js/`,
+`images/` and `audio/`. `server.js`, the package files, `server/` and `private/` return 404.
+
+### Server-side quizzes
+
+The browser knows every question and the wording of every answer, never which one is right.
+
+- **Level quiz.** `level/start` opens the quiz only for a level this session has completed on the
+  server, and returns the order to show its answers in. `level/answer` grades the chosen on-screen
+  position, once, and says which position was right. A correct answer restores a life.
+- **Rescue quiz.** The server draws the topic (never the same one twice in a row from an IP), shuffles
+  each question, grades the three answers in order and returns the verdict: 3 of 3 → 3 lives,
+  2 of 3 → 1, otherwise none. Once per session.
+- **Shuffled per session**, so "the right answer is the second one" does not travel between players.
+- **If the server is unreachable**, the level quiz does not count and the run continues; the rescue
+  cannot be graded and the run restarts from level 1.
+
+The answers live in `private/answer-key.json`, as the **exact English text** of each correct answer:
+
+```json
+{
+  "level":  { "1": "An EVM-compatible Layer-1 built by Circle for stablecoin finance", "...": "..." },
+  "rescue": { "stablecoin": ["…answer to question 1…", "…2…", "…3…"], "...": ["..."] }
+}
+```
+
+Text rather than positions means reordering answers in the content keeps working. If the key and the
+content disagree — a quiz without an answer, or a correct answer reworded in `js/quizzes.js` but not in
+the key — the server logs `QUIZZES UNAVAILABLE`, `/api/health` reports `"quizzes": "unavailable"`,
+and the rest of the backend keeps running. The file is never committed: the repository is public.
+`ANSWER_KEY_PATH` overrides its location.
 
 ---
 
@@ -317,12 +366,16 @@ Without `PRIVATE_KEY` the server generates a throwaway key on each start — the
 finalization will be rejected by the deployed contract. `npm run get-address` prints the signer
 address for the key in `.env`.
 
-**Point the client at your backend.** `js/config.js` ships with `API_URL: 'https://arcmangame.com'`.
-For a local backend set it to `http://localhost:3000`, and do not commit that change.
+**Quizzes need the answer key.** Put `answer-key.json` in `private/` (ask a maintainer for it). Without
+it the game runs, but every quiz reports that the server did not answer.
 
-**Serve over HTTP, not `file://`.** Wallet extensions do not inject into local files. If you only need
-the game and not the backend, any static server works (`python3 -m http.server 8000`), but sessions
-and on-chain finalization will be unavailable.
+**The client talks to the backend that served it.** `API_URL` in `js/config.js` resolves to the page's
+own origin, so `npm start` on `http://localhost:3000` just works. Opened from a file, it falls back to
+production.
+
+**Serve over HTTP, not `file://`.** Wallet extensions do not inject into local files. A plain static
+server (`python3 -m http.server 8000`) runs the game, but without the backend there are no sessions,
+no quizzes and no on-chain finalization.
 
 `npm run dev` runs the server under nodemon.
 
@@ -335,15 +388,14 @@ the same process.
 
 1. Copy the repository files to the server, **excluding** `.git/`, `node_modules/` and `.env`. The
    server keeps its own `.env` with the signing key — never overwrite it and never commit it.
+   `private/answer-key.json` is deployed the same way: kept on the server, never in git. Update it
+   whenever a quiz is added or a correct answer is reworded.
 2. Run `npm install` if `package.json` changed.
 3. **Restart the Node process** (for example `systemctl restart <service>`). Static files are picked up
    immediately, but `levels.js` is read once at startup — a process that still believes the run has a
    different number of levels rejects every finalization.
-4. Check `/api/health`, then load the site and confirm the new files are served. Browsers cache
-   `js/*.js` aggressively; test with a hard reload.
-
-Keep `API_URL` in `js/config.js` set to the production URL on `main`, so the repository can be
-deployed as it is.
+4. Check `/api/health` — it must say `"quizzes": "ok"` — then load the site and confirm the new files
+   are served. Browsers cache `js/*.js` aggressively; test with a hard reload.
 
 ---
 

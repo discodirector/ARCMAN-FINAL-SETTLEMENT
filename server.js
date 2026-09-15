@@ -10,16 +10,32 @@ const axios = require('axios');
 const crypto = require('crypto');
 
 const app = express();
+
+// The server sits behind a reverse proxy on the same machine. Trusting only the
+// loopback proxy makes req.ip the player's address from X-Forwarded-For, while a
+// request that reaches Node directly cannot spoof it. Without this every player
+// shares the proxy's address and the per-session IP binding checks nothing.
+app.set('trust proxy', 'loopback');
+
 app.use(cors());
 app.use(express.json());
 
-// Serve static files from the current directory
-app.use(express.static(__dirname));
+// Only the game itself is public. server.js, the package files, the contracts,
+// the server modules and the private answer key live in the same directory and
+// must never be served.
+for (const dir of ['js', 'images', 'audio']) {
+    app.use('/' + dir, express.static(path.join(__dirname, dir)));
+}
+for (const file of ['index.html', 'levels.js', 'communityLevels.js']) {
+    app.get('/' + file, (req, res) => res.sendFile(path.join(__dirname, file)));
+}
 
 // Serve index.html at root
 app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, 'index.html'));
 });
+
+const getIp = (req) => req.ip;
 
 // ------------------------------------------------------------
 // Anti-cheat: Session-based score verification
@@ -32,6 +48,7 @@ const playerActiveSessions = new Map(); // player (lowercase) -> sessionId
 const playerLastFinalize = new Map();   // player (lowercase) -> timestamp
 
 const SESSION_EXPIRY_MS = 60 * 60 * 1000; // 1 hour
+const MAX_ANONYMOUS_SESSIONS_PER_IP = 20;  // walletless runs; oldest is dropped past this
 const MIN_SECONDS_PER_LEVEL = 3;
 const FINALIZE_COOLDOWN_MS = 60 * 1000;   // 60s between finalizations
 
@@ -125,11 +142,13 @@ app.post('/api/session/start', (req, res) => {
     try {
         const { player, gameMode } = req.body;
 
-        if (!player || !gameMode) {
+        if (!gameMode) {
             return res.status(400).json({ error: 'Missing required fields' });
         }
 
-        if (!ethers.isAddress(player)) {
+        // A wallet is optional: the quizzes need a session for every run, while
+        // only a session with a wallet can be finalized on-chain.
+        if (player && !ethers.isAddress(player)) {
             return res.status(400).json({ error: 'Invalid player address' });
         }
 
@@ -138,20 +157,31 @@ app.post('/api/session/start', (req, res) => {
             return res.status(400).json({ error: 'Invalid game mode' });
         }
 
-        const normalizedPlayer = player.toLowerCase();
+        const normalizedPlayer = player ? player.toLowerCase() : null;
+        const ip = getIp(req);
 
-        // Invalidate any existing session for this player
-        const existingSessionId = playerActiveSessions.get(normalizedPlayer);
-        if (existingSessionId) {
-            sessions.delete(existingSessionId);
+        if (normalizedPlayer) {
+            // Invalidate any existing session for this player
+            const existingSessionId = playerActiveSessions.get(normalizedPlayer);
+            if (existingSessionId) {
+                sessions.delete(existingSessionId);
+            }
+        } else {
+            // Bound walletless sessions per address; a shared IP never gets
+            // locked out, the oldest run is simply forgotten
+            const mine = [...sessions.values()]
+                .filter(s => !s.normalizedPlayer && s.ip === ip)
+                .sort((a, b) => a.startTime - b.startTime);
+            while (mine.length >= MAX_ANONYMOUS_SESSIONS_PER_IP) {
+                sessions.delete(mine.shift().sessionId);
+            }
         }
 
         const sessionId = crypto.randomUUID();
-        const ip = req.ip || req.connection.remoteAddress;
 
         const session = {
             sessionId,
-            player,                    // original-case address for signing
+            player: player || null,    // original-case address for signing; null for walletless runs
             normalizedPlayer,          // lowercase for map lookups
             gameMode: validGameMode,
             startTime: Date.now(),
@@ -163,9 +193,11 @@ app.post('/api/session/start', (req, res) => {
         };
 
         sessions.set(sessionId, session);
-        playerActiveSessions.set(normalizedPlayer, sessionId);
+        if (normalizedPlayer) {
+            playerActiveSessions.set(normalizedPlayer, sessionId);
+        }
 
-        console.log(`Session started: ${sessionId} for ${player} (${validGameMode})`);
+        console.log(`Session started: ${sessionId} for ${player || 'a walletless run'} (${validGameMode})`);
         res.json({ success: true, sessionId, totalLevels: TOTAL_DEFAULT_LEVELS });
     } catch (error) {
         console.error('Error starting session:', error);
@@ -191,7 +223,7 @@ app.post('/api/session/event', (req, res) => {
             return res.status(400).json({ error: 'Session already finalized' });
         }
 
-        const ip = req.ip || req.connection.remoteAddress;
+        const ip = getIp(req);
         if (session.ip !== ip) {
             return res.status(403).json({ error: 'Session IP mismatch' });
         }
@@ -299,7 +331,11 @@ app.post('/api/session/finalize', async (req, res) => {
             return res.status(400).json({ error: 'Session already finalized' });
         }
 
-        const ip = req.ip || req.connection.remoteAddress;
+        if (!session.player) {
+            return res.status(400).json({ error: 'Session has no wallet' });
+        }
+
+        const ip = getIp(req);
         if (session.ip !== ip) {
             return res.status(403).json({ error: 'Session IP mismatch' });
         }
@@ -495,9 +531,19 @@ app.post('/api/submit-level', async (req, res) => {
     }
 });
 
+// ------------------------------------------------------------
+// Quizzes: graded here, answers never sent to the browser
+// ------------------------------------------------------------
+
+const quizService = require('./server/quizService.js').registerQuizRoutes(app, {
+    sessions,
+    getIp,
+    sessionExpiryMs: SESSION_EXPIRY_MS,
+});
+
 // Health check
 app.get('/api/health', (req, res) => {
-    res.json({ status: 'ok' });
+    res.json({ status: 'ok', quizzes: quizService.isReady() ? 'ok' : 'unavailable' });
 });
 
 const PORT = process.env.PORT || 3000;

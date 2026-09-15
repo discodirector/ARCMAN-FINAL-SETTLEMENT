@@ -76,7 +76,11 @@ const GameConfig = {
             localhost: 1337
         },
         // Backend API URL
-        API_URL: 'https://arcmangame.com', // Production URL
+        // The backend serves the page and the API from one origin, so use whatever
+        // origin this page came from. Opened from a file, fall back to production.
+        API_URL: (typeof window !== 'undefined' && /^https?:$/.test(window.location.protocol))
+            ? window.location.origin
+            : 'https://arcmangame.com',
         // NFT image URL for the completion certificate
         // For development: use a local path (images/nft-tournament.png)
         // For production: replace with an IPFS/CDN URL (e.g., https://ipfs.io/ipfs/QmXx...)

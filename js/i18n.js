@@ -146,8 +146,8 @@ const I18n = {
     //
     // Levels, info screens and quizzes keep their English source in levels.js /
     // infoScreens.js / quizzes.js / rescueTopics.js — only the wording is
-    // translated here, so ids, correctIndex and level geometry stay in one
-    // place.
+    // translated here, so ids, answer order and level geometry stay in one
+    // place. Which answer is right lives only on the server.
 
     levelName: function (level) {
         if (!level) return '';
@@ -162,7 +162,7 @@ const I18n = {
     },
 
     // Returns { question, answers } — always three answers, in source order,
-    // so correctIndex keeps pointing at the right one.
+    // because the server's shuffled order refers to these positions.
     quiz: function (quiz) {
         if (!quiz) return null;
         const translated = this.lookup('quiz.' + quiz.id, this.current);
@@ -177,7 +177,8 @@ const I18n = {
         };
     },
 
-    // Returns { title, hint, questions: [{ question, answers, correctIndex }] }
+    // Returns { title, hint, questions: [{ question, answers }] } — wording only;
+    // grading happens on the server
     rescueTopic: function (topic) {
         if (!topic) return null;
         const translated = this.lookup('rescueTopics.' + topic.id, this.current);
@@ -192,8 +193,7 @@ const I18n = {
                 if (!tq) return q;
                 return {
                     question: tq.question || q.question,
-                    answers: q.answers.map((answer, j) => (tq.answers && tq.answers[j]) || answer),
-                    correctIndex: q.correctIndex
+                    answers: q.answers.map((answer, j) => (tq.answers && tq.answers[j]) || answer)
                 };
             })
         };

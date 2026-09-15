@@ -21,3 +21,6 @@ Thumbs.db
 # Build outputs
 dist/
 build/
+
+# Quiz answer key — deployed to the server like .env, never committed
+private/

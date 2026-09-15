@@ -8,6 +8,9 @@
 // js/quizzes.js — a player who has just failed should not be re-asked what
 // they already answered on the way here.
 //
+// The correct answers are not in this file: the server draws the topic, grades
+// every answer against private/answer-key.json and decides the lives handed back.
+//
 // Content verified against Arc / Circle / x402 public materials as of September 2026
 
 const RESCUE_TOPICS = [
@@ -22,8 +25,7 @@ const RESCUE_TOPICS = [
                     "Traders agree to keep it there",
                     "Every token can be redeemed for a dollar from the issuer",
                     "An algorithm buys and sells it to defend the peg"
-                ],
-                correctIndex: 1
+                ]
             },
             {
                 question: "Is holding USDC an investment in Circle?",
@@ -31,8 +33,7 @@ const RESCUE_TOPICS = [
                     "No — it is a claim on a dollar, not a share of the company",
                     "Yes, holders receive a cut of Circle's profits",
                     "Yes, it works like a corporate bond"
-                ],
-                correctIndex: 0
+                ]
             },
             {
                 question: "What does one-for-one redemption mean?",
@@ -40,8 +41,7 @@ const RESCUE_TOPICS = [
                     "One USDC always buys one of any other token",
                     "New tokens are minted only when others are burned",
                     "Hand back one token, receive one dollar"
-                ],
-                correctIndex: 2
+                ]
             }
         ]
     },
@@ -56,8 +56,7 @@ const RESCUE_TOPICS = [
                     "A deposit returned once the transaction confirms",
                     "The fee the network charges to process a transaction",
                     "A charge collected by your wallet provider"
-                ],
-                correctIndex: 1
+                ]
             },
             {
                 question: "Why does a business care that gas is paid in a stablecoin?",
@@ -65,8 +64,7 @@ const RESCUE_TOPICS = [
                     "The cost stays predictable in dollars",
                     "Transactions are processed faster",
                     "It removes the need to hold a wallet"
-                ],
-                correctIndex: 0
+                ]
             },
             {
                 question: "On a chain with a volatile gas token, what can happen to your fee while you wait?",
@@ -74,8 +72,7 @@ const RESCUE_TOPICS = [
                     "Nothing — fees are fixed in dollars",
                     "It is refunded if the price moves",
                     "It moves with the token's price"
-                ],
-                correctIndex: 2
+                ]
             }
         ]
     },
@@ -90,8 +87,7 @@ const RESCUE_TOPICS = [
                     "The transaction reached the mempool",
                     "The transaction can no longer be reversed",
                     "The fee has been paid in full"
-                ],
-                correctIndex: 1
+                ]
             },
             {
                 question: "Why do people wait for confirmations on some chains?",
@@ -99,8 +95,7 @@ const RESCUE_TOPICS = [
                     "A recent block can still be replaced",
                     "The network is slow to transmit the payment",
                     "The wallet needs time to synchronise"
-                ],
-                correctIndex: 0
+                ]
             },
             {
                 question: "What is a reorg?",
@@ -108,8 +103,7 @@ const RESCUE_TOPICS = [
                     "A wallet re-sorting the tokens it holds",
                     "Rewriting a deployed smart contract",
                     "Recently accepted blocks being replaced by a different chain"
-                ],
-                correctIndex: 2
+                ]
             }
         ]
     },
@@ -124,8 +118,7 @@ const RESCUE_TOPICS = [
                     "The coins themselves",
                     "A personal copy of the blockchain",
                     "The key that authorises spending"
-                ],
-                correctIndex: 2
+                ]
             },
             {
                 question: "Someone from support asks for your seed phrase. What is happening?",
@@ -133,8 +126,7 @@ const RESCUE_TOPICS = [
                     "An attempt to take your funds",
                     "A routine identity check",
                     "A standard wallet migration"
-                ],
-                correctIndex: 0
+                ]
             },
             {
                 question: "What is the point of splitting a signing key between two parties?",
@@ -142,8 +134,7 @@ const RESCUE_TOPICS = [
                     "Transactions become cheaper to send",
                     "Neither party can move the funds alone",
                     "The balance is insured twice over"
-                ],
-                correctIndex: 1
+                ]
             }
         ]
     },
@@ -158,8 +149,7 @@ const RESCUE_TOPICS = [
                     "The amounts are tiny and nobody is at the checkout",
                     "They can be reversed at any time",
                     "They must be approved at a bank branch"
-                ],
-                correctIndex: 0
+                ]
             },
             {
                 question: "What stops an agent from spending everything it can reach?",
@@ -167,8 +157,7 @@ const RESCUE_TOPICS = [
                     "Nothing — an agent has to be trusted",
                     "A daily phone call from the bank",
                     "The spending limit its owner approved"
-                ],
-                correctIndex: 2
+                ]
             },
             {
                 question: "Why do machine payments need fees measured in fractions of a cent?",
@@ -176,8 +165,7 @@ const RESCUE_TOPICS = [
                     "Networks charge programs more than people",
                     "A fee bigger than the payment makes the trade pointless",
                     "Machines send far more transactions than people do"
-                ],
-                correctIndex: 1
+                ]
             }
         ]
     },
@@ -192,8 +180,7 @@ const RESCUE_TOPICS = [
                     "A token locked on one chain and represented by a copy on another",
                     "A token with its fee included in the transfer",
                     "A token whose amount is hidden from the public"
-                ],
-                correctIndex: 0
+                ]
             },
             {
                 question: "Why is burn-and-mint safer than a lock-and-wrap bridge?",
@@ -201,8 +188,7 @@ const RESCUE_TOPICS = [
                     "It is quicker to program",
                     "Validators approve each transfer by hand",
                     "There is no pool of locked funds to steal"
-                ],
-                correctIndex: 2
+                ]
             },
             {
                 question: "You send USDC to an address on the wrong chain. What is the likely outcome?",
@@ -210,8 +196,7 @@ const RESCUE_TOPICS = [
                     "The network reroutes it to the right chain",
                     "It may be gone for good",
                     "It bounces back after a few blocks"
-                ],
-                correctIndex: 1
+                ]
             }
         ]
     },
@@ -226,8 +211,7 @@ const RESCUE_TOPICS = [
                     "That the reserves cover the tokens in circulation",
                     "Where the token's price is heading",
                     "Who the largest holders are"
-                ],
-                correctIndex: 0
+                ]
             },
             {
                 question: "Who prepares an attestation?",
@@ -235,8 +219,7 @@ const RESCUE_TOPICS = [
                     "The issuer's own finance team",
                     "An independent accounting firm",
                     "The blockchain, automatically"
-                ],
-                correctIndex: 1
+                ]
             },
             {
                 question: "What do confidential transfers on Arc hide?",
@@ -244,8 +227,7 @@ const RESCUE_TOPICS = [
                     "Everything — no record is kept at all",
                     "Only the sender's identity",
                     "The amount, which can still be disclosed to an auditor"
-                ],
-                correctIndex: 2
+                ]
             }
         ]
     },
@@ -260,8 +242,7 @@ const RESCUE_TOPICS = [
                     "It shares Ethereum's fees",
                     "Contracts and tools built for Ethereum work on it",
                     "Its blocks are validated by Ethereum"
-                ],
-                correctIndex: 1
+                ]
             },
             {
                 question: "What is a testnet for?",
@@ -269,8 +250,7 @@ const RESCUE_TOPICS = [
                     "Running the real software with money that is worth nothing",
                     "Making real transactions more cheaply",
                     "Trying out wallet passwords safely"
-                ],
-                correctIndex: 0
+                ]
             },
             {
                 question: "Arc is a Layer-1. What does that mean?",
@@ -278,8 +258,7 @@ const RESCUE_TOPICS = [
                     "It is the first release of a Layer-2 network",
                     "It supports only one token",
                     "It settles its own blocks instead of posting them to another chain"
-                ],
-                correctIndex: 2
+                ]
             }
         ]
     }

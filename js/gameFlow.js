@@ -7,25 +7,37 @@ const GameFlow = {
         return GameConfig.BLOCKCHAIN.API_URL || '';
     },
 
-    startSession: async function(player, gameMode) {
+    // POST to the backend. Resolves { ok, status, data } and never throws, so a
+    // server that is down degrades a screen instead of breaking the game.
+    apiPost: async function(path, body, timeoutMs = 5000) {
         try {
-            const apiUrl = this._getApiUrl();
-            const response = await fetch(`${apiUrl}/api/session/start`, {
+            const response = await fetch(`${this._getApiUrl()}${path}`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ player, gameMode }),
-                signal: AbortSignal.timeout(5000)
+                body: JSON.stringify(body),
+                signal: AbortSignal.timeout(timeoutMs)
             });
-            if (!response.ok) return null;
-            const data = await response.json();
-            if (data.success) {
-                GameState.sessionId = data.sessionId;
-                console.log('Session started:', data.sessionId);
-                return data.sessionId;
-            }
+            let data = null;
+            try { data = await response.json(); } catch (e) { /* empty body */ }
+            return { ok: response.ok, status: response.status, data };
         } catch (e) {
-            console.warn('Failed to start session:', e.message);
+            return { ok: false, status: 0, data: { error: e.message } };
         }
+    },
+
+    // Every tournament run gets a session — the quizzes are graded against it.
+    // A wallet is optional; only a session started with one can be finalized.
+    startSession: async function(player, gameMode) {
+        GameState.sessionId = null;
+        GameState.sessionPlayer = null;
+        const { ok, data } = await this.apiPost('/api/session/start', player ? { player, gameMode } : { gameMode });
+        if (ok && data && data.success) {
+            GameState.sessionId = data.sessionId;
+            GameState.sessionPlayer = player || null;
+            console.log('Session started:', data.sessionId, player ? 'with wallet' : 'without wallet');
+            return data.sessionId;
+        }
+        console.warn('Failed to start session:', data && data.error);
         return null;
     },
 
@@ -122,10 +134,7 @@ const GameFlow = {
         GameState.gameCompleted = false;
 
         // Restart anti-cheat session (old one is now invalid)
-        const account = Web3Manager.currentAccount;
-        if (account) {
-            await this.startSession(account, 'Tournament');
-        }
+        await this.startSession(Web3Manager.currentAccount || null, 'Tournament');
         
         // Reset lives to 5
         GameState.tournamentLives = GameConfig.MAX_TOURNAMENT_LIVES;
@@ -1389,7 +1398,7 @@ const GameFlow = {
                 throw new Error(t('errors.noAccount'));
             }
 
-            if (!GameState.sessionId) {
+            if (!GameState.sessionId || !GameState.sessionPlayer) {
                 throw new Error(t('errors.noSession'));
             }
             
@@ -2084,10 +2093,7 @@ const GameFlow = {
         GameState.totalBarriersHit = 0;
 
         // Start anti-cheat session (must await so sessionId is set before first levelStart)
-        const account = Web3Manager.currentAccount;
-        if (account) {
-            await this.startSession(account, 'Tournament');
-        }
+        await this.startSession(Web3Manager.currentAccount || null, 'Tournament');
         
         this.hideMainMenu();
         

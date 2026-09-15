@@ -10,16 +10,21 @@
 //
 // Once per run. The topics live in js/rescueTopics.js and are deliberately
 // not the ones asked between levels.
+//
+// The server runs the quiz: it draws the topic, shuffles each question's
+// answers, grades every answer and hands back the verdict and the lives. The
+// browser only shows the wording. If the server cannot be reached the rescue
+// cannot be graded, and the run restarts as it did before rescues existed.
 
 const RescueManager = {
-    REWARDS: { 3: 3, 2: 1 },   // correct answers -> lives handed back
-    lastTopicId: null,         // so two runs in a row do not draw the same topic
-
     active: false,
-    topic: null,
+    topic: null,          // translated topic: { id, title, hint, questions: [{ question, answers }] }
+    orders: null,         // server order per question: orders[i][position] = source answer index
     index: 0,
     correct: 0,
     answered: false,
+    verdict: null,        // { correctCount, lives } from the server
+    request: 0,           // bumped when the screen closes, so late responses are ignored
 
     el: function (id) { return document.getElementById(id); },
 
@@ -31,31 +36,42 @@ const RescueManager = {
             && RESCUE_TOPICS.length > 0;
     },
 
-    pickTopic: function () {
-        const pool = RESCUE_TOPICS.filter(topic => topic.id !== this.lastTopicId);
-        const list = pool.length ? pool : RESCUE_TOPICS;
-        return list[Math.floor(Math.random() * list.length)];
-    },
-
-    start: function () {
+    start: async function () {
         if (!this.available()) return false;
-
-        this.active = true;
-        // The drawn topic is translated once here; correctIndex is carried over
-        // unchanged, so scoring does not depend on the language.
-        const source = this.pickTopic();
-        this.lastTopicId = source.id;
-        this.topic = I18n.rescueTopic(source);
-        this.index = 0;
-        this.correct = 0;
-        this.answered = false;
-        GameState.rescueUsed = true;
 
         const screen = this.el('rescueScreen');
         if (!screen) {
             console.error('Rescue screen element not found');
             return false;
         }
+
+        this.active = true;
+        this.index = 0;
+        this.correct = 0;
+        this.answered = false;
+        this.verdict = null;
+        GameState.rescueUsed = true;
+        const request = ++this.request;
+
+        const started = GameState.sessionId
+            ? await GameFlow.apiPost('/api/quiz/rescue/start', { sessionId: GameState.sessionId })
+            : { ok: false, data: { error: 'No session' } };
+        if (request !== this.request) return false;
+
+        const source = started.ok && started.data
+            && RESCUE_TOPICS.find(topic => topic.id === started.data.topicId);
+        if (!source || !Array.isArray(started.data.orders)) {
+            console.warn('Rescue could not be started:', started.data && started.data.error);
+            screen.style.display = 'flex';
+            this.showUnavailable();
+            return false;
+        }
+
+        // Translated once here; the order stays with the server's positions
+        this.topic = I18n.rescueTopic(source);
+        this.orders = started.data.orders;
+        this.index = started.data.answered || 0;
+
         screen.style.display = 'flex';
         this.showHint();
         return true;
@@ -94,6 +110,7 @@ const RescueManager = {
         if (!q) return this.showVerdict();
 
         this.answered = false;
+        const order = this.orders[this.index];
 
         const lead = this.el('rescueLead');
         const hint = this.el('rescueHint');
@@ -117,33 +134,55 @@ const RescueManager = {
         if (result) { result.style.display = 'none'; result.textContent = ''; }
         if (button) button.style.display = 'none';
 
-        for (let i = 0; i < 3; i++) {
-            const btn = this.el('rescueAnswer' + (i + 1));
+        for (let position = 0; position < 3; position++) {
+            const btn = this.el('rescueAnswer' + (position + 1));
             if (!btn) continue;
             const fresh = btn.cloneNode(true);
-            fresh.textContent = q.answers[i];
+            fresh.textContent = q.answers[order[position]];
             fresh.classList.remove('correct', 'incorrect', 'disabled');
             fresh.disabled = false;
             btn.parentNode.replaceChild(fresh, btn);
-            fresh.addEventListener('click', () => this.answer(i));
+            fresh.addEventListener('click', () => this.answer(position));
         }
     },
 
-    answer: function (choice) {
+    answer: async function (position) {
         if (this.answered || !this.topic) return;
         this.answered = true;
+        const request = this.request;
 
         const q = this.topic.questions[this.index];
-        const right = choice === q.correctIndex;
-        if (right) this.correct++;
+        const order = this.orders[this.index];
 
         for (let i = 0; i < 3; i++) {
             const btn = this.el('rescueAnswer' + (i + 1));
             if (!btn) continue;
             btn.disabled = true;
             btn.classList.add('disabled');
-            if (i === q.correctIndex) btn.classList.add('correct');
-            else if (i === choice) btn.classList.add('incorrect');
+        }
+
+        const graded = await GameFlow.apiPost('/api/quiz/rescue/answer', {
+            sessionId: GameState.sessionId,
+            index: this.index,
+            choice: position
+        });
+        if (request !== this.request) return;
+
+        if (!graded.ok || !graded.data || typeof graded.data.correct !== 'boolean') {
+            console.warn('Rescue answer could not be graded:', graded.data && graded.data.error);
+            this.showUnavailable();
+            return;
+        }
+
+        const { correct: right, correctPosition, done } = graded.data;
+        if (right) this.correct++;
+        if (done) this.verdict = { correctCount: graded.data.correctCount, lives: graded.data.lives };
+
+        for (let i = 0; i < 3; i++) {
+            const btn = this.el('rescueAnswer' + (i + 1));
+            if (!btn) continue;
+            if (i === correctPosition) btn.classList.add('correct');
+            else if (i === position) btn.classList.add('incorrect');
         }
 
         const result = this.el('rescueResult');
@@ -152,7 +191,7 @@ const RescueManager = {
             result.className = 'quiz-result ' + (right ? 'correct-result' : 'incorrect-result');
             result.textContent = right
                 ? t('rescue.correct')
-                : t('rescue.wrong', { answer: q.answers[q.correctIndex] });
+                : t('rescue.wrong', { answer: q.answers[order[correctPosition]] });
         }
 
         const button = this.el('rescueButton');
@@ -170,7 +209,9 @@ const RescueManager = {
 
     // --- verdict ----------------------------------------------------------
     showVerdict: function () {
-        const lives = this.REWARDS[this.correct] || 0;
+        // The server decides the lives; without its verdict nothing is handed back
+        const lives = this.verdict ? this.verdict.lives : 0;
+        const correctCount = this.verdict ? this.verdict.correctCount : this.correct;
         const total = this.topic.questions.length;
 
         const title = this.el('rescueTitle');
@@ -180,7 +221,7 @@ const RescueManager = {
         const button = this.el('rescueButton');
 
         if (questionWrap) questionWrap.style.display = 'none';
-        if (title) title.textContent = t('rescue.verdictTitle', { correct: this.correct, total: total });
+        if (title) title.textContent = t('rescue.verdictTitle', { correct: correctCount, total: total });
         if (lead) {
             lead.style.display = 'block';
             lead.textContent = lives
@@ -196,6 +237,30 @@ const RescueManager = {
             button.textContent = lives ? t('rescue.backToLevel') : t('rescue.startOver');
             button.style.display = 'block';
             this.onButton(() => this.finish(lives));
+        }
+    },
+
+    // The server could not run the rescue: it cannot be graded, so the run restarts
+    showUnavailable: function () {
+        const title = this.el('rescueTitle');
+        const lead = this.el('rescueLead');
+        const hint = this.el('rescueHint');
+        const questionWrap = this.el('rescueQuestionWrap');
+        const result = this.el('rescueResult');
+        const button = this.el('rescueButton');
+
+        if (title) title.textContent = t('rescue.title');
+        if (lead) {
+            lead.textContent = t('rescue.unavailable');
+            lead.style.display = 'block';
+        }
+        if (hint) hint.style.display = 'none';
+        if (questionWrap) questionWrap.style.display = 'none';
+        if (result) { result.style.display = 'none'; result.textContent = ''; }
+        if (button) {
+            button.textContent = t('rescue.startOver');
+            button.style.display = 'block';
+            this.onButton(() => this.finish(0));
         }
     },
 
@@ -226,11 +291,14 @@ const RescueManager = {
     hide: function () {
         const screen = this.el('rescueScreen');
         if (screen) screen.style.display = 'none';
+        this.request++;
         this.active = false;
         this.topic = null;
+        this.orders = null;
         this.index = 0;
         this.correct = 0;
         this.answered = false;
+        this.verdict = null;
     }
 };
 

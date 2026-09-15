@@ -82,7 +82,8 @@ I18n.register('en', {
         continue: 'Continue',
         correct: 'Correct!',
         correctLife: 'Correct! +1 Life',
-        incorrect: 'Incorrect. Correct answer: {answer}'
+        incorrect: 'Incorrect. Correct answer: {answer}',
+        unavailable: 'The quiz server did not answer, so this question does not count. Continue to the next level.'
     },
 
     rescue: {
@@ -102,7 +103,8 @@ I18n.register('en', {
         runOver: 'Run over',
         backToLevel: 'Back to the level',
         startOver: 'Start over',
-        continue: 'Continue'
+        continue: 'Continue',
+        unavailable: 'The rescue quiz could not reach the server, so it cannot be graded. The run restarts from the first level.'
     },
 
     infoUi: {

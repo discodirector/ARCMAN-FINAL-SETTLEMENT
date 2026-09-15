@@ -61,6 +61,7 @@ const GameState = {
     
     // Anti-cheat session tracking
     sessionId: null,            // Server-issued session ID for score verification
+    sessionPlayer: null,        // Wallet the session was started with; null for walletless runs
 
     // Game completion tracking
     gameStartTime: null,        // Timestamp when game started
@@ -125,6 +126,7 @@ const GameState = {
         this.rescueUsed = false;
         this.gameState = 'aiming';
         this.sessionId = null;
+        this.sessionPlayer = null;
         this.gameStartTime = null;
         this.gameEndTime = null;
         this.finalScore = 0;

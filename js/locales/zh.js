@@ -82,7 +82,8 @@ I18n.register('zh', {
         continue: '继续',
         correct: '答对了！',
         correctLife: '答对了！+1 生命',
-        incorrect: '答错了。正确答案：{answer}'
+        incorrect: '答错了。正确答案：{answer}',
+        unavailable: '测验服务器没有响应，本题不计分。请继续下一关。'
     },
 
     rescue: {
@@ -102,7 +103,8 @@ I18n.register('zh', {
         runOver: '赛程结束',
         backToLevel: '回到关卡',
         startOver: '重新开始',
-        continue: '继续'
+        continue: '继续',
+        unavailable: '救援测验无法连接服务器，因此无法评分。本轮将从第一关重新开始。'
     },
 
     infoUi: {

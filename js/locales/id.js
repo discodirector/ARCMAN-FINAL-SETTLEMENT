@@ -82,7 +82,8 @@ I18n.register('id', {
         continue: 'Lanjut',
         correct: 'Benar!',
         correctLife: 'Benar! +1 Nyawa',
-        incorrect: 'Salah. Jawaban yang benar: {answer}'
+        incorrect: 'Salah. Jawaban yang benar: {answer}',
+        unavailable: 'Server kuis tidak merespons, jadi soal ini tidak dihitung. Lanjutkan ke level berikutnya.'
     },
 
     rescue: {
@@ -102,7 +103,8 @@ I18n.register('id', {
         runOver: 'Permainan berakhir',
         backToLevel: 'Kembali ke level',
         startOver: 'Mulai dari awal',
-        continue: 'Lanjut'
+        continue: 'Lanjut',
+        unavailable: 'Kuis penyelamatan tidak dapat menghubungi server, jadi tidak bisa dinilai. Permainan dimulai ulang dari level pertama.'
     },
 
     infoUi: {

@@ -1,158 +1,190 @@
 // Quiz Management Module
+//
+// The quiz after each level is graded by the server. The browser knows the
+// question and the wording of the answers, never which one is right:
+//   1. /api/quiz/level/start opens the quiz for a level this session completed
+//      and returns the order to show the answers in (shuffled per session);
+//   2. /api/quiz/level/answer grades the chosen position and says which position
+//      was right, so the screen can show it.
+// If the server cannot be reached the quiz does not count: no life is given,
+// and the player simply continues.
 const QuizManager = {
     currentQuiz: null,
     quizAnswered: false,
-    
+    order: null,          // server order: order[position] = index into the source answers
+    request: 0,           // bumped whenever the screen closes, so late responses are ignored
+
     // Check if quiz should be shown for this level
     shouldShowQuiz: function(levelId) {
         return GameState.tournamentMode && this.getQuizForLevel(levelId) !== null;
     },
-    
+
     // Get quiz data for a specific level — the quiz's id is the level it follows
     getQuizForLevel: function(levelId) {
         if (typeof QUIZZES === 'undefined') return null;
         return QUIZZES.find(quiz => quiz.id === levelId) || null;
     },
-    
+
+    answerButtons: function() {
+        return [1, 2, 3].map(n => document.getElementById('quizAnswer' + n));
+    },
+
     // Show quiz screen
-    showQuiz: function(quizData) {
+    showQuiz: async function(quizData) {
         if (!quizData) return;
-        
+
         this.currentQuiz = quizData;
         this.quizAnswered = false;
-        
+        this.order = null;
+        const request = ++this.request;
+
         const quizScreen = document.getElementById('quizScreen');
         if (!quizScreen) {
             console.error('Quiz screen element not found');
             return;
         }
-        
-        // Update quiz content
+
         const questionEl = document.getElementById('quizQuestion');
-        const answer1El = document.getElementById('quizAnswer1');
-        const answer2El = document.getElementById('quizAnswer2');
-        const answer3El = document.getElementById('quizAnswer3');
         const skipBtn = document.getElementById('quizSkip');
+        const continueBtn = document.getElementById('quizContinue');
         const resultMessage = document.getElementById('quizResultMessage');
-        
-        // Wording comes from the active language pack; correctIndex stays with
-        // the source data in quizzes.js, so the answers keep their order.
+
+        // Wording comes from the active language pack, in source order
         const text = I18n.quiz(quizData);
         if (questionEl) questionEl.textContent = text.question;
-        if (answer1El) answer1El.textContent = text.answers[0];
-        if (answer2El) answer2El.textContent = text.answers[1];
-        if (answer3El) answer3El.textContent = text.answers[2];
-        
-        // Reset button states
-        if (answer1El) {
-            answer1El.classList.remove('correct', 'incorrect', 'disabled');
-            answer1El.disabled = false;
-        }
-        if (answer2El) {
-            answer2El.classList.remove('correct', 'incorrect', 'disabled');
-            answer2El.disabled = false;
-        }
-        if (answer3El) {
-            answer3El.classList.remove('correct', 'incorrect', 'disabled');
-            answer3El.disabled = false;
-        }
-        
-        // Hide result message
+
+        // Answers stay blank and locked until the server says in which order to show them
+        this.answerButtons().forEach(btn => {
+            if (!btn) return;
+            btn.textContent = '…';
+            btn.classList.remove('correct', 'incorrect');
+            btn.classList.add('disabled');
+            btn.disabled = true;
+        });
+
         if (resultMessage) {
             resultMessage.textContent = '';
             resultMessage.style.display = 'none';
         }
-        
+        if (continueBtn) continueBtn.style.display = 'none';
+
         // Show skip button (always available)
         if (skipBtn) {
             skipBtn.style.display = 'block';
-            // Check if player has full lives
             if (GameState.tournamentLives >= GameConfig.MAX_TOURNAMENT_LIVES) {
                 skipBtn.textContent = t('quizUi.skipFullLives');
             } else {
                 skipBtn.textContent = t('quizUi.skip');
             }
         }
-        
-        // Show quiz screen
+
         quizScreen.style.display = 'flex';
-        
-        // Setup event listeners
         this.setupQuizListeners();
+
+        const opened = await this.openOnServer(quizData.id);
+        if (request !== this.request) return;   // the screen was closed meanwhile
+
+        if (!opened) {
+            this.showUnavailable();
+            return;
+        }
+
+        this.order = opened.order;
+        this.answerButtons().forEach((btn, position) => {
+            if (!btn) return;
+            btn.textContent = text.answers[this.order[position]];
+            btn.classList.remove('disabled');
+            btn.disabled = false;
+        });
     },
-    
+
+    // Open the quiz on the server. The level-complete event is sent a moment
+    // earlier without waiting, so a "not completed yet" answer is retried briefly.
+    openOnServer: async function(levelId) {
+        if (!GameState.sessionId) return null;
+        for (let attempt = 0; attempt < 4; attempt++) {
+            const { ok, status, data } = await GameFlow.apiPost('/api/quiz/level/start', {
+                sessionId: GameState.sessionId,
+                levelId
+            });
+            if (ok && data && Array.isArray(data.order)) return data;
+            if (status !== 409 || !data || !/not completed/i.test(data.error || '')) {
+                console.warn('Quiz could not be opened:', status, data && data.error);
+                return null;
+            }
+            await new Promise(resolve => setTimeout(resolve, 600));
+        }
+        return null;
+    },
+
     // Setup event listeners for quiz buttons
     setupQuizListeners: function() {
-        const answer1El = document.getElementById('quizAnswer1');
-        const answer2El = document.getElementById('quizAnswer2');
-        const answer3El = document.getElementById('quizAnswer3');
         const skipBtn = document.getElementById('quizSkip');
         const continueBtn = document.getElementById('quizContinue');
-        
+
         // Remove existing listeners by cloning
-        if (answer1El) {
-            const newBtn = answer1El.cloneNode(true);
-            answer1El.parentNode.replaceChild(newBtn, answer1El);
-            newBtn.addEventListener('click', () => this.handleQuizAnswer(0));
-        }
-        
-        if (answer2El) {
-            const newBtn = answer2El.cloneNode(true);
-            answer2El.parentNode.replaceChild(newBtn, answer2El);
-            newBtn.addEventListener('click', () => this.handleQuizAnswer(1));
-        }
-        
-        if (answer3El) {
-            const newBtn = answer3El.cloneNode(true);
-            answer3El.parentNode.replaceChild(newBtn, answer3El);
-            newBtn.addEventListener('click', () => this.handleQuizAnswer(2));
-        }
-        
+        this.answerButtons().forEach((btn, position) => {
+            if (!btn) return;
+            const newBtn = btn.cloneNode(true);
+            btn.parentNode.replaceChild(newBtn, btn);
+            newBtn.addEventListener('click', () => this.handleQuizAnswer(position));
+        });
+
         if (skipBtn) {
             const newBtn = skipBtn.cloneNode(true);
             skipBtn.parentNode.replaceChild(newBtn, skipBtn);
             newBtn.addEventListener('click', () => this.skipQuiz());
         }
-        
+
         if (continueBtn) {
             const newBtn = continueBtn.cloneNode(true);
             continueBtn.parentNode.replaceChild(newBtn, continueBtn);
             newBtn.addEventListener('click', () => this.closeQuizAndContinue());
         }
     },
-    
-    // Handle quiz answer selection
-    handleQuizAnswer: function(selectedIndex) {
-        if (this.quizAnswered || !this.currentQuiz) return;
-        
+
+    // Handle quiz answer selection — position is the button as shown on screen
+    handleQuizAnswer: async function(position) {
+        if (this.quizAnswered || !this.currentQuiz || !this.order) return;
+
         this.quizAnswered = true;
-        const correctIndex = this.currentQuiz.correctIndex;
-        const isCorrect = selectedIndex === correctIndex;
-        
-        // Disable all answer buttons
-        const answer1El = document.getElementById('quizAnswer1');
-        const answer2El = document.getElementById('quizAnswer2');
-        const answer3El = document.getElementById('quizAnswer3');
+        const request = this.request;
+        const quiz = this.currentQuiz;
+
+        const buttons = this.answerButtons();
+        buttons.forEach(btn => {
+            if (!btn) return;
+            btn.disabled = true;
+            btn.classList.add('disabled');
+        });
+
         const skipBtn = document.getElementById('quizSkip');
-        const resultMessage = document.getElementById('quizResultMessage');
-        const continueBtn = document.getElementById('quizContinue');
-        
-        [answer1El, answer2El, answer3El].forEach((btn, index) => {
-            if (btn) {
-                btn.disabled = true;
-                btn.classList.add('disabled');
-                if (index === correctIndex) {
-                    btn.classList.add('correct');
-                } else if (index === selectedIndex && !isCorrect) {
-                    btn.classList.add('incorrect');
-                }
+        if (skipBtn) skipBtn.style.display = 'none';
+
+        const { ok, data } = await GameFlow.apiPost('/api/quiz/level/answer', {
+            sessionId: GameState.sessionId,
+            levelId: quiz.id,
+            choice: position
+        });
+        if (request !== this.request) return;
+
+        if (!ok || !data || typeof data.correct !== 'boolean') {
+            console.warn('Quiz answer could not be graded:', data && data.error);
+            this.showUnavailable();
+            return;
+        }
+
+        const isCorrect = data.correct;
+        buttons.forEach((btn, index) => {
+            if (!btn) return;
+            if (index === data.correctPosition) {
+                btn.classList.add('correct');
+            } else if (index === position && !isCorrect) {
+                btn.classList.add('incorrect');
             }
         });
-        
-        // Hide skip button
-        if (skipBtn) skipBtn.style.display = 'none';
-        
-        // Show result message
+
+        const resultMessage = document.getElementById('quizResultMessage');
         if (resultMessage) {
             resultMessage.style.display = 'block';
             if (isCorrect) {
@@ -162,18 +194,38 @@ const QuizManager = {
                 resultMessage.className = 'quiz-result correct-result';
                 this.awardLife();
             } else {
-                const correctText = I18n.quiz(this.currentQuiz).answers[correctIndex];
+                const correctText = I18n.quiz(quiz).answers[this.order[data.correctPosition]];
                 resultMessage.textContent = t('quizUi.incorrect', { answer: correctText });
                 resultMessage.className = 'quiz-result incorrect-result';
             }
         }
-        
-        // Show continue button
-        if (continueBtn) {
-            continueBtn.style.display = 'block';
-        }
+
+        const continueBtn = document.getElementById('quizContinue');
+        if (continueBtn) continueBtn.style.display = 'block';
     },
-    
+
+    // The server could not open or grade the quiz: it does not count, the run goes on
+    showUnavailable: function() {
+        this.quizAnswered = true;
+        this.answerButtons().forEach(btn => {
+            if (!btn) return;
+            btn.disabled = true;
+            btn.classList.add('disabled');
+        });
+
+        const resultMessage = document.getElementById('quizResultMessage');
+        if (resultMessage) {
+            resultMessage.style.display = 'block';
+            resultMessage.className = 'quiz-result incorrect-result';
+            resultMessage.textContent = t('quizUi.unavailable');
+        }
+
+        const skipBtn = document.getElementById('quizSkip');
+        if (skipBtn) skipBtn.style.display = 'none';
+        const continueBtn = document.getElementById('quizContinue');
+        if (continueBtn) continueBtn.style.display = 'block';
+    },
+
     // Award life for correct answer
     awardLife: function() {
         if (GameState.tournamentLives < GameConfig.MAX_TOURNAMENT_LIVES) {
@@ -183,23 +235,17 @@ const QuizManager = {
             }
         }
     },
-    
+
     // Skip quiz
     skipQuiz: function() {
         this.quizAnswered = true;
         this.closeQuizAndContinue();
     },
-    
+
     // Close quiz and continue to next level
     closeQuizAndContinue: function() {
-        const quizScreen = document.getElementById('quizScreen');
-        if (quizScreen) {
-            quizScreen.style.display = 'none';
-        }
-        
-        this.currentQuiz = null;
-        this.quizAnswered = false;
-        
+        this.hideQuiz();
+
         // Continue to next level after a short delay
         setTimeout(() => {
             if (typeof GameFlow !== 'undefined' && GameFlow.advanceToNextLevel) {
@@ -207,15 +253,16 @@ const QuizManager = {
             }
         }, 300);
     },
-    
+
     // Hide quiz screen
     hideQuiz: function() {
         const quizScreen = document.getElementById('quizScreen');
         if (quizScreen) {
             quizScreen.style.display = 'none';
         }
+        this.request++;
         this.currentQuiz = null;
         this.quizAnswered = false;
+        this.order = null;
     }
 };
-
