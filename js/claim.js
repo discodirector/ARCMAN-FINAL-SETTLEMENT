@@ -57,16 +57,23 @@ const ClaimManager = {
 
         const started = await this.post('/api/claim/start', { sessionId: GameState.sessionId });
         if (started.status !== 200 || !started.data || !started.data.claimId) {
-            // Falling short on the quizzes is the one refusal the player can do
-            // something about, so it is said out loud and the steps stay on
-            // screen, greyed. Every other refusal means this run was never
-            // eligible, and the section quietly goes away.
+            // A player who finished the course has earned an explanation. The
+            // two refusals we can explain are said out loud, with the steps
+            // left on screen and greyed; anything else means this run was never
+            // eligible in the first place, and the section quietly goes away.
             if (started.data && started.data.quizNeeded) {
                 this.setStage('closed');
                 this.say(t('claim.quizNeeded', {
                     needed: started.data.quizNeeded,
                     correct: started.data.quizCorrect,
                 }), 'warn');
+                return;
+            }
+            if (started.data && started.data.reason === 'ip_limit') {
+                // Shared connections are ordinary — an office, a campus, a phone
+                // network. Saying so beats vanishing without a word.
+                this.setStage('closed');
+                this.say(t('claim.ipLimit'), 'warn');
                 return;
             }
             section.style.display = 'none';

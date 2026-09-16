@@ -31,3 +31,4 @@ chain/cache/
 
 # Local test helper: plays a course without a human. Never committed, never deployed.
 js/_autoplay.js
+js/_solve.js
