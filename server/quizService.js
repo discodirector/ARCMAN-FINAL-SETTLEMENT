@@ -120,22 +120,27 @@ function registerQuizRoutes(app, { sessions, getIp, sessionExpiryMs, log = conso
             return null;
         }
         const { sessionId } = req.body || {};
+        // A refused quiz reaches the player as "the quiz server did not answer",
+        // which says nothing about why. These lines are what turn that into
+        // something we can actually chase.
+        const refuse = (status, error, detail) => {
+            log.log(`Quiz refused (${error}${detail ? ': ' + detail : ''}) for session ${sessionId || 'none'}`);
+            res.status(status).json({ error });
+            return null;
+        };
+
         const session = sessionId && sessions.get(sessionId);
         if (!session) {
-            res.status(404).json({ error: 'Session not found' });
-            return null;
+            return refuse(404, 'Session not found', `${sessions.size} sessions held`);
         }
         if (session.ip !== getIp(req)) {
-            res.status(403).json({ error: 'Session IP mismatch' });
-            return null;
+            return refuse(403, 'Session IP mismatch', `session ${session.ip}, request ${getIp(req)}`);
         }
         if (Date.now() - session.startTime > sessionExpiryMs) {
-            res.status(410).json({ error: 'Session expired' });
-            return null;
+            return refuse(410, 'Session expired', `${Math.round((Date.now() - session.startTime) / 1000)}s old`);
         }
         if (session.finalized) {
-            res.status(400).json({ error: 'Session already finalized' });
-            return null;
+            return refuse(400, 'Session already finalized');
         }
         session.quizzes = session.quizzes || {};
         return session;
@@ -157,6 +162,9 @@ function registerQuizRoutes(app, { sessions, getIp, sessionExpiryMs, log = conso
         // Only a level this session actually completed opens its quiz
         const level = session.levels[levelId - 1];
         if (!level || !level.completedAt) {
+            log.log(`Quiz refused (level ${levelId} not completed) for session ${req.body.sessionId}: `
+                + `${session.levels.length} levels recorded, `
+                + `${session.levels.filter(l => l && l.completedAt).length} of them finished`);
             return res.status(409).json({ error: 'Level not completed in this session' });
         }
 

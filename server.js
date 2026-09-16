@@ -225,7 +225,14 @@ app.post('/api/session/start', (req, res) => {
                 .filter(s => !s.normalizedPlayer && s.ip === ip)
                 .sort((a, b) => a.startTime - b.startTime);
             while (mine.length >= MAX_ANONYMOUS_SESSIONS_PER_IP) {
-                sessions.delete(mine.shift().sessionId);
+                const dropped = mine.shift();
+                sessions.delete(dropped.sessionId);
+                // The oldest run is not always an abandoned one — a player who
+                // reloads in a second tab, or a whole office behind one address,
+                // can push out a run still being played. Worth seeing.
+                console.log(`Dropped session ${dropped.sessionId} from ${ip}: `
+                    + `${MAX_ANONYMOUS_SESSIONS_PER_IP} walletless runs already held, `
+                    + `this one ${Math.round((Date.now() - dropped.startTime) / 1000)}s old`);
             }
         }
 
