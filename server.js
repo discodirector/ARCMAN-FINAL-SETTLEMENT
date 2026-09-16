@@ -541,9 +541,22 @@ const quizService = require('./server/quizService.js').registerQuizRoutes(app, {
     sessionExpiryMs: SESSION_EXPIRY_MS,
 });
 
+// Reward claims. Unconfigured, /api/claim/* answers 503 and the game hides the
+// reward; the game itself keeps working either way.
+const claimService = require('./server/claimService.js').registerClaimRoutes(app, {
+    sessions,
+    getIp,
+    sessionExpiryMs: SESSION_EXPIRY_MS,
+    minSecondsPerLevel: MIN_SECONDS_PER_LEVEL,
+});
+
 // Health check
 app.get('/api/health', (req, res) => {
-    res.json({ status: 'ok', quizzes: quizService.isReady() ? 'ok' : 'unavailable' });
+    res.json({
+        status: 'ok',
+        quizzes: quizService.isReady() ? 'ok' : 'unavailable',
+        rewards: claimService.isReady() ? 'ok' : 'unavailable',
+    });
 });
 
 const PORT = process.env.PORT || 3000;
