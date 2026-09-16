@@ -488,6 +488,12 @@ app.post('/api/session/finalize', async (req, res) => {
         res.json({
             success: true,
             score: totalScore,
+            // The contract checks the signature over exactly these three, so
+            // the game must send back what was signed rather than its own idea
+            // of them — a quiet mismatch would only surface as a failed
+            // transaction the player has already paid for.
+            player: session.player,
+            levelId: Number(levelIdNum),
             signature: signed.signature,
             signerAddress: signed.signerAddress,
             timestamp: Date.now()

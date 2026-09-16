@@ -1119,76 +1119,95 @@ const GameFlow = {
                 }
             }
             
-            // Generate nonce
-            const nonceString = Web3Manager.generateNonce();
+            // The server signs a run once and marks the session finished the
+            // moment it does. So a signature already in hand is kept and reused:
+            // a declined wallet prompt, or a wallet that cannot reach the chain,
+            // must cost the player a second attempt, not the whole run. The
+            // nonce is part of what was signed, so it comes back with it.
+            const kept = this.pendingFinalization && this.pendingFinalization.sessionId === GameState.sessionId
+                ? this.pendingFinalization
+                : null;
+
             let nonceBigInt;
-            if (/[a-zA-Z]/.test(nonceString)) {
-                const nonceBytes = ethers.toUtf8Bytes(nonceString);
-                const nonceHash = ethers.keccak256(nonceBytes);
-                nonceBigInt = BigInt(nonceHash);
+            if (kept) {
+                nonceBigInt = kept.nonce;
             } else {
-                nonceBigInt = BigInt(nonceString);
+                const nonceString = Web3Manager.generateNonce();
+                if (/[a-zA-Z]/.test(nonceString)) {
+                    const nonceBytes = ethers.toUtf8Bytes(nonceString);
+                    const nonceHash = ethers.keccak256(nonceBytes);
+                    nonceBigInt = BigInt(nonceHash);
+                } else {
+                    nonceBigInt = BigInt(nonceString);
+                }
             }
-            
-            // Health check
-            const apiUrl = GameConfig.BLOCKCHAIN.API_URL;
-            if (!apiUrl || apiUrl.includes('localhost:3000')) {
-                try {
-                    const healthCheck = await fetch(`${apiUrl}/api/health`, { 
-                        method: 'GET',
-                        signal: AbortSignal.timeout(2000)
-                    });
-                    if (!healthCheck.ok) {
-                        throw new Error('Server health check failed');
+
+            let signed = kept ? kept.signed : null;
+
+            if (!signed) {
+                // Health check
+                const apiUrl = GameConfig.BLOCKCHAIN.API_URL;
+                if (!apiUrl || apiUrl.includes('localhost:3000')) {
+                    try {
+                        const healthCheck = await fetch(`${apiUrl}/api/health`, { 
+                            method: 'GET',
+                            signal: AbortSignal.timeout(2000)
+                        });
+                        if (!healthCheck.ok) {
+                            throw new Error('Server health check failed');
+                        }
+                    } catch (healthError) {
+                        throw new Error(
+                            'Backend server is not running. Please start it with:\n\n' +
+                            '  npm start\n\n' +
+                            'Or if using the backend server:\n\n' +
+                            '  node server.js\n\n' +
+                            'Then refresh this page and try again.'
+                        );
                     }
-                } catch (healthError) {
-                    throw new Error(
-                        'Backend server is not running. Please start it with:\n\n' +
-                        '  npm start\n\n' +
-                        'Or if using the backend server:\n\n' +
-                        '  node server.js\n\n' +
-                        'Then refresh this page and try again.'
-                    );
                 }
-            }
             
-            // Request session finalization with server-side score computation
-            let response;
-            try {
-                response = await fetch(`${apiUrl}/api/session/finalize`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        sessionId: GameState.sessionId,
-                        nonce: nonceBigInt.toString()
-                    }),
-                    signal: AbortSignal.timeout(10000)
-                });
-            } catch (fetchError) {
-                if (fetchError.name === 'AbortError') {
-                    throw new Error(t('errors.requestTimeout'));
-                } else if (fetchError.message.includes('Failed to fetch') || fetchError.message.includes('ERR_CONNECTION_REFUSED')) {
-                    throw new Error(
-                        'Cannot connect to backend server. Please make sure the server is running:\n\n' +
-                        '  npm start\n\n' +
-                        'The server should be running on ' + apiUrl
-                    );
-                }
-                throw fetchError;
-            }
-            
-            if (!response.ok) {
-                let errorMessage = t('errors.signatureFailed');
+                // Request session finalization with server-side score computation
+                let response;
                 try {
-                    const error = await response.json();
-                    errorMessage = error.error || errorMessage;
-                } catch (e) {
-                    errorMessage = t('errors.serverError', { status: response.status, statusText: response.statusText });
+                    response = await fetch(`${apiUrl}/api/session/finalize`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            sessionId: GameState.sessionId,
+                            nonce: nonceBigInt.toString()
+                        }),
+                        signal: AbortSignal.timeout(10000)
+                    });
+                } catch (fetchError) {
+                    if (fetchError.name === 'AbortError') {
+                        throw new Error(t('errors.requestTimeout'));
+                    } else if (fetchError.message.includes('Failed to fetch') || fetchError.message.includes('ERR_CONNECTION_REFUSED')) {
+                        throw new Error(
+                            'Cannot connect to backend server. Please make sure the server is running:\n\n' +
+                            '  npm start\n\n' +
+                            'The server should be running on ' + apiUrl
+                        );
+                    }
+                    throw fetchError;
                 }
-                throw new Error(errorMessage);
-            }
             
-            const signed = await response.json();
+                if (!response.ok) {
+                    let errorMessage = t('errors.signatureFailed');
+                    try {
+                        const error = await response.json();
+                        errorMessage = error.error || errorMessage;
+                    } catch (e) {
+                        errorMessage = t('errors.serverError', { status: response.status, statusText: response.statusText });
+                    }
+                    throw new Error(errorMessage);
+                }
+            
+                signed = await response.json();
+                // Kept so that a failure past this point costs the
+                // player a second attempt, not the run itself.
+                this.pendingFinalization = { sessionId: GameState.sessionId, signed, nonce: nonceBigInt };
+            }
 
             // Use the SERVER-COMPUTED score (not the client-side score)
             const serverScore = BigInt(signed.score);
@@ -1197,16 +1216,20 @@ const GameFlow = {
                 statusText.textContent = t('onchain.submitting');
             }
             
+            // Everything the contract verifies comes back from the server, not
+            // from the screen: the two could disagree, and only the signed
+            // version is the one that will check out.
             const scoreData = {
-                player: account,
+                player: signed.player || account,
                 score: serverScore,
-                levelId: BigInt(GameState.completionData.levelsCompleted),
+                levelId: BigInt(signed.levelId !== undefined ? signed.levelId : GameState.completionData.levelsCompleted),
                 nonce: nonceBigInt,
                 gameMode: GameState.completionData.gameMode || 'Tournament'
             };
-            
+
             const result = await Web3Manager.submitScore(scoreData, signed.signature);
-            
+
+            this.pendingFinalization = null;
             this.showOnchainSuccess(result.txHash);
             
         } catch (error) {
@@ -1243,10 +1266,14 @@ const GameFlow = {
     },
     
     // Show on-chain error
+    // A red box with nothing in it tells the player nothing, and told us nothing
+    // either: the reason used to reach the console alone.
     showOnchainError: function(message) {
         console.error('On-chain error:', message);
         const errorSection = document.getElementById('onchainErrorSection');
         if (errorSection) errorSection.style.display = 'block';
+        const errorMessage = document.getElementById('onchainErrorMessage');
+        if (errorMessage) errorMessage.textContent = message || '';
     },
     
     // Hide on-chain finalization screen
