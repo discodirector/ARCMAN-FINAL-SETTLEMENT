@@ -85,6 +85,36 @@ try {
     process.exit(1);
 }
 
+// A made-up key looks like it works — the server signs happily, and every
+// score is then rejected on-chain as "Invalid signature", a long way from here
+// and with nothing in the logs. Say it at startup instead, and check against
+// the contract itself when it can be reached.
+if (!process.env.PRIVATE_KEY) {
+    console.warn('WARNING: no PRIVATE_KEY set. Scores are signed with a throwaway key and the contract will reject every one of them.');
+}
+
+if (process.env.SCORE_CONTRACT_ADDRESS && process.env.ARC_RPC_URL) {
+    (async () => {
+        try {
+            const provider = new ethers.JsonRpcProvider(process.env.ARC_RPC_URL);
+            const contract = new ethers.Contract(
+                process.env.SCORE_CONTRACT_ADDRESS,
+                ['function serverSigner() view returns (address)'],
+                provider,
+            );
+            const expected = await contract.serverSigner();
+            if (expected.toLowerCase() !== signerWallet.address.toLowerCase()) {
+                console.warn(`WARNING: the score contract expects ${expected}, this server signs as ${signerWallet.address}. Every finalization will revert.`);
+            } else {
+                console.log('Score signer matches the contract.');
+            }
+            provider.destroy();
+        } catch (error) {
+            console.warn('Could not check the score signer against the contract:', error.message);
+        }
+    })();
+}
+
 // Sign message for smart contract verification
 async function signMessage(player, score, levelId, nonce, gameMode) {
     try {
