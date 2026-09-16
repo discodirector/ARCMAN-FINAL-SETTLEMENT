@@ -588,11 +588,22 @@ const Web3Manager = {
                     if (callback) callback(accounts);
                 });
                 
-                // Listen for chain changes
-                provider.on('chainChanged', (chainId) => {
+                // A changed chain used to reload the page. That was harmless
+                // when the page held nothing worth keeping — but connecting a
+                // wallet at the end of a run switches the chain, and the reload
+                // then threw the finished run away along with the reward. The
+                // provider is rebuilt in place instead: it caches the network,
+                // so a new one is needed, and nothing else has to be lost.
+                provider.on('chainChanged', async (chainId) => {
                     console.log('Chain changed:', chainId);
-                    // Reload page to reset state
-                    window.location.reload();
+                    try {
+                        this.provider = new ethers.BrowserProvider(provider);
+                        this.signer = await this.provider.getSigner();
+                        this.contract = null;
+                        if (GameConfig.BLOCKCHAIN.CONTRACT_ADDRESS) this.initializeContract();
+                    } catch (error) {
+                        console.warn('Could not follow the chain change:', error.message);
+                    }
                 });
             }
         }
