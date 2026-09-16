@@ -58,10 +58,10 @@ const GameConfig = {
     
     // Blockchain configuration
     BLOCKCHAIN: {
-        // Contract addresses (update these after deployment)
-        CONTRACT_ADDRESS: '0x1E880c3165f5f2ee6B4d00598C9B5e1BfAC6ED0f', // Will be set after contract deployment
+        // The score board on Arc mainnet, deployed 17 September 2026
+        CONTRACT_ADDRESS: '0x54f8D69E62d1E83c4616792c1D95508c539F7715',
         // Which chain the game talks to: 'ArcMainnet', 'ArcTestnet', 'localhost'
-        NETWORK: 'ArcTestnet',
+        NETWORK: 'ArcMainnet',
         // RPC URLs (using public endpoints - in production, use your own)
         RPC_URLS: {
             ArcMainnet: 'https://rpc.mainnet.arc.io',

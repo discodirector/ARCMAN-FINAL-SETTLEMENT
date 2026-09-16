@@ -333,6 +333,15 @@ and the rest of the backend keeps running. The file is never committed: the repo
 Arc mainnet is chain id `5042`, RPC `https://rpc.mainnet.arc.io`; the testnet is `5042002` at
 `https://rpc.testnet.arc.io`. On both, the gas is USDC.
 
+| Contract | Address on Arc mainnet |
+|---|---|
+| `ARCMANScoreBoard` | `0x54f8D69E62d1E83c4616792c1D95508c539F7715` |
+| `ARCMANRewardPool` | `0xDcEA9faF6a8F5CdDB983dBC9c45F49291c432F87` |
+
+Both were deployed on 17 September 2026. The owner is a wallet held by the maintainer, separate from
+every key on the server; the two signing keys and the relayer are separate from each other again, so
+no single key can both authorise a reward and take the money.
+
 **ARCMANScoreBoard** (`chain/contracts/scoreBoard.sol`)
 
 - `finalizeScore(scoreData, signature)` — verifies the server signature and keeps the player's best
