@@ -4,10 +4,10 @@ const { ethers } = require('hardhat');
 // The server signs the bare hash and tells the chain it is 32 bytes long, which
 // is what the contract reproduces. Signing the same way here is the only way to
 // know the two still agree.
-const signScore = (wallet, data) => {
+const signScore = (wallet, data, where) => {
     const packed = ethers.solidityPacked(
-        ['address', 'uint256', 'uint256', 'uint256', 'string'],
-        [data.player, data.score, data.levelId, data.nonce, data.gameMode],
+        ['uint256', 'address', 'address', 'uint256', 'uint256', 'uint256', 'string'],
+        [where.chainId, where.board, data.player, data.score, data.levelId, data.nonce, data.gameMode],
     );
     const messageHash = ethers.keccak256(packed);
     const signedHash = ethers.keccak256(
@@ -26,7 +26,7 @@ const score = (player, points, over = {}) => ({
 });
 
 describe('ARCMANScoreBoard', function () {
-    let board, owner, signer, relayer, alice, bob, carol;
+    let board, owner, signer, relayer, alice, bob, carol, here;
 
     beforeEach(async function () {
         [owner, relayer, alice, bob, carol] = await ethers.getSigners();
@@ -34,10 +34,16 @@ describe('ARCMANScoreBoard', function () {
         const Board = await ethers.getContractFactory('ARCMANScoreBoard');
         board = await Board.deploy(owner.address, signer.address);
         await board.waitForDeployment();
+        here = {
+            chainId: (await ethers.provider.getNetwork()).chainId,
+            board: await board.getAddress(),
+        };
     });
 
+    const sign = (wallet, data) => signScore(wallet, data, here);
+
     const submit = (data, from = relayer, wallet = signer) =>
-        board.connect(from).finalizeScore(data, signScore(wallet, data));
+        board.connect(from).finalizeScore(data, sign(wallet, data));
 
     describe('recording a score', function () {
         it('lets anyone send a score the server signed', async function () {
@@ -91,21 +97,21 @@ describe('ARCMANScoreBoard', function () {
 
         it('refuses a signature raised to a bigger score', async function () {
             const data = score(alice.address, 100n);
-            const signature = signScore(signer, data);
+            const signature = sign(signer, data);
             await expect(board.connect(relayer).finalizeScore({ ...data, score: 999999n }, signature))
                 .to.be.revertedWithCustomError(board, 'BadSignature');
         });
 
         it('refuses a signature moved to another player', async function () {
             const data = score(alice.address, 100n);
-            const signature = signScore(signer, data);
+            const signature = sign(signer, data);
             await expect(board.connect(relayer).finalizeScore({ ...data, player: bob.address }, signature))
                 .to.be.revertedWithCustomError(board, 'BadSignature');
         });
 
         it('refuses the same signature twice', async function () {
             const data = score(alice.address, 100n);
-            const signature = signScore(signer, data);
+            const signature = sign(signer, data);
             await board.connect(relayer).finalizeScore(data, signature);
             await expect(board.connect(relayer).finalizeScore(data, signature))
                 .to.be.revertedWithCustomError(board, 'SignatureAlreadyUsed');
@@ -113,7 +119,7 @@ describe('ARCMANScoreBoard', function () {
 
         it('refuses the mirror image of a used signature', async function () {
             const data = score(alice.address, 100n);
-            const signature = signScore(signer, data);
+            const signature = sign(signer, data);
             await board.connect(relayer).finalizeScore(data, signature);
 
             // Same signature, flipped into the upper half of the curve. ethers
@@ -128,6 +134,26 @@ describe('ARCMANScoreBoard', function () {
             ]);
             await expect(board.connect(relayer).finalizeScore(data, flipped))
                 .to.be.revertedWithCustomError(board, 'BadSignature');
+        });
+
+        it('refuses a signature meant for another board', async function () {
+            // The same key signs for both, as it would if one server served a
+            // test network and the real one. Play on a test network is free and
+            // endless, so a score must not travel between them.
+            const Board = await ethers.getContractFactory('ARCMANScoreBoard');
+            const elsewhere = await Board.deploy(owner.address, signer.address);
+            await elsewhere.waitForDeployment();
+
+            const data = score(alice.address, 5000n);
+            const forElsewhere = signScore(signer, data, {
+                chainId: here.chainId,
+                board: await elsewhere.getAddress(),
+            });
+            await expect(board.connect(relayer).finalizeScore(data, forElsewhere))
+                .to.be.revertedWithCustomError(board, 'BadSignature');
+            // and it is perfectly good where it was meant to go
+            await expect(elsewhere.connect(relayer).finalizeScore(data, forElsewhere))
+                .to.emit(elsewhere, 'ScoreSubmitted');
         });
 
         it('refuses a score of zero', async function () {

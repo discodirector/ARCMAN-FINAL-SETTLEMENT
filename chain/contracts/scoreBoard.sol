@@ -90,8 +90,13 @@ contract ARCMANScoreBoard {
         bytes32 signatureId = keccak256(signature);
         if (usedSignatures[signatureId]) revert SignatureAlreadyUsed();
 
+        // The chain and this contract are part of what is signed. Without them
+        // a score signed for one board would count on every other board the
+        // same key signs for — and play on a test network is free and endless.
         bytes32 messageHash = keccak256(
             abi.encodePacked(
+                block.chainid,
+                address(this),
                 scoreData.player,
                 scoreData.score,
                 scoreData.levelId,

@@ -93,6 +93,11 @@ if (!process.env.PRIVATE_KEY) {
     console.warn('WARNING: no PRIVATE_KEY set. Scores are signed with a throwaway key and the contract will reject every one of them.');
 }
 
+// What a score signature is bound to. Both belong in the signature, so both
+// must name the board the game actually talks to.
+const SCORE_CONTRACT = process.env.SCORE_CONTRACT_ADDRESS || ethers.ZeroAddress;
+const SCORE_CHAIN_ID = BigInt(process.env.SCORE_CHAIN_ID || 0);
+
 if (process.env.SCORE_CONTRACT_ADDRESS && process.env.ARC_RPC_URL) {
     (async () => {
         try {
@@ -102,12 +107,19 @@ if (process.env.SCORE_CONTRACT_ADDRESS && process.env.ARC_RPC_URL) {
                 ['function serverSigner() view returns (address)'],
                 provider,
             );
+
             const expected = await contract.serverSigner();
             if (expected.toLowerCase() !== signerWallet.address.toLowerCase()) {
                 console.warn(`WARNING: the score contract expects ${expected}, this server signs as ${signerWallet.address}. Every finalization will revert.`);
             } else {
                 console.log('Score signer matches the contract.');
             }
+
+            const chainId = (await provider.getNetwork()).chainId;
+            if (SCORE_CHAIN_ID !== chainId) {
+                console.warn(`WARNING: SCORE_CHAIN_ID is ${SCORE_CHAIN_ID || 'unset'} but the node is on ${chainId}. Every score will be signed for the wrong chain and refused.`);
+            }
+
             provider.destroy();
         } catch (error) {
             console.warn('Could not check the score signer against the contract:', error.message);
@@ -115,17 +127,16 @@ if (process.env.SCORE_CONTRACT_ADDRESS && process.env.ARC_RPC_URL) {
     })();
 }
 
-// Sign message for smart contract verification
+// Sign a score the way the board checks it.
+//
+// The chain and the board's own address are part of what is signed: without
+// them, a score signed for one board would count on every other board this key
+// signs for — and play on a test network is free and endless.
 async function signMessage(player, score, levelId, nonce, gameMode) {
     try {
-        // Create message hash using abi.encodePacked (matching contract.sol format)
-        // Contract uses: keccak256(abi.encodePacked(player, score, levelId, nonce, gameMode))
-        // We need to manually pack the data to match Solidity's abi.encodePacked
-        
-        // Better approach: use solidityPacked which matches abi.encodePacked
         const packedData = ethers.solidityPacked(
-            ['address', 'uint256', 'uint256', 'uint256', 'string'],
-            [player, score, levelId, nonce, gameMode || 'Tournament']
+            ['uint256', 'address', 'address', 'uint256', 'uint256', 'uint256', 'string'],
+            [SCORE_CHAIN_ID, SCORE_CONTRACT, player, score, levelId, nonce, gameMode || 'Tournament']
         );
         
         // Hash the packed data (this matches contract's keccak256(abi.encodePacked(...)))
