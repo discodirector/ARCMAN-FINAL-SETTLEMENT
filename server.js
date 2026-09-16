@@ -439,8 +439,20 @@ app.post('/api/session/finalize', async (req, res) => {
             return res.status(404).json({ error: 'Session not found or expired' });
         }
 
+        // A run is signed once. If it was signed but the transaction never
+        // landed, asking again resends the same signature rather than refusing:
+        // the contract spends a signature on use, so a duplicate is harmless
+        // and losing the run is not.
         if (session.finalized) {
-            return res.status(400).json({ error: 'Session already finalized' });
+            if (!session.finalization) {
+                return res.status(400).json({ error: 'Session already finalized' });
+            }
+            try {
+                return res.json(await sendScore(session));
+            } catch (error) {
+                console.error('Resending a score failed:', error.message);
+                return res.status(502).json({ error: 'The score could not be sent. Try again.' });
+            }
         }
 
         if (!session.player) {
@@ -508,26 +520,37 @@ app.post('/api/session/finalize', async (req, res) => {
         // Sign the SERVER-COMPUTED score
         const signed = await signMessage(session.player, scoreNum, levelIdNum, nonceNum, session.gameMode);
 
-        // Mark session as finalized
+        // Kept on the session so that a transaction which never lands can be
+        // sent again without signing a second, different score.
+        session.finalization = {
+            scoreData: {
+                player: session.player,
+                score: scoreNum,
+                levelId: levelIdNum,
+                nonce: nonceNum,
+                gameMode: session.gameMode,
+            },
+            signature: signed.signature,
+            signerAddress: signed.signerAddress,
+            score: totalScore,
+            txHash: null,
+        };
+
         session.finalized = true;
         playerLastFinalize.set(session.normalizedPlayer, Date.now());
         playerActiveSessions.delete(session.normalizedPlayer);
 
         console.log(`Session finalized: ${sessionId}, score=${totalScore}, player=${session.player}`);
 
-        res.json({
-            success: true,
-            score: totalScore,
-            // The contract checks the signature over exactly these three, so
-            // the game must send back what was signed rather than its own idea
-            // of them — a quiet mismatch would only surface as a failed
-            // transaction the player has already paid for.
-            player: session.player,
-            levelId: Number(levelIdNum),
-            signature: signed.signature,
-            signerAddress: signed.signerAddress,
-            timestamp: Date.now()
-        });
+        try {
+            return res.json(await sendScore(session));
+        } catch (error) {
+            console.error('Sending a score failed:', error.message);
+            return res.status(502).json({
+                error: 'The score was signed but could not be sent. Try again.',
+                score: totalScore,
+            });
+        }
     } catch (error) {
         console.error('Error in session finalize:', error);
         res.status(500).json({ error: 'Internal server error', message: error.message });
@@ -668,12 +691,53 @@ const claimService = require('./server/claimService.js').registerClaimRoutes(app
     minSecondsPerLevel: MIN_SECONDS_PER_LEVEL,
 });
 
+// Scores on the chain and the ranking read back out of them. Unconfigured, the
+// leaderboard answers 503 and a finished run hands its signature to the player
+// to send themselves.
+const scoreService = require('./server/scoreService.js').registerScoreRoutes(app, {
+    sessions,
+    getIp,
+});
+
+/**
+ * Put a finished run on the chain at our expense.
+ *
+ * Sending twice is safe — the contract spends a signature on use, so a second
+ * attempt cannot double-count — which is what lets a failed send be retried.
+ */
+async function sendScore(session) {
+    const record = session.finalization;
+
+    if (record.txHash) {
+        return { success: true, score: record.score, txHash: record.txHash, relayed: true };
+    }
+
+    if (!scoreService.isReady()) {
+        // Nothing to relay with. Hand back what was signed so the player can
+        // send it from their own wallet, as they used to.
+        return {
+            success: true,
+            score: record.score,
+            relayed: false,
+            player: record.scoreData.player,
+            levelId: Number(record.scoreData.levelId),
+            signature: record.signature,
+            signerAddress: record.signerAddress,
+        };
+    }
+
+    const receipt = await scoreService.submit(record);
+    record.txHash = receipt.hash;
+    return { success: true, score: record.score, txHash: receipt.hash, relayed: true };
+}
+
 // Health check
 app.get('/api/health', (req, res) => {
     res.json({
         status: 'ok',
         quizzes: quizService.isReady() ? 'ok' : 'unavailable',
         rewards: claimService.isReady() ? 'ok' : 'unavailable',
+        scores: scoreService.isReady() ? 'ok' : 'unavailable',
     });
 });
 

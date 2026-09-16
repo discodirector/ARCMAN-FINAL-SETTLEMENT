@@ -87,12 +87,26 @@ const hijack = await post('/api/session/wallet', {
 check('a second, different wallet cannot take the run', hijack.status === 409, JSON.stringify(hijack.data));
 
 const finalized = await post('/api/session/finalize', { sessionId, nonce: 'run-' + Date.now() });
-check('the score is signed for the named wallet', finalized.status === 200 && finalized.data.success, JSON.stringify(finalized.data));
+check('the run is finalized for the named wallet', finalized.status === 200 && finalized.data.success, JSON.stringify(finalized.data));
 check('the score is a real number', Number(finalized.data && finalized.data.score) > 0, JSON.stringify(finalized.data && finalized.data.score));
-check('the signature is 65 bytes', typeof finalized.data?.signature === 'string' && finalized.data.signature.length === 132, finalized.data?.signature);
+
+const relayed = finalized.data && finalized.data.relayed;
+if (relayed) {
+    check('the score went on-chain at our expense', typeof finalized.data.txHash === 'string' && finalized.data.txHash.length === 66, finalized.data.txHash);
+
+    const board = await fetch(`${base}/api/leaderboard?gameMode=Tournament`).then(r => r.json());
+    const seat = board.players.findIndex(p => p.toLowerCase() === player.address.toLowerCase());
+    check('the ranking, read back from the chain, holds the player', seat >= 0, JSON.stringify(board.players));
+    check('with the score the server computed', String(board.scores[seat]) === String(finalized.data.score), `${board.scores[seat]} vs ${finalized.data.score}`);
+} else {
+    check('the signature is handed back to be sent by the player', typeof finalized.data?.signature === 'string' && finalized.data.signature.length === 132, finalized.data?.signature);
+}
 
 const twice = await post('/api/session/finalize', { sessionId, nonce: 'again' });
-check('a session finalizes only once', twice.status === 400, JSON.stringify(twice.data));
+check('asking again returns the same run rather than signing a second one',
+    twice.status === 200 && String(twice.data.score) === String(finalized.data.score)
+        && (!relayed || twice.data.txHash === finalized.data.txHash),
+    JSON.stringify(twice.data));
 
 const late = await post('/api/session/wallet', {
     sessionId, address: player.address, signature: await player.signMessage(walletMessage),

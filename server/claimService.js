@@ -31,12 +31,10 @@ const fs = require('fs');
 const path = require('path');
 const crypto = require('crypto');
 const { ethers } = require('ethers');
+const { sharedRelay } = require('./relay.js');
 
 const ROOT = path.join(__dirname, '..');
 const DEFAULT_LEDGER = path.join(ROOT, 'private', 'claims.json');
-
-// Arc silently drops transactions priced below 20 Gwei.
-const MIN_GAS_PRICE = 25_000_000_000n;
 
 const POOL_ABI = [
     'function claim(uint256 courseId, address player, bytes32 identityHash, uint256 amount, uint256 deadline, bytes signature)',
@@ -219,7 +217,8 @@ function registerClaimRoutes(app, { sessions, getIp, sessionExpiryMs, minSeconds
 
     const provider = new ethers.JsonRpcProvider(config.rpcUrl);
     const claimSigner = new ethers.Wallet(config.claimSignerKey);
-    const relayer = new ethers.Wallet(config.relayerKey, provider);
+    const relay = sharedRelay({ provider, key: config.relayerKey });
+    const relayer = relay.wallet;
     const pool = new ethers.Contract(config.poolAddress, POOL_ABI, provider);
     const ledger = createLedger(config.ledgerPath, log);
 
@@ -237,17 +236,6 @@ function registerClaimRoutes(app, { sessions, getIp, sessionExpiryMs, minSeconds
         }
         return domain;
     }
-
-    // Claims are relayed one at a time. Two transactions built at the same
-    // moment would be given the same nonce and one of them would be thrown
-    // away; a queue is simpler than tracking nonces ourselves, and claims are
-    // far too rare for the wait to matter.
-    let relayQueue = Promise.resolve();
-    const relaySerially = (task) => {
-        const result = relayQueue.then(task, task);
-        relayQueue = result.then(() => undefined, () => undefined);
-        return result;
-    };
 
     // Claims in progress: claimId -> { sessionId, ip, wallet, identityHash, … }
     const pending = new Map();
@@ -563,14 +551,8 @@ function registerClaimRoutes(app, { sessions, getIp, sessionExpiryMs, minSeconds
 
             // Sending and waiting happen inside the queue: the next claim must
             // not pick its nonce until this transaction is in a block.
-            const receipt = await relaySerially(async () => {
-                const fees = await provider.getFeeData();
-                const gasPrice = fees.gasPrice && fees.gasPrice > MIN_GAS_PRICE ? fees.gasPrice : MIN_GAS_PRICE;
-                // Asked for explicitly: a node that reports the pending count
-                // late would otherwise hand out a nonce already used.
-                const nonce = await provider.getTransactionCount(relayer.address, 'latest');
-
-                const tx = await pool.connect(relayer).claim(
+            const receipt = await relay.send(async ({ wallet, gasPrice, nonce }) => {
+                const tx = await pool.connect(wallet).claim(
                     message.courseId, message.player, message.identityHash,
                     message.amount, message.deadline, signature,
                     { gasPrice, nonce }
