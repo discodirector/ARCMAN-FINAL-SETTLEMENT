@@ -151,90 +151,36 @@ describe('ARCMANScoreBoard', function () {
         });
     });
 
-    describe('the leaderboard', function () {
-        const names = (rows) => rows[0];
-
-        it('holds the best first', async function () {
-            await submit(score(alice.address, 300n));
-            await submit(score(bob.address, 900n));
-            await submit(score(carol.address, 600n));
-
-            const rows = await board.getLeaderboard(10, 'Tournament');
-            expect(names(rows)).to.deep.equal([bob.address, carol.address, alice.address]);
-            expect(rows[1]).to.deep.equal([900n, 600n, 300n]);
+    describe('the trail the ranking is built from', function () {
+        it('announces a new best only when the run beats the old one', async function () {
+            await expect(submit(score(alice.address, 500n)))
+                .to.emit(board, 'NewBestScore');
+            await expect(submit(score(alice.address, 200n)))
+                .to.not.emit(board, 'NewBestScore');
+            await expect(submit(score(alice.address, 900n)))
+                .to.emit(board, 'NewBestScore');
         });
 
-        it('moves a player up without disturbing the order', async function () {
+        it('announces every finished run either way', async function () {
+            await submit(score(alice.address, 500n));
+            await expect(submit(score(alice.address, 200n)))
+                .to.emit(board, 'ScoreSubmitted')
+                .withArgs(alice.address, 200n, 20n, 'Tournament');
+        });
+
+        it('carries everything a ranking needs', async function () {
             await submit(score(alice.address, 300n));
             await submit(score(bob.address, 900n));
-            await submit(score(carol.address, 600n));
-
             await submit(score(alice.address, 1200n));
+            await submit(score(bob.address, 100n));       // no improvement
 
-            const rows = await board.getLeaderboard(10, 'Tournament');
-            expect(names(rows)).to.deep.equal([alice.address, bob.address, carol.address]);
-            expect(rows[1]).to.deep.equal([1200n, 900n, 600n]);
-        });
+            const logs = await board.queryFilter(board.filters.NewBestScore());
+            const best = new Map();
+            for (const log of logs) best.set(log.args.player, log.args.score);
+            const ranking = [...best.entries()].sort((a, b) => Number(b[1] - a[1]));
 
-        it('lists a player once, however many runs they finish', async function () {
-            await submit(score(alice.address, 100n));
-            await submit(score(alice.address, 200n));
-            await submit(score(alice.address, 300n));
-            expect(await board.leaderboardLength('Tournament')).to.equal(1n);
-            expect(await board.leaderboardPosition(alice.address, 'Tournament')).to.equal(1n);
-        });
-
-        it('keeps its own order after many runs in any order', async function () {
-            const players = await ethers.getSigners();
-            const used = players.slice(5, 15);
-            const points = [420n, 77n, 1900n, 350n, 1100n, 15n, 880n, 2400n, 640n, 95n];
-
-            for (let i = 0; i < used.length; i++) {
-                await submit(score(used[i].address, points[i]));
-            }
-            // and then a few of them do better
-            await submit(score(used[5].address, 2000n));
-            await submit(score(used[1].address, 1500n));
-
-            const rows = await board.getLeaderboard(50, 'Tournament');
-            const scores = rows[1].map(Number);
-            expect(scores).to.deep.equal([...scores].sort((a, b) => b - a));
-            expect(scores.length).to.equal(10);
-        });
-
-        it('holds a hundred and drops the weakest', async function () {
-            this.timeout(120000);
-            const wallets = [];
-            for (let i = 0; i < 101; i++) wallets.push(ethers.Wallet.createRandom().address);
-
-            // 1000, 1010, 1020 … the last one is the best of all
-            for (let i = 0; i < 100; i++) {
-                await submit(score(wallets[i], BigInt(1000 + i * 10)));
-            }
-            expect(await board.leaderboardLength('Tournament')).to.equal(100n);
-
-            const weakest = wallets[0];                       // 1000, the lowest
-            await submit(score(wallets[100], 5000n));
-
-            expect(await board.leaderboardLength('Tournament')).to.equal(100n);
-            expect(await board.leaderboardPosition(weakest, 'Tournament')).to.equal(0n);
-            const rows = await board.getLeaderboard(1, 'Tournament');
-            expect(rows[0][0]).to.equal(wallets[100]);
-            // dropped from the board, but the score itself is still on record
-            const [best] = await board.getPlayerScore(weakest, 'Tournament');
-            expect(best).to.equal(1000n);
-        });
-
-        it('leaves a full board alone for a score too small to enter', async function () {
-            this.timeout(120000);
-            for (let i = 0; i < 100; i++) {
-                await submit(score(ethers.Wallet.createRandom().address, BigInt(1000 + i * 10)));
-            }
-            const before = await board.getLeaderboard(100, 'Tournament');
-            await submit(score(alice.address, 5n));
-            const after = await board.getLeaderboard(100, 'Tournament');
-            expect(after[0]).to.deep.equal(before[0]);
-            expect(await board.leaderboardPosition(alice.address, 'Tournament')).to.equal(0n);
+            expect(ranking.map(r => r[0])).to.deep.equal([alice.address, bob.address]);
+            expect(ranking.map(r => r[1])).to.deep.equal([1200n, 900n]);
         });
     });
 

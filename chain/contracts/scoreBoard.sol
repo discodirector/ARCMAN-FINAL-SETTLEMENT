@@ -3,19 +3,23 @@ pragma solidity 0.8.24;
 
 /**
  * @title ARCMAN score board
- * @notice Keeps each player's best score per game mode and a leaderboard of the
- *         top hundred, on the word of the game's server.
+ * @notice Keeps each player's best score per game mode, on the word of the
+ *         game's server.
  *
  * The server watches a run, computes the score itself and signs it. This
  * contract checks that signature and nothing else: it has no idea what a level
- * is. Two consequences worth stating plainly —
+ * is. Three consequences worth stating plainly —
  *
  *   - whoever holds the signing key can write any score for any player, which
  *     is why the key can be replaced without redeploying;
  *   - anyone may send the transaction. The signature names the player, so a
- *     stranger paying the gas cannot steal or misplace a score. That is the
- *     point: on Arc the gas is USDC, and a player who has just finished their
- *     first run has none.
+ *     stranger paying the gas can neither steal a score nor misplace it. That
+ *     is the point: on Arc the gas is USDC, and a player who has just finished
+ *     their first run has none;
+ *   - there is no leaderboard here. Keeping a sorted hundred in storage cost
+ *     about six times the price of the score itself, because a new leader
+ *     shifts everyone below them. The ranking is built by reading NewBestScore
+ *     instead — the chain still holds every score, just not the order.
  */
 contract ARCMANScoreBoard {
     struct ScoreData {
@@ -30,10 +34,7 @@ contract ARCMANScoreBoard {
         uint256 bestScore;
         uint256 levelId;
         uint256 timestamp;
-        string gameMode;
     }
-
-    uint256 public constant LEADERBOARD_SIZE = 100;
 
     address public owner;
     address public pendingOwner;
@@ -41,18 +42,15 @@ contract ARCMANScoreBoard {
     /// The key the server signs scores with.
     address public serverSigner;
 
-    /// Every score the server has signed, so none can be replayed.
+    /// Every signature is spent on use, so none can be replayed.
     mapping(bytes32 => bool) public usedSignatures;
 
     mapping(address => mapping(string => PlayerRecord)) public playerScores;
 
-    /// One leaderboard per game mode, best first.
-    mapping(string => address[]) public leaderboards;
-    /// Position of a player on their mode's board, one-based; 0 means absent.
-    mapping(string => mapping(address => uint256)) private leaderboardIndices;
-
+    /// Every finished run, whether or not it beat the player's own best.
     event ScoreSubmitted(address indexed player, uint256 score, uint256 levelId, string gameMode);
-    event LeaderboardUpdated(address indexed player, uint256 newScore, string gameMode);
+    /// A player's new best. Read these to build the ranking.
+    event NewBestScore(address indexed player, uint256 score, uint256 levelId, string gameMode, uint256 timestamp);
     event SignerChanged(address indexed previousSigner, address indexed newSigner);
     event OwnershipTransferStarted(address indexed previousOwner, address indexed newOwner);
     event OwnershipTransferred(address indexed previousOwner, address indexed newOwner);
@@ -112,75 +110,13 @@ contract ARCMANScoreBoard {
             record.bestScore = scoreData.score;
             record.levelId = scoreData.levelId;
             record.timestamp = block.timestamp;
-            record.gameMode = scoreData.gameMode;
-
-            _place(scoreData.player, scoreData.score, scoreData.gameMode);
+            emit NewBestScore(scoreData.player, scoreData.score, scoreData.levelId, scoreData.gameMode, block.timestamp);
         }
 
         emit ScoreSubmitted(scoreData.player, scoreData.score, scoreData.levelId, scoreData.gameMode);
     }
 
-    /**
-     * @dev Put a player at their place on the board, best first. The old entry
-     *      is lifted out by shifting the rest up rather than by swapping the
-     *      last one into the gap: a swap is cheaper but leaves the board out of
-     *      order, and every later insertion then lands in the wrong place.
-     */
-    function _place(address player, uint256 score, string calldata gameMode) private {
-        address[] storage board = leaderboards[gameMode];
-        mapping(address => uint256) storage indexOf = leaderboardIndices[gameMode];
-
-        uint256 held = indexOf[player];
-        if (held != 0) {
-            for (uint256 i = held - 1; i + 1 < board.length; i++) {
-                board[i] = board[i + 1];
-                indexOf[board[i]] = i + 1;
-            }
-            indexOf[player] = 0;
-            board.pop();
-        }
-
-        uint256 place = board.length;
-        for (uint256 i = 0; i < board.length; i++) {
-            if (playerScores[board[i]][gameMode].bestScore < score) {
-                place = i;
-                break;
-            }
-        }
-        if (place >= LEADERBOARD_SIZE) return;   // not good enough for a full board
-
-        board.push(player);
-        for (uint256 i = board.length - 1; i > place; i--) {
-            board[i] = board[i - 1];
-            indexOf[board[i]] = i + 1;
-        }
-        board[place] = player;
-        indexOf[player] = place + 1;
-
-        if (board.length > LEADERBOARD_SIZE) {
-            indexOf[board[LEADERBOARD_SIZE]] = 0;
-            board.pop();
-        }
-
-        emit LeaderboardUpdated(player, score, gameMode);
-    }
-
     // --- reading -----------------------------------------------------------
-
-    function getLeaderboard(uint256 count, string calldata gameMode)
-        external
-        view
-        returns (address[] memory players, uint256[] memory scores)
-    {
-        address[] storage board = leaderboards[gameMode];
-        uint256 length = count < board.length ? count : board.length;
-        players = new address[](length);
-        scores = new uint256[](length);
-        for (uint256 i = 0; i < length; i++) {
-            players[i] = board[i];
-            scores[i] = playerScores[board[i]][gameMode].bestScore;
-        }
-    }
 
     function getPlayerScore(address player, string calldata gameMode)
         external
@@ -189,14 +125,6 @@ contract ARCMANScoreBoard {
     {
         PlayerRecord memory record = playerScores[player][gameMode];
         return (record.bestScore, record.levelId, record.timestamp);
-    }
-
-    function leaderboardLength(string calldata gameMode) external view returns (uint256) {
-        return leaderboards[gameMode].length;
-    }
-
-    function leaderboardPosition(address player, string calldata gameMode) external view returns (uint256) {
-        return leaderboardIndices[gameMode][player];
     }
 
     // --- keeping the keys --------------------------------------------------
