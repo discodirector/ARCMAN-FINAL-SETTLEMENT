@@ -6,8 +6,8 @@ levels, the game teaches you how Arc, USDC and on-chain payments actually work.
 
 **Play it at [arcmangame.com](https://arcmangame.com)** · English · Русский · 中文 · Bahasa Indonesia
 
-Scores are computed and signed by the server, finalized on **Arc Testnet**, and ranked on an on-chain
-leaderboard. Finish the run and you can mint an ERC-721 completion certificate.
+Scores are computed and signed by the server, put on **Arc** at the server's expense, and ranked by
+reading the contract's own events. Finish a course and you can claim a USDC reward.
 
 ---
 
@@ -50,15 +50,15 @@ The main mode is **Tournament**: 20 levels, 10 lives, one run.
 5. **Finish.** After level 20: claim the reward, finalize the score on-chain and check the
    leaderboard.
 
-A wallet (MetaMask, Rabby) is only needed for the on-chain steps — the game itself plays without one.
-Test USDC for gas comes from the [Circle faucet](https://faucet.circle.com/).
+A wallet (MetaMask, Rabby) is only needed for the on-chain steps — the game itself plays without one,
+and the wallet needs nothing in it: the server pays the gas for both the score and the reward.
 
 **Other menu entries**
 
 - **Community Levels** — levels submitted by players and approved by the maintainers.
 - **Level Editor** — build a level, test it in place, export it, or submit it for review.
 - **Statistics** — games played and completed, best scores, times and totals, stored in the browser.
-- **Leaderboard** — top 10 / 25 / 50 / 100 from the contract, with your own rank.
+- **Leaderboard** — top 10 / 25 / 50 / 100, read from the chain by the server, with your own rank.
 
 ---
 
@@ -223,7 +223,7 @@ communityLevels.js    approved community levels
 server.js             Express: public files, anti-cheat sessions, score signing, level submissions
 server/quizService.js server-side quiz grading
 private/              answer-key.json — never committed, deployed to the server like .env
-contract.sol          USDCLaunchScore — signature check, best scores, leaderboards
+contract.sol          the retired score contract, kept for the record
 chain/                 ARCMANRewardPool — the USDC reward for finishing a course
 js/
   i18n.js             translation runtime            locales/   en, ru, zh, id packs
@@ -330,19 +330,28 @@ and the rest of the backend keeps running. The file is never committed: the repo
 
 ## Smart contracts
 
-Deployed on **Arc Testnet** (chain id `5042002`, RPC `https://rpc.testnet.arc.network`).
+Arc mainnet is chain id `5042`, RPC `https://rpc.mainnet.arc.io`; the testnet is `5042002` at
+`https://rpc.testnet.arc.io`. On both, the gas is USDC.
 
-| Contract | Address |
-|---|---|
-| `USDCLaunchScore` (`contract.sol`) | `0x1E880c3165f5f2ee6B4d00598C9B5e1BfAC6ED0f` |
+**ARCMANScoreBoard** (`chain/contracts/scoreBoard.sol`)
 
-**USDCLaunchScore**
+- `finalizeScore(scoreData, signature)` — verifies the server signature and keeps the player's best
+  score per game mode. Anyone may send it: the signature names the player, so a stranger paying the
+  gas can neither steal a score nor misplace it. That is what lets the server pay for a player whose
+  wallet is empty.
+- Signatures are spent on use and the upper half of the curve is refused, so one cannot be replayed
+  or mirrored.
+- No leaderboard in storage. Sorting a hundred players cost up to 1.3M gas and charged the best
+  players the most; the ranking is built from `NewBestScore` instead, by the server, and served at
+  `/api/leaderboard`.
+- `setServerSigner` (owner only) replaces the signing key without redeploying — it matters, because
+  whoever holds that key can write any score. Ownership moves in two steps.
 
-- `finalizeScore(scoreData, signature)` — the caller must be the player; verifies the server
-  signature, keeps the player's best score per game mode and updates that mode's leaderboard.
-- `getLeaderboard(count, gameMode)`, `getPlayerScore(player, gameMode)` — read views.
-- Leaderboards hold the top 100 per game mode. The game finalizes to `Tournament`; records from the
-  retired Immortal mode remain on-chain and are no longer shown.
+**ARCMANRewardPool** (`chain/contracts/rewardPool.sol`)
+
+- A fixed USDC reward per finished course, once per wallet and once per X account, released against
+  an EIP-712 signature from the server and relayed at our expense.
+- The owner can withdraw and pause; the signer can only authorise a reward it already holds.
 
 ---
 
@@ -403,8 +412,8 @@ the same process.
 
 ## Project notes
 
-- **The game runs on Arc Testnet.** Arc's public mainnet opened on 16 September 2026, but the game's
-  contracts are still on testnet, so everything on-chain here uses test USDC with no value.
+- **Which chain.** `GameConfig.BLOCKCHAIN.NETWORK` decides; on testnet everything uses test USDC
+  with no value. Arc's public mainnet opened on 16 September 2026.
 - **Retired modes.** Immortal mode was removed; Tournament is the only scored mode. The Agent Shift
   mode was retired from the game, but `js/agent.js`, `agentShift.js`, `agentWallet.js`,
   `agentOnboarding.js` and `agentMode.js` stay in the tree with their markup and styles. No script tag

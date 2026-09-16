@@ -22,8 +22,7 @@ I18n.register('en', {
         editor: 'LEVEL EDITOR',
         statistics: 'STATISTIC',
         leaderboard: 'LEADERBOARD',
-        audio: 'AUDIO OPTIONS',
-        faucet: 'USDC Faucet'
+        audio: 'AUDIO OPTIONS'
     },
 
     hud: {
@@ -276,7 +275,8 @@ I18n.register('en', {
         switchNetwork: 'Please approve the network switch to {network} in your wallet.',
         switchFailed: 'Failed to switch to {network}. Please switch manually in your wallet.',
         contractMissing: 'Contract not initialized. Please set CONTRACT_ADDRESS in config.',
-        txWouldFail: 'Transaction would fail. Please check your score data.'
+        txWouldFail: 'Transaction would fail. Please check your score data.',
+        leaderboardUnavailable: 'The leaderboard could not be reached. Try again in a moment.'
     },
 
     errors: {

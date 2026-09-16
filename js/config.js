@@ -60,18 +60,18 @@ const GameConfig = {
     BLOCKCHAIN: {
         // Contract addresses (update these after deployment)
         CONTRACT_ADDRESS: '0x1E880c3165f5f2ee6B4d00598C9B5e1BfAC6ED0f', // Will be set after contract deployment
-        // Network configuration
-        NETWORK: 'ArcTestnet', // 'sepolia', 'mainnet', 'localhost', 'ArcTestnet'
+        // Which chain the game talks to: 'ArcMainnet', 'ArcTestnet', 'localhost'
+        NETWORK: 'ArcTestnet',
         // RPC URLs (using public endpoints - in production, use your own)
         RPC_URLS: {
-            ArcTestnet: 'https://rpc.testnet.arc.network',
-            sepolia: 'https://rpc.sepolia.org',
+            ArcMainnet: 'https://rpc.mainnet.arc.io',
+            ArcTestnet: 'https://rpc.testnet.arc.io',
             localhost: 'http://localhost:8545'
         },
         // Chain IDs
         CHAIN_IDS: {
-            ArcTestnet: 5042002, // Arc Testnet chain ID
-            sepolia: 11155111, // Sepolia testnet (corrected)
+            ArcMainnet: 5042,      // Arc, public since 16 September 2026
+            ArcTestnet: 5042002,
             localhost: 1337
         },
         // Backend API URL

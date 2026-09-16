@@ -1088,37 +1088,6 @@ const GameFlow = {
                 GameState.sessionPlayer = attached.data.player;
             }
             
-            // Verify correct network
-            const expectedChainId = GameConfig.BLOCKCHAIN.CHAIN_IDS[GameConfig.BLOCKCHAIN.NETWORK];
-            if (expectedChainId) {
-                try {
-                    const network = await Web3Manager.provider.getNetwork();
-                    const currentChainId = typeof network.chainId === 'bigint' 
-                        ? network.chainId 
-                        : BigInt(network.chainId || 0);
-                    const expectedChainIdBigInt = BigInt(expectedChainId);
-                    
-                    if (currentChainId !== expectedChainIdBigInt) {
-                        await Web3Manager.checkNetwork();
-                        const networkAfter = await Web3Manager.provider.getNetwork();
-                        const chainIdAfter = typeof networkAfter.chainId === 'bigint' 
-                            ? networkAfter.chainId 
-                            : BigInt(networkAfter.chainId || 0);
-                        if (chainIdAfter !== expectedChainIdBigInt) {
-                            throw new Error(
-                                `Please switch to ${GameConfig.BLOCKCHAIN.NETWORK} in your wallet. ` +
-                                `Current network: ${currentChainId}, Required: ${expectedChainIdBigInt}`
-                            );
-                        }
-                    }
-                } catch (networkError) {
-                    throw new Error(
-                        `Network error: ${networkError.message}. ` +
-                        `Please ensure you're connected to ${GameConfig.BLOCKCHAIN.NETWORK}.`
-                    );
-                }
-            }
-            
             // The server signs a run once and marks the session finished the
             // moment it does. So a signature already in hand is kept and reused:
             // a declined wallet prompt, or a wallet that cannot reach the chain,
@@ -1177,7 +1146,7 @@ const GameFlow = {
                             sessionId: GameState.sessionId,
                             nonce: nonceBigInt.toString()
                         }),
-                        signal: AbortSignal.timeout(10000)
+                        signal: AbortSignal.timeout(90000)
                     });
                 } catch (fetchError) {
                     if (fetchError.name === 'AbortError') {
@@ -1209,19 +1178,59 @@ const GameFlow = {
                 this.pendingFinalization = { sessionId: GameState.sessionId, signed, nonce: nonceBigInt };
             }
 
-            // Use the SERVER-COMPUTED score (not the client-side score)
-            const serverScore = BigInt(signed.score);
-            
+            // The server sends the transaction itself and pays the gas: on Arc
+            // that gas is USDC, and a player who has just finished their first
+            // run has none. Nothing more is asked of the wallet.
+            if (signed.relayed && signed.txHash) {
+                this.pendingFinalization = null;
+                this.showOnchainSuccess(signed.txHash);
+                return;
+            }
+
+            // No relayer configured, so the run is handed back for the player to
+            // send from their own wallet, as it used to work.
+
+            // Only now does the wallet need to be on the right chain.
+            const expectedChainId = GameConfig.BLOCKCHAIN.CHAIN_IDS[GameConfig.BLOCKCHAIN.NETWORK];
+            if (expectedChainId) {
+                try {
+                    const network = await Web3Manager.provider.getNetwork();
+                    const currentChainId = typeof network.chainId === 'bigint' 
+                        ? network.chainId 
+                        : BigInt(network.chainId || 0);
+                    const expectedChainIdBigInt = BigInt(expectedChainId);
+                    
+                    if (currentChainId !== expectedChainIdBigInt) {
+                        await Web3Manager.checkNetwork();
+                        const networkAfter = await Web3Manager.provider.getNetwork();
+                        const chainIdAfter = typeof networkAfter.chainId === 'bigint' 
+                            ? networkAfter.chainId 
+                            : BigInt(networkAfter.chainId || 0);
+                        if (chainIdAfter !== expectedChainIdBigInt) {
+                            throw new Error(
+                                `Please switch to ${GameConfig.BLOCKCHAIN.NETWORK} in your wallet. ` +
+                                `Current network: ${currentChainId}, Required: ${expectedChainIdBigInt}`
+                            );
+                        }
+                    }
+                } catch (networkError) {
+                    throw new Error(
+                        `Network error: ${networkError.message}. ` +
+                        `Please ensure you're connected to ${GameConfig.BLOCKCHAIN.NETWORK}.`
+                    );
+                }
+            }
+
             if (statusText) {
                 statusText.textContent = t('onchain.submitting');
             }
-            
+
             // Everything the contract verifies comes back from the server, not
             // from the screen: the two could disagree, and only the signed
             // version is the one that will check out.
             const scoreData = {
                 player: signed.player || account,
-                score: serverScore,
+                score: BigInt(signed.score),
                 levelId: BigInt(signed.levelId !== undefined ? signed.levelId : GameState.completionData.levelsCompleted),
                 nonce: nonceBigInt,
                 gameMode: GameState.completionData.gameMode || 'Tournament'

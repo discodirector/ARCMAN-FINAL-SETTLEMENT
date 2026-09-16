@@ -22,8 +22,7 @@ I18n.register('id', {
         editor: 'EDITOR LEVEL',
         statistics: 'STATISTIK',
         leaderboard: 'PAPAN PERINGKAT',
-        audio: 'PENGATURAN AUDIO',
-        faucet: 'Faucet USDC'
+        audio: 'PENGATURAN AUDIO'
     },
 
     hud: {
@@ -276,7 +275,8 @@ I18n.register('id', {
         switchNetwork: 'Setujui pergantian jaringan ke {network} di dompet Anda.',
         switchFailed: 'Gagal beralih ke {network}. Ganti jaringan secara manual di dompet Anda.',
         contractMissing: 'Kontrak belum diinisialisasi. Atur CONTRACT_ADDRESS di konfigurasi.',
-        txWouldFail: 'Transaksi akan gagal. Periksa data skor Anda.'
+        txWouldFail: 'Transaksi akan gagal. Periksa data skor Anda.',
+        leaderboardUnavailable: 'Papan peringkat tidak dapat dijangkau. Coba lagi sebentar lagi.'
     },
 
     errors: {

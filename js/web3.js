@@ -9,13 +9,14 @@ const Web3Manager = {
     currentAccount: null,
     
     // Contract ABI (matching contract.sol)
+    // The board keeps scores; the ranking is read from its events by the
+    // server, so there is no getLeaderboard to call here.
     CONTRACT_ABI: [
         "function finalizeScore((address player, uint256 score, uint256 levelId, uint256 nonce, string gameMode), bytes signature) external",
-        "function getPlayerScore(address player, string memory gameMode) external view returns (uint256 bestScore, uint256 levelId, uint256 timestamp)",
-        "function getLeaderboard(uint256 count, string memory gameMode) external view returns (address[] memory players, uint256[] memory scores)",
-        "function playerScores(address, string) external view returns (uint256 bestScore, uint256 levelId, uint256 timestamp, string gameMode)",
-        "event ScoreSubmitted(address indexed player, uint256 score, uint256 levelId)",
-        "event LeaderboardUpdated(address indexed player, uint256 newScore)"
+        "function getPlayerScore(address player, string gameMode) external view returns (uint256 bestScore, uint256 levelId, uint256 timestamp)",
+        "function playerScores(address, string) external view returns (uint256 bestScore, uint256 levelId, uint256 timestamp)",
+        "event ScoreSubmitted(address indexed player, uint256 score, uint256 levelId, string gameMode)",
+        "event NewBestScore(address indexed player, uint256 score, uint256 levelId, string gameMode, uint256 timestamp)"
     ],
     
     // Check if wallet is connected
@@ -26,10 +27,8 @@ const Web3Manager = {
     // Where a player can go and see a transaction for themselves
     getTransactionUrl: function(txHash) {
         const network = GameConfig.BLOCKCHAIN.NETWORK;
-        if (network === 'ArcTestnet') return `https://testnet.arcscan.app/tx/${txHash}`;
-        if (network === 'ArcMainnet') return `https://arcscan.app/tx/${txHash}`;
-        if (network === 'sepolia') return `https://sepolia.etherscan.io/tx/${txHash}`;
-        return `https://etherscan.io/tx/${txHash}`;
+        if (network === 'ArcMainnet') return `https://explorer.arc.io/tx/${txHash}`;
+        return `https://explorer.testnet.arc.io/tx/${txHash}`;
     },
 
     // Get a read-only provider (no wallet required) for view-only contract calls
@@ -345,26 +344,21 @@ const Web3Manager = {
         const rpcUrl = GameConfig.BLOCKCHAIN.RPC_URLS[GameConfig.BLOCKCHAIN.NETWORK];
         
         const networks = {
+            ArcMainnet: {
+                chainId: '0x' + chainId.toString(16),
+                chainName: 'Arc',
+                // On Arc the gas is USDC itself. The wallet shows it with
+                // eighteen decimals even though the token has six.
+                nativeCurrency: { name: 'USDC', symbol: 'USDC', decimals: 18 },
+                rpcUrls: [rpcUrl],
+                blockExplorerUrls: ['https://explorer.arc.io']
+            },
             ArcTestnet: {
                 chainId: '0x' + chainId.toString(16),
                 chainName: 'Arc Testnet',
                 nativeCurrency: { name: 'USDC', symbol: 'USDC', decimals: 18 },
                 rpcUrls: [rpcUrl],
-                blockExplorerUrls: ['https://testnet.arcscan.app']
-            },
-            sepolia: {
-                chainId: '0x' + chainId.toString(16),
-                chainName: 'Sepolia Test Network',
-                nativeCurrency: { name: 'SepoliaETH', symbol: 'ETH', decimals: 18 },
-                rpcUrls: [rpcUrl],
-                blockExplorerUrls: ['https://sepolia.etherscan.io']
-            },
-            mainnet: {
-                chainId: '0x' + chainId.toString(16),
-                chainName: 'Ethereum Mainnet',
-                nativeCurrency: { name: 'Ether', symbol: 'ETH', decimals: 18 },
-                rpcUrls: [rpcUrl],
-                blockExplorerUrls: ['https://etherscan.io']
+                blockExplorerUrls: ['https://explorer.testnet.arc.io']
             }
         };
         
@@ -515,29 +509,22 @@ const Web3Manager = {
     },
     
     // Get leaderboard from contract
+    // The ranking comes from our server, which reads it out of the contract's
+    // events. Sorting a hundred players in contract storage cost ten times the
+    // price of a score, and it was the best players who paid it — so the chain
+    // keeps the scores and the order is worked out from them.
     getLeaderboard: async function(count = 100, gameMode = 'Tournament') {
-        try {
-            const provider = this.provider || this.getReadOnlyProvider();
-            
-            if (!GameConfig.BLOCKCHAIN.CONTRACT_ADDRESS) {
-                throw new Error('Contract address not set');
-            }
-            
-            const contract = new ethers.Contract(
-                GameConfig.BLOCKCHAIN.CONTRACT_ADDRESS,
-                this.CONTRACT_ABI,
-                provider
-            );
-            
-            const result = await contract.getLeaderboard(count, gameMode);
-            return {
-                players: result[0],
-                scores: result[1].map(s => s.toString())
-            };
-        } catch (error) {
-            console.error('Error getting leaderboard:', error);
-            throw error;
-        }
+        const url = `${GameConfig.BLOCKCHAIN.API_URL}/api/leaderboard`
+            + `?count=${encodeURIComponent(count)}&gameMode=${encodeURIComponent(gameMode)}`;
+
+        const response = await fetch(url, { cache: 'no-store' });
+        if (!response.ok) throw new Error(t('errors.leaderboardUnavailable'));
+
+        const board = await response.json();
+        return {
+            players: board.players || [],
+            scores: (board.scores || []).map(String),
+        };
     },
     
     // Get player's score for a specific game mode
@@ -576,18 +563,6 @@ const Web3Manager = {
     formatAddress: function(address) {
         if (!address) return '';
         return address.substring(0, 6) + '...' + address.substring(address.length - 4);
-    },
-    
-    // Get transaction URL (Etherscan)
-    getTransactionUrl: function(txHash) {
-        const network = GameConfig.BLOCKCHAIN.NETWORK;
-        const baseUrls = {
-            ArcTestnet: 'https://testnet.arcscan.app/tx/',
-            sepolia: 'https://sepolia.etherscan.io/tx/',
-            mainnet: 'https://etherscan.io/tx/',
-            localhost: '#'
-        };
-        return (baseUrls[network] || baseUrls.ArcTestnet) + txHash;
     },
     
     // Listen for account changes

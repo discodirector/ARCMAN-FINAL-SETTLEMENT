@@ -22,8 +22,7 @@ I18n.register('zh', {
         editor: '关卡编辑器',
         statistics: '统计数据',
         leaderboard: '排行榜',
-        audio: '音频设置',
-        faucet: 'USDC 水龙头'
+        audio: '音频设置'
     },
 
     hud: {
@@ -276,7 +275,8 @@ I18n.register('zh', {
         switchNetwork: '请在钱包中批准切换到 {network} 网络。',
         switchFailed: '切换到 {network} 失败。请在钱包中手动切换。',
         contractMissing: '合约未初始化。请在配置中设置 CONTRACT_ADDRESS。',
-        txWouldFail: '该交易将会失败，请检查你的分数数据。'
+        txWouldFail: '该交易将会失败，请检查你的分数数据。',
+        leaderboardUnavailable: '暂时无法获取排行榜，请稍后再试。'
     },
 
     errors: {

@@ -29,7 +29,7 @@ module.exports = {
       gasPrice: 25_000_000_000,
     },
     arcMainnet: {
-      url: process.env.ARC_MAINNET_RPC || 'https://arc.drpc.org',
+      url: process.env.ARC_MAINNET_RPC || 'https://rpc.mainnet.arc.io',
       chainId: 5042,
       accounts: deployer,
       gasPrice: 25_000_000_000,

@@ -2089,44 +2089,6 @@
             box-shadow: 0 0 25px #ff8c00;
         }
 
-        /* USDC Faucet Button in Main Menu (Below Wallet Button) */
-        .menu-faucet-button {
-            position: absolute;
-            top: clamp(65px, 8vw, 75px); /* Positioned below wallet button */
-            left: clamp(15px, 3vw, 25px);
-            min-width: 140px;
-            height: 40px;
-            padding: 0 12px;
-            background: rgba(39, 117, 202, 0.2); /* USDC blue */
-            border: 2px solid #2775CA;
-            color: #2775CA;
-            font-family: 'Courier New', monospace;
-            font-size: clamp(11px, 2vw, 14px);
-            font-weight: bold;
-            cursor: pointer;
-            box-shadow: 0 0 15px rgba(39, 117, 202, 0.5);
-            border-radius: 5px;
-            z-index: 200;
-            transition: all 0.3s;
-            text-align: center;
-            white-space: nowrap;
-            text-decoration: none;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            box-sizing: border-box;
-        }
-
-        .menu-faucet-button:hover {
-            background: rgba(39, 117, 202, 0.3);
-            box-shadow: 0 0 25px #2775CA;
-            transform: scale(1.05);
-        }
-
-        .menu-faucet-button:active {
-            transform: scale(0.95);
-        }
-
         /* --- Language switcher (main menu, top right) --- */
         .menu-language-switcher {
             position: absolute;
@@ -2701,13 +2663,6 @@
                 font-size: 10px;
             }
 
-            .menu-faucet-button {
-                min-width: 110px;
-                height: 32px;
-                font-size: 10px;
-                top: clamp(52px, 7vw, 62px);
-            }
-
             .menu-language-switcher {
                 min-width: 128px;
             }
@@ -2811,14 +2766,6 @@
             .menu-wallet-button,
             .menu-wallet-button #menuWalletButtonText {
                 font-size: 9px;
-            }
-
-            .menu-faucet-button {
-                min-width: 100px;
-                height: 28px;
-                font-size: 9px;
-                top: 40px;
-                left: 8px;
             }
 
             .menu-language-switcher {
@@ -3626,10 +3573,6 @@
             <span id="menuWalletButtonText" data-i18n="wallet.connect">Connect Wallet</span>
             <span id="menuWalletButtonAddress" style="display: none;"></span>
         </button>
-        <!-- USDC Faucet Button (Below Wallet Button) -->
-        <a href="https://faucet.circle.com/" target="_blank" class="menu-faucet-button" id="menuFaucetButton" data-i18n="menu.faucet">
-            USDC Faucet
-        </a>
         <!-- Language Switcher (Top Right) — options are built from I18n.LANGUAGES -->
         <div id="languageSwitcher" class="menu-language-switcher">
             <button type="button" id="languageToggle" class="menu-language-button"
