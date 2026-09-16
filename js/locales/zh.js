@@ -44,7 +44,7 @@ I18n.register('zh', {
         title: '模式说明',
         close: '我准备好了',
         tournamentText: '你就是 <span style="color: #0ff; text-shadow: 0 0 20px #0ff; font-weight: bold;">Arc Man</span>。你的任务：完成这笔稳定币交易的最终结算。让代币沿弧线飞出，命中结算区。\n\n赚取分数，与他人一较高下，冲上排行榜，并铸造你的最终 NFT。',
-        tournamentHighlight: '本模式中你有 5 条生命。答对问答题可以恢复生命——即使全部用完，最后一轮问答也能让你重返赛程。'
+        tournamentHighlight: '本模式中你有 10 条生命。答对问答题可以恢复生命——即使全部用完，最后一轮问答也能让你重返赛程。'
     },
 
     tutorial: {
@@ -121,7 +121,6 @@ I18n.register('zh', {
         averageLevelScore: '单关平均分',
         gameMode: '游戏模式',
         finalizeOnchain: '上链结算',
-        mintNft: '铸造 NFT',
         returnToMenu: '返回主菜单'
     },
 
@@ -164,6 +163,7 @@ I18n.register('zh', {
         needWallet: '请先验证钱包。',
         needX: '请先验证 X 账号。',
         expired: '本次领取已过期，请重新完成一轮课程后再领取。',
+        quizNeeded: '领取奖励需要在 20 道题中答对 {needed} 道，你答对了 {correct} 道。再玩一遍，慢慢答题。',
         failed: '奖励领取失败。'
     },
 
@@ -241,6 +241,7 @@ I18n.register('zh', {
         estimatedGas: '预估 Gas：',
         submit: '将分数上链',
         processing: '处理中……',
+        provingWallet: '请查看钱包：签名只用于证明钱包属于你，不会转移任何资产。',
         gettingSignature: '正在获取服务器签名……',
         submitting: '正在提交交易……',
         successTitle: '✅ 分数已上链！',
@@ -249,37 +250,6 @@ I18n.register('zh', {
         errorTitle: '❌ 出错了',
         close: '关闭',
         failed: '分数上链失败'
-    },
-
-    nft: {
-        title: '🎨 铸造通关 NFT',
-        preview: 'NFT 预览',
-        previewName: 'ARCMAN: Final Settlement — 通关证书',
-        connectPrompt: '连接钱包以铸造你的通关 NFT',
-        supportedWallets: '支持的钱包：MetaMask、Rabby',
-        connectWallet: '连接钱包',
-        connected: '已连接：',
-        alreadyHave: '✓ 你已经拥有一枚通关 NFT！',
-        tokenId: '代币 ID：',
-        viewOnExplorer: '在区块浏览器中查看',
-        disconnect: '断开连接',
-        readyToMint: '准备铸造',
-        estimatedGas: '预估 Gas：',
-        mint: '铸造 NFT',
-        minting: '铸造中……',
-        preparing: '正在准备交易……',
-        estimatingGas: '正在估算 Gas……',
-        mintingNft: '正在铸造 NFT……',
-        mintedSuccess: 'NFT 铸造成功！',
-        alreadyMinted: '已铸造',
-        successTitle: '🎉 NFT 铸造成功！🎉',
-        successText: '你的通关证书已完成铸造！',
-        transaction: '交易：',
-        viewTx: '查看交易',
-        errorTitle: '❌ 出错了',
-        close: '关闭',
-        connectFailed: '连接钱包失败：{error}',
-        mintFailed: 'NFT 铸造失败'
     },
 
     audio: {
@@ -306,9 +276,7 @@ I18n.register('zh', {
         switchNetwork: '请在钱包中批准切换到 {network} 网络。',
         switchFailed: '切换到 {network} 失败。请在钱包中手动切换。',
         contractMissing: '合约未初始化。请在配置中设置 CONTRACT_ADDRESS。',
-        txWouldFail: '该交易将会失败，请检查你的分数数据。',
-        nftExists: '你已经拥有 {mode} 模式的通关 NFT',
-        nftInitFailed: 'NFT 合约初始化失败'
+        txWouldFail: '该交易将会失败，请检查你的分数数据。'
     },
 
     errors: {

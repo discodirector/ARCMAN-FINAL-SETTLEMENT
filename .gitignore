@@ -28,3 +28,6 @@ private/
 # Contract toolchain build output
 chain/artifacts/
 chain/cache/
+
+# Local test helper: plays a course without a human. Never committed, never deployed.
+js/_autoplay.js

@@ -338,6 +338,9 @@ function registerClaimRoutes(app, { sessions, getIp, sessionExpiryMs, minSeconds
                 balance: ethers.formatUnits(balance, 6),
                 remainingClaims: Number(remaining),
                 open: !paused && remaining > 0n,
+                // So the game can warn a player that skipping every question
+                // costs them the reward, rather than springing it at the end.
+                quizNeeded: config.minQuizCorrect > 0 ? config.minQuizCorrect : 0,
             };
             poolCache = { at: Date.now(), data };
             res.json(data);

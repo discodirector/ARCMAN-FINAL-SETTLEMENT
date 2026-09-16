@@ -29,7 +29,7 @@ leaderboard. Finish the run and you can mint an ERC-721 completion certificate.
 
 ## How a run works
 
-The main mode is **Tournament**: 20 levels, 5 lives, one run.
+The main mode is **Tournament**: 20 levels, 10 lives, one run.
 
 1. **Aim and launch.** Drag to set direction and power — a glowing line traces the arc the coin
    will fly — and release to launch.
@@ -47,7 +47,7 @@ The main mode is **Tournament**: 20 levels, 5 lives, one run.
 
    The score, the level and the server session carry on through a rescue. A second loss in the same
    run goes straight to a restart.
-5. **Finish.** After level 20: finalize the score on-chain, mint the completion NFT, and check the
+5. **Finish.** After level 20: claim the reward, finalize the score on-chain and check the
    leaderboard.
 
 A wallet (MetaMask, Rabby) is only needed for the on-chain steps — the game itself plays without one.
@@ -224,7 +224,7 @@ server.js             Express: public files, anti-cheat sessions, score signing,
 server/quizService.js server-side quiz grading
 private/              answer-key.json — never committed, deployed to the server like .env
 contract.sol          USDCLaunchScore — signature check, best scores, leaderboards
-nftContract.sol       ARCMANCompletionNFT — ERC-721 completion certificate
+chain/                 ARCMANRewardPool — the USDC reward for finishing a course
 js/
   i18n.js             translation runtime            locales/   en, ru, zh, id packs
   config.js           constants, chain and contract settings
@@ -237,14 +237,14 @@ js/
   scoring.js          level scoring and the level summary screen
   ui.js               HUD updates
   input.js            mouse and touch aiming
-  gameFlow.js         modes, level progression, completion, leaderboard and NFT screens
+  gameFlow.js         modes, level progression, completion and leaderboard screens
   infoScreens.js      info screen content      infoManager.js   info screen display
   quizzes.js          level quiz content       quiz.js          level quiz display and rewards
   rescueTopics.js     rescue topic base        rescue.js        the rescue quiz
   statistics.js       player statistics in localStorage
   web3.js             wallet connection, network switching, contract calls
   leaderboard.js      leaderboard fetching and formatting
-  nft.js              NFT metadata and minting
+  claim.js            the reward claim on the completion screen
   levelEditor.js      the level editor
   main.js             game loop and initialisation
   agent*.js           retired Agent Shift mode — not loaded, see Project notes
@@ -335,7 +335,6 @@ Deployed on **Arc Testnet** (chain id `5042002`, RPC `https://rpc.testnet.arc.ne
 | Contract | Address |
 |---|---|
 | `USDCLaunchScore` (`contract.sol`) | `0x1E880c3165f5f2ee6B4d00598C9B5e1BfAC6ED0f` |
-| `ARCMANCompletionNFT` (`nftContract.sol`) | `0x6695B1B9d03fB3E94fdC7599abeB97DDF3E9a764` |
 
 **USDCLaunchScore**
 
@@ -344,13 +343,6 @@ Deployed on **Arc Testnet** (chain id `5042002`, RPC `https://rpc.testnet.arc.ne
 - `getLeaderboard(count, gameMode)`, `getPlayerScore(player, gameMode)` — read views.
 - Leaderboards hold the top 100 per game mode. The game finalizes to `Tournament`; records from the
   retired Immortal mode remain on-chain and are no longer shown.
-
-**ARCMANCompletionNFT**
-
-- `mintCompletionNFT(player, finalScore, levelsCompleted, completionTime, gameMode, tokenURI)` —
-  players can only mint for themselves, one certificate per game mode.
-- `hasCompletionNFT`, `getPlayerTokenId`, `getCompletionData`, `totalSupply` — read views.
-- Metadata is built client-side in `js/nft.js`; the image comes from `GameConfig.BLOCKCHAIN.NFT_IMAGES`.
 
 ---
 

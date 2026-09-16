@@ -57,8 +57,18 @@ const ClaimManager = {
 
         const started = await this.post('/api/claim/start', { sessionId: GameState.sessionId });
         if (started.status !== 200 || !started.data || !started.data.claimId) {
-            // Most often: this run does not qualify. Nothing to offer, so the
-            // section goes away again.
+            // Falling short on the quizzes is the one refusal the player can do
+            // something about, so it is said out loud and the steps stay on
+            // screen, greyed. Every other refusal means this run was never
+            // eligible, and the section quietly goes away.
+            if (started.data && started.data.quizNeeded) {
+                this.setStage('closed');
+                this.say(t('claim.quizNeeded', {
+                    needed: started.data.quizNeeded,
+                    correct: started.data.quizCorrect,
+                }), 'warn');
+                return;
+            }
             section.style.display = 'none';
             return;
         }
@@ -226,8 +236,7 @@ const ClaimManager = {
 
             const link = this.el('claimTxLink');
             if (link && sent.data.txHash) {
-                // Same explorer the NFT screen uses, so both links behave alike
-                link.href = NFTManager.getTransactionUrl(sent.data.txHash);
+                link.href = Web3Manager.getTransactionUrl(sent.data.txHash);
                 link.textContent = t('claim.viewTransaction');
                 link.style.display = 'inline-block';
             }

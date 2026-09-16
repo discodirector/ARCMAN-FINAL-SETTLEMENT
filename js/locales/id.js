@@ -44,7 +44,7 @@ I18n.register('id', {
         title: 'Deskripsi Mode',
         close: 'Saya siap',
         tournamentText: 'Anda adalah <span style="color: #0ff; text-shadow: 0 0 20px #0ff; font-weight: bold;">Arc Man</span>. Misi Anda: menuntaskan setelmen transaksi stablecoin. Luncurkan token dalam lintasan melengkung dan kenai Zona Setelmen.\n\nKumpulkan poin, bersaing dengan pemain lain, naiki Papan Peringkat, dan cetak NFT akhir Anda.',
-        tournamentHighlight: 'Di mode ini Anda punya 5 nyawa. Jawaban benar dalam kuis akan memulihkannya — dan jika semuanya habis, satu kuis terakhir masih bisa mengembalikan Anda ke permainan.'
+        tournamentHighlight: 'Di mode ini Anda punya 10 nyawa. Jawaban benar dalam kuis akan memulihkannya — dan jika semuanya habis, satu kuis terakhir masih bisa mengembalikan Anda ke permainan.'
     },
 
     tutorial: {
@@ -121,7 +121,6 @@ I18n.register('id', {
         averageLevelScore: 'Rata-rata Skor Level',
         gameMode: 'Mode Permainan',
         finalizeOnchain: 'Finalisasi On-Chain',
-        mintNft: 'Cetak NFT',
         returnToMenu: 'Kembali ke Menu'
     },
 
@@ -164,6 +163,7 @@ I18n.register('id', {
         needWallet: 'Buktikan dompet Anda terlebih dahulu.',
         needX: 'Verifikasi dengan X terlebih dahulu.',
         expired: 'Klaim ini sudah kedaluwarsa. Selesaikan permainan lagi untuk mengklaim.',
+        quizNeeded: 'Hadiah memerlukan {needed} jawaban benar dari 20. Kamu punya {correct}. Mainkan lagi dan jawab pertanyaannya perlahan.',
         failed: 'Hadiah tidak dapat diklaim.'
     },
 
@@ -241,6 +241,7 @@ I18n.register('id', {
         estimatedGas: 'Perkiraan Gas:',
         submit: 'Finalisasi Skor On-Chain',
         processing: 'Memproses...',
+        provingWallet: 'Periksa dompet Anda: tanda tangan membuktikan dompet itu milik Anda dan tidak memindahkan apa pun.',
         gettingSignature: 'Mengambil tanda tangan server...',
         submitting: 'Mengirim transaksi...',
         successTitle: '✅ Skor Difinalisasi!',
@@ -249,37 +250,6 @@ I18n.register('id', {
         errorTitle: '❌ Kesalahan',
         close: 'Tutup',
         failed: 'Gagal memfinalisasi skor on-chain'
-    },
-
-    nft: {
-        title: '🎨 Cetak NFT Penyelesaian',
-        preview: 'Pratinjau NFT',
-        previewName: 'ARCMAN: Final Settlement - Sertifikat Penyelesaian',
-        connectPrompt: 'Hubungkan dompet Anda untuk mencetak NFT penyelesaian',
-        supportedWallets: 'Dompet yang didukung: MetaMask, Rabby',
-        connectWallet: 'Hubungkan Dompet',
-        connected: 'Terhubung:',
-        alreadyHave: '✓ Anda sudah punya NFT penyelesaian!',
-        tokenId: 'ID Token:',
-        viewOnExplorer: 'Lihat di Block Explorer',
-        disconnect: 'Putuskan',
-        readyToMint: 'Siap dicetak',
-        estimatedGas: 'Perkiraan gas:',
-        mint: 'Cetak NFT',
-        minting: 'Mencetak...',
-        preparing: 'Menyiapkan transaksi...',
-        estimatingGas: 'Memperkirakan gas...',
-        mintingNft: 'Mencetak NFT...',
-        mintedSuccess: 'NFT berhasil dicetak!',
-        alreadyMinted: 'Sudah Dicetak',
-        successTitle: '🎉 NFT Berhasil Dicetak! 🎉',
-        successText: 'Sertifikat penyelesaian Anda telah dicetak!',
-        transaction: 'Transaksi:',
-        viewTx: 'Lihat Transaksi',
-        errorTitle: '❌ Kesalahan',
-        close: 'Tutup',
-        connectFailed: 'Gagal menghubungkan dompet: {error}',
-        mintFailed: 'Gagal mencetak NFT'
     },
 
     audio: {
@@ -306,9 +276,7 @@ I18n.register('id', {
         switchNetwork: 'Setujui pergantian jaringan ke {network} di dompet Anda.',
         switchFailed: 'Gagal beralih ke {network}. Ganti jaringan secara manual di dompet Anda.',
         contractMissing: 'Kontrak belum diinisialisasi. Atur CONTRACT_ADDRESS di konfigurasi.',
-        txWouldFail: 'Transaksi akan gagal. Periksa data skor Anda.',
-        nftExists: 'Anda sudah punya NFT penyelesaian untuk mode {mode}',
-        nftInitFailed: 'Gagal menginisialisasi kontrak NFT'
+        txWouldFail: 'Transaksi akan gagal. Periksa data skor Anda.'
     },
 
     errors: {

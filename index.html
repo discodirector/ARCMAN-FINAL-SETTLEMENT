@@ -1613,260 +1613,6 @@
             margin-top: clamp(20px, 4vw, 30px);
         }
 
-        /* NFT Minting Screen */
-        #nftMintingScreen {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.95);
-            z-index: 600;
-            display: flex;
-            align-items: flex-start;
-            justify-content: center;
-            overflow-y: auto;
-            -webkit-overflow-scrolling: touch;
-            touch-action: auto;
-            padding: 20px;
-            box-sizing: border-box;
-        }
-
-        .nft-content {
-            background: linear-gradient(135deg, rgba(255, 255, 0, 0.15), rgba(0, 255, 255, 0.15));
-            border: 4px solid #ff0;
-            box-shadow: 0 0 40px #ff0, inset 0 0 30px rgba(255, 255, 0, 0.3);
-            padding: clamp(25px, 5vw, 40px);
-            border-radius: 15px;
-            text-align: center;
-            max-width: 90%;
-            min-width: 320px;
-            margin: auto;
-        }
-
-        .nft-content h2 {
-            color: #ff0;
-            font-size: clamp(24px, 5vw, 36px);
-            text-shadow: 0 0 20px #ff0;
-            margin-bottom: clamp(20px, 4vw, 30px);
-            font-family: 'Courier New', monospace;
-            font-weight: bold;
-        }
-
-        .nft-section {
-            margin-bottom: clamp(20px, 4vw, 30px);
-        }
-
-        .nft-preview {
-            display: flex;
-            flex-direction: column;
-            gap: clamp(15px, 3vw, 20px);
-            align-items: center;
-        }
-
-        .nft-preview-image {
-            width: 200px;
-            height: 200px;
-            border: 3px solid #ff0;
-            border-radius: 10px;
-            background: rgba(255, 255, 0, 0.1);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            box-shadow: 0 0 20px #ff0;
-        }
-
-        .nft-preview-image img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            border-radius: 7px;
-        }
-
-        .nft-placeholder {
-            color: #ff0;
-            font-size: clamp(14px, 2.5vw, 18px);
-            font-family: 'Courier New', monospace;
-        }
-
-        .nft-preview-info {
-            text-align: left;
-            width: 100%;
-            max-width: 400px;
-        }
-
-        .nft-preview-info h3 {
-            color: #ff0;
-            font-size: clamp(16px, 3vw, 22px);
-            margin-bottom: 15px;
-            font-family: 'Courier New', monospace;
-        }
-
-        .nft-attributes {
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-        }
-
-        .nft-attribute {
-            display: flex;
-            justify-content: space-between;
-            padding: 8px 12px;
-            background: rgba(255, 255, 0, 0.1);
-            border: 1px solid #ff0;
-            border-radius: 5px;
-        }
-
-        .nft-attribute-label {
-            color: #0ff;
-            font-size: clamp(12px, 2vw, 14px);
-        }
-
-        .nft-attribute-value {
-            color: #ff0;
-            font-size: clamp(12px, 2vw, 14px);
-            font-weight: bold;
-        }
-
-        .nft-status {
-            text-align: center;
-        }
-
-        .nft-status p {
-            color: #0ff;
-            font-size: clamp(14px, 2.5vw, 18px);
-            margin-bottom: 15px;
-        }
-
-        .nft-status-text {
-            color: #ff0;
-            font-size: clamp(16px, 3vw, 20px);
-            margin-bottom: 15px;
-            font-weight: bold;
-        }
-
-        .nft-gas-info {
-            color: #0ff;
-            font-size: clamp(12px, 2vw, 14px);
-            margin-bottom: 15px;
-        }
-
-        .nft-button {
-            border: none;
-            padding: clamp(12px, 2.5vw, 18px) clamp(24px, 5vw, 36px);
-            font-size: clamp(14px, 2.5vw, 18px);
-            font-family: 'Courier New', monospace;
-            font-weight: bold;
-            cursor: pointer;
-            border-radius: 8px;
-            transition: all 0.3s;
-        }
-
-        .nft-button.primary {
-            background: #ff0;
-            color: #000;
-            box-shadow: 0 0 20px #ff0;
-        }
-
-        .nft-button.primary:hover {
-            background: #fff;
-            box-shadow: 0 0 30px #fff;
-            transform: scale(1.05);
-        }
-
-        .nft-button.secondary {
-            background: rgba(255, 255, 0, 0.2);
-            color: #ff0;
-            border: 2px solid #ff0;
-        }
-
-        .nft-button.secondary:hover {
-            background: rgba(255, 255, 0, 0.3);
-            box-shadow: 0 0 25px #ff0;
-            transform: scale(1.05);
-        }
-
-        .nft-button:active {
-            transform: scale(0.95);
-        }
-
-        .nft-button:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
-        }
-
-        .nft-success {
-            background: rgba(0, 255, 0, 0.1);
-            border: 2px solid #0f0;
-            padding: clamp(20px, 4vw, 30px);
-            border-radius: 8px;
-        }
-
-        .nft-success h3 {
-            color: #0f0;
-            font-size: clamp(20px, 4vw, 28px);
-            text-shadow: 0 0 15px #0f0;
-            margin-bottom: 15px;
-            font-family: 'Courier New', monospace;
-        }
-
-        .nft-success p {
-            color: #0f0;
-            font-size: clamp(14px, 2.5vw, 18px);
-            margin-bottom: 10px;
-        }
-
-        .nft-success-info {
-            margin-top: 15px;
-            padding-top: 15px;
-            border-top: 1px solid rgba(0, 255, 0, 0.3);
-        }
-
-        .nft-success-info p {
-            color: #0ff;
-            font-size: clamp(12px, 2vw, 14px);
-            margin-bottom: 8px;
-        }
-
-        .nft-success-info a {
-            color: #0ff;
-            text-decoration: none;
-            border-bottom: 1px solid #0ff;
-        }
-
-        .nft-success-info a:hover {
-            color: #fff;
-            text-shadow: 0 0 8px #fff;
-        }
-
-        .nft-error {
-            background: rgba(255, 0, 0, 0.1);
-            border: 2px solid #f00;
-            padding: clamp(20px, 4vw, 30px);
-            border-radius: 8px;
-        }
-
-        .nft-error h3 {
-            color: #f00;
-            font-size: clamp(20px, 4vw, 28px);
-            text-shadow: 0 0 15px #f00;
-            margin-bottom: 15px;
-            font-family: 'Courier New', monospace;
-        }
-
-        .nft-error p {
-            color: #f00;
-            font-size: clamp(14px, 2.5vw, 18px);
-        }
-
-        .nft-buttons {
-            display: flex;
-            gap: clamp(15px, 3vw, 20px);
-            justify-content: center;
-            flex-wrap: wrap;
-            margin-top: clamp(20px, 4vw, 30px);
-        }
-
         #finalizedFlash {
             position: absolute;
             top: 0;
@@ -3174,15 +2920,13 @@
             }
 
             .completion-buttons,
-            .statistics-buttons,
-            .nft-buttons {
+            .statistics-buttons {
                 gap: 5px;
             }
 
             .completion-button,
             .statistics-button,
-            .onchain-button,
-            .nft-button {
+            .onchain-button {
                 min-width: 90px;
                 padding: 6px 12px;
                 font-size: clamp(10px, 2vh, 13px);
@@ -3597,7 +3341,6 @@
                 </div>
                 <div class="completion-buttons">
                     <button id="completionFinalizeOnchain" class="completion-button primary" data-i18n="completion.finalizeOnchain">Finalize On-Chain</button>
-                    <button id="completionMintNFT" class="completion-button primary" style="background: #ff0; border-color: #ff0; color: #000; box-shadow: 0 0 20px #ff0;" data-i18n="completion.mintNft">Mint NFT</button>
                     <button id="completionReturnToMenu" class="completion-button secondary" data-i18n="completion.returnToMenu">Return to Menu</button>
                 </div>
             </div>
@@ -3864,78 +3607,6 @@
                 </div>
             </div>
         </div>
-        
-        <!-- NFT Minting Screen -->
-        <div id="nftMintingScreen" style="display: none;">
-            <div class="nft-content">
-                <h2 data-i18n="nft.title">🎨 Mint Completion NFT</h2>
-                
-                <div class="nft-section">
-                    <div class="nft-preview">
-                        <div class="nft-preview-image" id="nftPreviewImage">
-                            <div class="nft-placeholder" data-i18n="nft.preview">NFT Preview</div>
-                        </div>
-                        <div class="nft-preview-info">
-                            <h3 id="nftPreviewName" data-i18n="nft.previewName">ARCMAN: Final Settlement - Completion Certificate</h3>
-                            <div class="nft-attributes" id="nftAttributes">
-                                <!-- Attributes will be populated dynamically -->
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                
-                <div class="nft-section" id="nftWalletSection">
-                    <div class="nft-status" id="nftWalletStatus">
-                        <div id="nftWalletNotConnected">
-                            <p data-i18n="nft.connectPrompt">Connect your wallet to mint your completion NFT</p>
-                            <p style="font-size: clamp(10px, 1.8vw, 12px); margin-top: 10px; opacity: 0.8;" data-i18n="nft.supportedWallets">
-                                Supported wallets: MetaMask, Rabby
-                            </p>
-                            <button id="nftConnectWallet" class="nft-button primary" data-i18n="nft.connectWallet">Connect Wallet</button>
-                        </div>
-                        <div id="nftWalletConnected" style="display: none;">
-                            <p><span data-i18n="nft.connected">Connected:</span> <span id="nftWalletAddress"></span></p>
-                            <div id="nftAlreadyMinted" style="display: none; margin-top: 15px; padding: 15px; background: rgba(255, 255, 0, 0.1); border: 2px solid #ff0; border-radius: 8px;">
-                                <p style="color: #ff0; font-weight: bold; margin-bottom: 10px;" data-i18n="nft.alreadyHave">✓ You already have a completion NFT!</p>
-                                <p style="color: #0ff; font-size: clamp(12px, 2vw, 14px);"><span data-i18n="nft.tokenId">Token ID:</span> <span id="nftExistingTokenId"></span></p>
-                                <a id="nftViewTokenLink" href="#" target="_blank" style="color: #0ff; text-decoration: underline; font-size: clamp(12px, 2vw, 14px);" data-i18n="nft.viewOnExplorer">View on Block Explorer</a>
-                            </div>
-                            <button id="nftDisconnectWallet" class="nft-button secondary" style="margin-top: 10px;" data-i18n="nft.disconnect">Disconnect</button>
-                        </div>
-                    </div>
-                </div>
-                
-                <div class="nft-section" id="nftMintingSection" style="display: none;">
-                    <div class="nft-status-text" id="nftStatusText" data-i18n="nft.readyToMint">Ready to mint</div>
-                    <div class="nft-gas-info" id="nftGasInfo" style="display: none;">
-                        <p><span data-i18n="nft.estimatedGas">Estimated gas:</span> <span id="nftGasAmount">-</span></p>
-                    </div>
-                    <button id="nftMintButton" class="nft-button primary" data-i18n="nft.mint">Mint NFT</button>
-                </div>
-                
-                <div class="nft-section" id="nftSuccessSection" style="display: none;">
-                    <div class="nft-success">
-                        <h3 data-i18n="nft.successTitle">🎉 NFT Minted Successfully! 🎉</h3>
-                        <p data-i18n="nft.successText">Your completion certificate has been minted!</p>
-                        <div class="nft-success-info">
-                            <p><span data-i18n="nft.tokenId">Token ID:</span> <span id="nftTokenId"></span></p>
-                            <p><span data-i18n="nft.transaction">Transaction:</span> <a id="nftTxLink" href="#" target="_blank" data-i18n="nft.viewOnExplorer">View on Block Explorer</a></p>
-                        </div>
-                    </div>
-                </div>
-                
-                <div class="nft-section" id="nftErrorSection" style="display: none;">
-                    <div class="nft-error">
-                        <h3 data-i18n="nft.errorTitle">❌ Error</h3>
-                    </div>
-                </div>
-                
-                <div class="nft-buttons">
-                    <button id="nftClose" class="nft-button secondary" data-i18n="nft.close">Close</button>
-                </div>
-            </div>
-        </div>
-    </div>
 
     <!-- Click to Start Screen -->
     <div id="startScreen">
@@ -4137,7 +3808,6 @@
     <script src="js/statistics.js"></script>
     <script src="js/web3.js"></script>
     <script src="js/leaderboard.js"></script>
-    <script src="js/nft.js"></script>
     <script src="js/claim.js"></script>
     <script src="js/gameFlow.js"></script>
     <!-- Agent Shift is retired. The modules stay in js/ (agent.js, agentShift.js,

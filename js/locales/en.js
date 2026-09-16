@@ -44,7 +44,7 @@ I18n.register('en', {
         title: 'Mode Description',
         close: "I'm in",
         tournamentText: 'You are <span style="color: #0ff; text-shadow: 0 0 20px #0ff; font-weight: bold;">Arc Man</span>. Your mission: finalize the stablecoin transaction. Launch the token in an arc and hit the Settlement Zone.\n\nScore points, compete with others, climb the Leaderboard, and mint your final NFT.',
-        tournamentHighlight: 'You have 5 lives in this mode. Correct answers in the quiz restore them — and if you lose them all, one last quiz can put you back in.'
+        tournamentHighlight: 'You have 10 lives in this mode. Correct answers in the quiz restore them — and if you lose them all, one last quiz can put you back in.'
     },
 
     tutorial: {
@@ -121,7 +121,6 @@ I18n.register('en', {
         averageLevelScore: 'Average Level Score',
         gameMode: 'Game Mode',
         finalizeOnchain: 'Finalize On-Chain',
-        mintNft: 'Mint NFT',
         returnToMenu: 'Return to Menu'
     },
 
@@ -164,6 +163,7 @@ I18n.register('en', {
         needWallet: 'Prove your wallet first.',
         needX: 'Verify with X first.',
         expired: 'This claim has expired. Finish a run again to claim.',
+        quizNeeded: 'The reward asks for {needed} correct quiz answers out of 20. You have {correct}. Play the course again and take the questions slowly.',
         failed: 'The reward could not be claimed.'
     },
 
@@ -241,6 +241,7 @@ I18n.register('en', {
         estimatedGas: 'Estimated Gas:',
         submit: 'Finalize Score On-Chain',
         processing: 'Processing...',
+        provingWallet: 'Check your wallet: signing proves it is yours and moves nothing.',
         gettingSignature: 'Getting server signature...',
         submitting: 'Submitting transaction...',
         successTitle: '✅ Score Finalized!',
@@ -249,37 +250,6 @@ I18n.register('en', {
         errorTitle: '❌ Error',
         close: 'Close',
         failed: 'Failed to finalize score on-chain'
-    },
-
-    nft: {
-        title: '🎨 Mint Completion NFT',
-        preview: 'NFT Preview',
-        previewName: 'ARCMAN: Final Settlement - Completion Certificate',
-        connectPrompt: 'Connect your wallet to mint your completion NFT',
-        supportedWallets: 'Supported wallets: MetaMask, Rabby',
-        connectWallet: 'Connect Wallet',
-        connected: 'Connected:',
-        alreadyHave: '✓ You already have a completion NFT!',
-        tokenId: 'Token ID:',
-        viewOnExplorer: 'View on Block Explorer',
-        disconnect: 'Disconnect',
-        readyToMint: 'Ready to mint',
-        estimatedGas: 'Estimated gas:',
-        mint: 'Mint NFT',
-        minting: 'Minting...',
-        preparing: 'Preparing transaction...',
-        estimatingGas: 'Estimating gas...',
-        mintingNft: 'Minting NFT...',
-        mintedSuccess: 'NFT minted successfully!',
-        alreadyMinted: 'Already Minted',
-        successTitle: '🎉 NFT Minted Successfully! 🎉',
-        successText: 'Your completion certificate has been minted!',
-        transaction: 'Transaction:',
-        viewTx: 'View Transaction',
-        errorTitle: '❌ Error',
-        close: 'Close',
-        connectFailed: 'Failed to connect wallet: {error}',
-        mintFailed: 'Failed to mint NFT'
     },
 
     audio: {
@@ -306,9 +276,7 @@ I18n.register('en', {
         switchNetwork: 'Please approve the network switch to {network} in your wallet.',
         switchFailed: 'Failed to switch to {network}. Please switch manually in your wallet.',
         contractMissing: 'Contract not initialized. Please set CONTRACT_ADDRESS in config.',
-        txWouldFail: 'Transaction would fail. Please check your score data.',
-        nftExists: 'You already have a completion NFT for {mode} mode',
-        nftInitFailed: 'Failed to initialize NFT contract'
+        txWouldFail: 'Transaction would fail. Please check your score data.'
     },
 
     errors: {

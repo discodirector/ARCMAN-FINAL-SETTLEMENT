@@ -28,7 +28,7 @@ const GameConfig = {
     },
     
     // Tournament mode constants
-    MAX_TOURNAMENT_LIVES: 5,
+    MAX_TOURNAMENT_LIVES: 10,
     
     // Player size scaling (1.0 = default size, 1.5 = 50% bigger, 2.0 = double size, etc.)
     PLAYER_SIZE_SCALE: 2.0,
@@ -60,7 +60,6 @@ const GameConfig = {
     BLOCKCHAIN: {
         // Contract addresses (update these after deployment)
         CONTRACT_ADDRESS: '0x1E880c3165f5f2ee6B4d00598C9B5e1BfAC6ED0f', // Will be set after contract deployment
-        NFT_CONTRACT_ADDRESS: '0x6695B1B9d03fB3E94fdC7599abeB97DDF3E9a764', // NFT contract address (set after deployment)
         // Network configuration
         NETWORK: 'ArcTestnet', // 'sepolia', 'mainnet', 'localhost', 'ArcTestnet'
         // RPC URLs (using public endpoints - in production, use your own)
@@ -80,13 +79,7 @@ const GameConfig = {
         // origin this page came from. Opened from a file, fall back to production.
         API_URL: (typeof window !== 'undefined' && /^https?:$/.test(window.location.protocol))
             ? window.location.origin
-            : 'https://arcmangame.com',
-        // NFT image URL for the completion certificate
-        // For development: use a local path (images/nft-tournament.png)
-        // For production: replace with an IPFS/CDN URL (e.g., https://ipfs.io/ipfs/QmXx...)
-        NFT_IMAGES: {
-            Tournament: 'https://black-generous-crocodile-850.mypinata.cloud/ipfs/bafybeiabkfecwarftaaaj3vvgavqaco4idmvshbtzkwbaqbrwu5qdsejoy' // Local file for development, replace with IPFS/CDN for production
-        }
+            : 'https://arcmangame.com'
     },
     
     // Initialize CONFIG from BASE_CONFIG

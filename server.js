@@ -137,6 +137,17 @@ async function signMessage(player, score, levelId, nonce, gameMode) {
 // Session endpoints (anti-cheat protected)
 // ------------------------------------------------------------
 
+// Almost nobody connects a wallet before pressing Play, so a run that wants its
+// score on-chain has to be able to name a wallet once it is over. The signature
+// over this message is what makes that safe: it is tied to the one session, it
+// moves nothing, and it costs nothing.
+function sessionWalletMessage(sessionId) {
+    return 'ARCMAN — score finalization\n\n'
+        + 'Signing this proves you hold this wallet.\n'
+        + 'It does not move any funds.\n\n'
+        + `Session: ${sessionId}`;
+}
+
 // Start a new game session
 app.post('/api/session/start', (req, res) => {
     try {
@@ -198,9 +209,80 @@ app.post('/api/session/start', (req, res) => {
         }
 
         console.log(`Session started: ${sessionId} for ${player || 'a walletless run'} (${validGameMode})`);
-        res.json({ success: true, sessionId, totalLevels: TOTAL_DEFAULT_LEVELS });
+        res.json({
+            success: true,
+            sessionId,
+            totalLevels: TOTAL_DEFAULT_LEVELS,
+            // A run that began without a wallet can still adopt one at the end;
+            // this is the message that proves the wallet is the player's own.
+            walletMessage: player ? null : sessionWalletMessage(sessionId),
+        });
     } catch (error) {
         console.error('Error starting session:', error);
+        res.status(500).json({ error: 'Internal server error' });
+    }
+});
+
+// Name the wallet a finished run belongs to. Only a signature does it: the
+// address alone would let anyone hang their score on someone else's wallet.
+app.post('/api/session/wallet', (req, res) => {
+    try {
+        const { sessionId, address, signature } = req.body;
+
+        if (!sessionId || !address || !signature) {
+            return res.status(400).json({ error: 'Missing required fields' });
+        }
+        if (!ethers.isAddress(address)) {
+            return res.status(400).json({ error: 'Invalid player address' });
+        }
+
+        const session = sessions.get(sessionId);
+        if (!session) {
+            return res.status(404).json({ error: 'Session not found' });
+        }
+        if (session.ip !== getIp(req)) {
+            return res.status(403).json({ error: 'Session IP mismatch' });
+        }
+        if (Date.now() - session.startTime > SESSION_EXPIRY_MS) {
+            sessions.delete(sessionId);
+            return res.status(410).json({ error: 'Session expired' });
+        }
+        if (session.finalized) {
+            return res.status(400).json({ error: 'Session already finalized' });
+        }
+        if (session.player) {
+            // Naming the same wallet twice is a retry, not an error; a different
+            // one would quietly move the score, so it is refused.
+            if (session.normalizedPlayer !== address.toLowerCase()) {
+                return res.status(409).json({ error: 'Session already has a wallet' });
+            }
+            return res.json({ success: true, player: session.player });
+        }
+
+        let signer;
+        try {
+            signer = ethers.verifyMessage(sessionWalletMessage(sessionId), signature);
+        } catch (error) {
+            return res.status(400).json({ error: 'Invalid signature' });
+        }
+        if (signer.toLowerCase() !== address.toLowerCase()) {
+            return res.status(401).json({ error: 'Signature does not match the address' });
+        }
+
+        const normalizedPlayer = signer.toLowerCase();
+        const existingSessionId = playerActiveSessions.get(normalizedPlayer);
+        if (existingSessionId && existingSessionId !== sessionId) {
+            sessions.delete(existingSessionId);
+        }
+
+        session.player = signer;   // checksummed, the form the contract signs over
+        session.normalizedPlayer = normalizedPlayer;
+        playerActiveSessions.set(normalizedPlayer, sessionId);
+
+        console.log(`Session ${sessionId} claimed by ${signer}`);
+        res.json({ success: true, player: signer });
+    } catch (error) {
+        console.error('Error attaching wallet to session:', error);
         res.status(500).json({ error: 'Internal server error' });
     }
 });

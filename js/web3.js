@@ -23,6 +23,15 @@ const Web3Manager = {
         return this.currentAccount !== null && this.signer !== null;
     },
     
+    // Where a player can go and see a transaction for themselves
+    getTransactionUrl: function(txHash) {
+        const network = GameConfig.BLOCKCHAIN.NETWORK;
+        if (network === 'ArcTestnet') return `https://testnet.arcscan.app/tx/${txHash}`;
+        if (network === 'ArcMainnet') return `https://arcscan.app/tx/${txHash}`;
+        if (network === 'sepolia') return `https://sepolia.etherscan.io/tx/${txHash}`;
+        return `https://etherscan.io/tx/${txHash}`;
+    },
+
     // Get a read-only provider (no wallet required) for view-only contract calls
     getReadOnlyProvider: function() {
         const network = GameConfig.BLOCKCHAIN.NETWORK;

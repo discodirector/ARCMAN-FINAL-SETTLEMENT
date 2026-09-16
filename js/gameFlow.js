@@ -26,14 +26,17 @@ const GameFlow = {
     },
 
     // Every tournament run gets a session — the quizzes are graded against it.
-    // A wallet is optional; only a session started with one can be finalized.
+    // A wallet is optional here: a run that starts without one can name it at
+    // the end, by signing, which is what nearly every player actually does.
     startSession: async function(player, gameMode) {
         GameState.sessionId = null;
         GameState.sessionPlayer = null;
+        GameState.sessionWalletMessage = null;
         const { ok, data } = await this.apiPost('/api/session/start', player ? { player, gameMode } : { gameMode });
         if (ok && data && data.success) {
             GameState.sessionId = data.sessionId;
             GameState.sessionPlayer = player || null;
+            GameState.sessionWalletMessage = data.walletMessage || null;
             console.log('Session started:', data.sessionId, player ? 'with wallet' : 'without wallet');
             return data.sessionId;
         }
@@ -306,7 +309,7 @@ const GameFlow = {
             // Show simple completion message for community levels
             this.showCommunityCompletionMessage();
         } else {
-            // Show game completion screen with NFT minting for regular modes
+            // Show the full completion screen for regular modes
             this.showGameCompletionScreen();
         }
         
@@ -378,17 +381,6 @@ const GameFlow = {
             });
         }
         
-        const mintNFTBtn = document.getElementById('completionMintNFT');
-        if (mintNFTBtn) {
-            const newBtn = mintNFTBtn.cloneNode(true);
-            mintNFTBtn.parentNode.replaceChild(newBtn, mintNFTBtn);
-            
-            newBtn.addEventListener('click', () => {
-                this.hideGameCompletionScreen();
-                this.showNFTMintingScreen();
-            });
-        }
-
         // The reward, if there is one to offer. It asks the server itself and
         // stays hidden when rewards are off, the pool is dry or this run does
         // not qualify.
@@ -687,344 +679,6 @@ const GameFlow = {
         console.log('Closing leaderboard screen');
         this.hideLeaderboardScreen();
         this.showMainMenu();
-    },
-    
-    // Show NFT minting screen
-    showNFTMintingScreen: async function() {
-        const nftScreen = document.getElementById('nftMintingScreen');
-        if (!nftScreen) {
-            console.error('NFT minting screen element not found');
-            return;
-        }
-        
-        // Hide main menu if visible
-        const mainMenu = document.getElementById('mainMenu');
-        if (mainMenu && !mainMenu.classList.contains('hidden')) {
-            mainMenu.classList.add('hidden');
-        }
-        
-        // Reset UI state first to clear any stale data
-        this.resetNFTMintingUI();
-        
-        // Update NFT preview with game data
-        if (GameState.completionData) {
-            const metadata = NFTManager.generateMetadata(GameState.completionData);
-            
-            // Update preview name
-            const previewNameEl = document.getElementById('nftPreviewName');
-            if (previewNameEl) {
-                previewNameEl.textContent = metadata.name;
-            }
-            
-            // Update attributes
-            const attributesEl = document.getElementById('nftAttributes');
-            if (attributesEl) {
-                attributesEl.innerHTML = '';
-                metadata.attributes.forEach(attr => {
-                    const attrDiv = document.createElement('div');
-                    attrDiv.className = 'nft-attribute';
-                    attrDiv.innerHTML = `
-                        <span class="nft-attribute-label">${attr.trait_type}:</span>
-                        <span class="nft-attribute-value">${attr.value}</span>
-                    `;
-                    attributesEl.appendChild(attrDiv);
-                });
-            }
-            
-            // Update preview image if available
-            const previewImageEl = document.getElementById('nftPreviewImage');
-            if (previewImageEl) {
-                previewImageEl.innerHTML = '';
-                if (metadata.image && !metadata.image.startsWith('data:')) {
-                    const img = document.createElement('img');
-                    img.src = metadata.image;
-                    img.alt = 'NFT Preview';
-                    previewImageEl.appendChild(img);
-                } else {
-                    const placeholder = document.createElement('div');
-                    placeholder.className = 'nft-placeholder';
-                    placeholder.textContent = t('nft.preview');
-                    previewImageEl.appendChild(placeholder);
-                }
-            }
-        }
-        
-        // Check wallet connection and NFT status (this will update UI based on current game mode)
-        await this.updateNFTWalletStatus();
-        
-        // Show NFT screen
-        nftScreen.style.display = 'flex';
-        
-        // Setup button handlers
-        this.setupNFTMintingListeners();
-    },
-    
-    // Reset NFT minting UI to initial state
-    resetNFTMintingUI: function() {
-        // Hide all sections
-        const sections = ['nftMintingSection', 'nftSuccessSection', 'nftErrorSection', 'nftAlreadyMinted'];
-        sections.forEach(id => {
-            const el = document.getElementById(id);
-            if (el) el.style.display = 'none';
-        });
-        
-        // Reset button states
-        const mintBtn = document.getElementById('nftMintButton');
-        if (mintBtn) {
-            mintBtn.disabled = false;
-            mintBtn.textContent = t('nft.mint');
-        }
-        
-        const statusText = document.getElementById('nftStatusText');
-        if (statusText) {
-            statusText.textContent = t('nft.readyToMint');
-        }
-        
-        // Clear error/success messages
-        const errorMessage = document.getElementById('nftErrorMessage');
-        if (errorMessage) errorMessage.textContent = '';
-        
-        const tokenIdEl = document.getElementById('nftTokenId');
-        if (tokenIdEl) tokenIdEl.textContent = '';
-    },
-    
-    // Update NFT wallet connection status
-    updateNFTWalletStatus: async function() {
-        const walletNotConnected = document.getElementById('nftWalletNotConnected');
-        const walletConnected = document.getElementById('nftWalletConnected');
-        const walletAddressEl = document.getElementById('nftWalletAddress');
-        const mintingSection = document.getElementById('nftMintingSection');
-        const alreadyMinted = document.getElementById('nftAlreadyMinted');
-        const existingTokenIdEl = document.getElementById('nftExistingTokenId');
-        const viewTokenLink = document.getElementById('nftViewTokenLink');
-        
-        // Reset sections first
-        if (mintingSection) mintingSection.style.display = 'none';
-        if (alreadyMinted) alreadyMinted.style.display = 'none';
-        
-        if (Web3Manager.isConnected()) {
-            if (walletNotConnected) walletNotConnected.style.display = 'none';
-            if (walletConnected) walletConnected.style.display = 'block';
-            if (walletAddressEl) {
-                walletAddressEl.textContent = Web3Manager.formatAddress(Web3Manager.currentAccount);
-            }
-            
-            // Check if player already has NFT for this game mode
-            // Always use the current completion data's game mode
-            try {
-                // Get game mode from current completion data (should be the most recent)
-                const gameMode = GameState.completionData?.gameMode || 'Tournament';
-                console.log('Checking NFT status for game mode:', gameMode);
-                
-                const hasNFT = await NFTManager.hasCompletionNFT(Web3Manager.currentAccount, gameMode);
-                console.log('Has NFT for', gameMode + ':', hasNFT);
-                
-                if (hasNFT) {
-                    if (mintingSection) mintingSection.style.display = 'none';
-                    if (alreadyMinted) alreadyMinted.style.display = 'block';
-                    
-                    const tokenId = await NFTManager.getPlayerTokenId(Web3Manager.currentAccount, gameMode);
-                    console.log('Retrieved token ID:', tokenId, 'for game mode:', gameMode);
-                    
-                    if (existingTokenIdEl) {
-                        existingTokenIdEl.textContent = tokenId && tokenId !== '0' ? tokenId : t('stats.notAvailable');
-                    }
-                    
-                    if (viewTokenLink) {
-                        // Generate block explorer URL for the token
-                        if (tokenId && tokenId !== '0') {
-                            const tokenUrl = NFTManager.getTokenUrl(tokenId);
-                            viewTokenLink.href = tokenUrl;
-                            // Ensure link is visible and clickable
-                            viewTokenLink.style.display = 'inline';
-                            viewTokenLink.style.pointerEvents = 'auto';
-                            console.log('Set token URL:', tokenUrl, 'for token ID:', tokenId);
-                        } else {
-                            // Hide link if token ID is invalid
-                            viewTokenLink.href = '#';
-                            viewTokenLink.style.display = 'none';
-                            console.warn('Invalid token ID:', tokenId, '- hiding block explorer link');
-                        }
-                    }
-                } else {
-                    if (alreadyMinted) alreadyMinted.style.display = 'none';
-                    if (mintingSection) mintingSection.style.display = 'block';
-                }
-            } catch (error) {
-                console.error('Error checking NFT status:', error);
-                // On error, show minting section (allow user to try)
-                if (alreadyMinted) alreadyMinted.style.display = 'none';
-                if (mintingSection) mintingSection.style.display = 'block';
-            }
-        } else {
-            if (walletNotConnected) walletNotConnected.style.display = 'block';
-            if (walletConnected) walletConnected.style.display = 'none';
-        }
-    },
-    
-    // Setup NFT minting screen event listeners
-    setupNFTMintingListeners: function() {
-        const connectWalletBtn = document.getElementById('nftConnectWallet');
-        const disconnectWalletBtn = document.getElementById('nftDisconnectWallet');
-        const mintBtn = document.getElementById('nftMintButton');
-        const closeBtn = document.getElementById('nftClose');
-        
-        if (connectWalletBtn) {
-            const newBtn = connectWalletBtn.cloneNode(true);
-            connectWalletBtn.parentNode.replaceChild(newBtn, connectWalletBtn);
-            
-            newBtn.addEventListener('click', async () => {
-                try {
-                    await Web3Manager.connectWallet();
-                    await this.updateNFTWalletStatus();
-                } catch (error) {
-                    console.error('Error connecting wallet:', error);
-                    this.showNFTError(t('nft.connectFailed', { error: error.message }));
-                }
-            });
-        }
-        
-        if (disconnectWalletBtn) {
-            const newBtn = disconnectWalletBtn.cloneNode(true);
-            disconnectWalletBtn.parentNode.replaceChild(newBtn, disconnectWalletBtn);
-            
-            newBtn.addEventListener('click', () => {
-                Web3Manager.disconnectWallet();
-                this.updateNFTWalletStatus();
-            });
-        }
-        
-        if (mintBtn) {
-            const newBtn = mintBtn.cloneNode(true);
-            mintBtn.parentNode.replaceChild(newBtn, mintBtn);
-            
-            newBtn.addEventListener('click', async () => {
-                await this.mintCompletionNFT();
-            });
-        }
-        
-        if (closeBtn) {
-            const newBtn = closeBtn.cloneNode(true);
-            closeBtn.parentNode.replaceChild(newBtn, closeBtn);
-            
-            newBtn.addEventListener('click', () => {
-                this.closeNFTMintingScreen();
-            });
-        }
-    },
-    
-    // Mint completion NFT
-    mintCompletionNFT: async function() {
-        if (!Web3Manager.isConnected()) {
-            this.showNFTError(t('errors.connectWalletFirst'));
-            return;
-        }
-        
-        if (!GameState.completionData) {
-            this.showNFTError(t('errors.noCompletionData'));
-            return;
-        }
-        
-        const mintBtn = document.getElementById('nftMintButton');
-        const statusText = document.getElementById('nftStatusText');
-        const gasInfo = document.getElementById('nftGasInfo');
-        const errorSection = document.getElementById('nftErrorSection');
-        const successSection = document.getElementById('nftSuccessSection');
-        
-        // Hide error/success sections
-        if (errorSection) errorSection.style.display = 'none';
-        if (successSection) successSection.style.display = 'none';
-        
-        // Disable mint button and show status
-        if (mintBtn) {
-            mintBtn.disabled = true;
-            mintBtn.textContent = t('nft.minting');
-        }
-        if (statusText) {
-            statusText.textContent = t('nft.preparing');
-        }
-        
-        try {
-            // Estimate gas
-            if (statusText) statusText.textContent = t('nft.estimatingGas');
-            
-            // Prepare game data for minting
-            const gameData = {
-                finalScore: GameState.completionData.finalScore,
-                levelsCompleted: GameState.completionData.levelsCompleted,
-                completionTime: GameState.completionData.completionTime,
-                gameMode: GameState.completionData.gameMode,
-                timestamp: GameState.completionData.timestamp
-            };
-            
-            // Initialize contract if needed
-            await NFTManager.initializeContract();
-            
-            // Estimate gas (we'll do this inside mintNFT, but show status)
-            if (statusText) statusText.textContent = t('nft.mintingNft');
-            
-            // Mint NFT
-            const result = await NFTManager.mintNFT(gameData);
-            
-            // Hide error section if previously shown
-            const errorSection = document.getElementById('nftErrorSection');
-            if (errorSection) errorSection.style.display = 'none';
-            
-            // Show success
-            if (successSection) {
-                successSection.style.display = 'block';
-                const tokenIdEl = document.getElementById('nftTokenId');
-                const txLink = document.getElementById('nftTxLink');
-                
-                if (tokenIdEl) tokenIdEl.textContent = result.tokenId;
-                if (txLink) {
-                    txLink.href = NFTManager.getTransactionUrl(result.txHash);
-                    txLink.textContent = t('nft.viewTx');
-                }
-            }
-            
-            if (statusText) statusText.textContent = t('nft.mintedSuccess');
-            if (mintBtn) {
-                mintBtn.disabled = true;
-                mintBtn.textContent = t('nft.alreadyMinted');
-            }
-            
-            // Refresh wallet status to show already minted
-            // This ensures the UI updates correctly after minting
-            await this.updateNFTWalletStatus();
-            
-        } catch (error) {
-            console.error('Error minting NFT:', error);
-            this.showNFTError(error.message || t('nft.mintFailed'));
-            
-            if (mintBtn) {
-                mintBtn.disabled = false;
-                mintBtn.textContent = t('nft.mint');
-            }
-            if (statusText) statusText.textContent = t('nft.readyToMint');
-        }
-    },
-    
-    // Show NFT error
-    showNFTError: function(message) {
-        console.error('NFT error:', message);
-        const errorSection = document.getElementById('nftErrorSection');
-        if (errorSection) errorSection.style.display = 'block';
-    },
-    
-    // Hide NFT minting screen
-    hideNFTMintingScreen: function() {
-        const nftScreen = document.getElementById('nftMintingScreen');
-        if (nftScreen) {
-            nftScreen.style.display = 'none';
-        }
-    },
-    
-    // Close NFT minting screen
-    closeNFTMintingScreen: function() {
-        this.hideNFTMintingScreen();
-        // Return to game completion screen
-        this.showGameCompletionScreen();
     },
     
     // Setup leaderboard event listeners
@@ -1408,8 +1062,30 @@ const GameFlow = {
                 throw new Error(t('errors.noAccount'));
             }
 
-            if (!GameState.sessionId || !GameState.sessionPlayer) {
+            if (!GameState.sessionId) {
                 throw new Error(t('errors.noSession'));
+            }
+
+            // Hardly anyone connects a wallet before pressing Play, so the run
+            // learns which wallet it belongs to here. A signature does it: the
+            // address on its own would let anyone hang a score on a wallet that
+            // is not theirs. It moves nothing and costs nothing.
+            if (!GameState.sessionPlayer) {
+                if (!GameState.sessionWalletMessage || !Web3Manager.signer) {
+                    throw new Error(t('errors.noSession'));
+                }
+                if (statusText) statusText.textContent = t('onchain.provingWallet');
+
+                const proof = await Web3Manager.signer.signMessage(GameState.sessionWalletMessage);
+                const attached = await this.apiPost('/api/session/wallet', {
+                    sessionId: GameState.sessionId,
+                    address: account,
+                    signature: proof,
+                });
+                if (!attached.ok || !attached.data || !attached.data.success) {
+                    throw new Error((attached.data && attached.data.error) || t('errors.noSession'));
+                }
+                GameState.sessionPlayer = attached.data.player;
             }
             
             // Verify correct network
@@ -1793,9 +1469,6 @@ const GameFlow = {
         
         // Hide leaderboard screen if visible
         this.hideLeaderboardScreen();
-        
-        // Hide NFT minting screen if visible
-        this.hideNFTMintingScreen();
         
         // Reset level to first level when returning to menu
         if (GameState.levelManager) {
