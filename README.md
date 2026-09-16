@@ -336,7 +336,7 @@ Arc mainnet is chain id `5042`, RPC `https://rpc.mainnet.arc.io`; the testnet is
 | Contract | Address on Arc mainnet |
 |---|---|
 | `ARCMANScoreBoard` | `0x54f8D69E62d1E83c4616792c1D95508c539F7715` |
-| `ARCMANRewardPool` | `0xDcEA9faF6a8F5CdDB983dBC9c45F49291c432F87` |
+| `ARCMANRewardPool` | `0xC00575601174BC0551E07378E8c0a91097940F10` |
 
 Both were deployed on 17 September 2026. The owner is a wallet held by the maintainer, separate from
 every key on the server; the two signing keys and the relayer are separate from each other again, so

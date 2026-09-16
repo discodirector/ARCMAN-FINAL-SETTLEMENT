@@ -319,6 +319,20 @@ describe('ARCMANRewardPool', function () {
       expect(await pool.poolBalance()).to.equal(USDC(375));
       expect(await pool.remainingClaims()).to.equal(125n);
     });
+
+    // On Arc the gas token is USDC itself — one balance, seen either as the
+    // chain's own currency or through the ERC-20. A wallet told to "send USDC"
+    // therefore sends value and makes no token transfer at all, so a pool that
+    // cannot receive value refuses the money outright. That is exactly what
+    // happened on the first attempt to fund this pool for real.
+    //
+    // Here the two are separate tokens, so this can only show that the transfer
+    // is accepted rather than reverted; that it then shows up in poolBalance was
+    // checked against Arc itself, where the balances are one and the same.
+    it('takes a plain transfer instead of refusing it', async function () {
+      await expect(stranger.sendTransaction({ to: await pool.getAddress(), value: ethers.parseEther('1') }))
+        .to.emit(pool, 'Funded');
+    });
   });
 
   describe('the owner', function () {

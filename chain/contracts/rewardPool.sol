@@ -246,6 +246,19 @@ contract ARCMANRewardPool {
         emit Funded(msg.sender, amount);
     }
 
+    /**
+     * @notice Take USDC sent the plain way.
+     * @dev On Arc the gas token *is* USDC — one balance, seen either as the
+     *      chain's own currency or through the ERC-20 at 0x3600…0000. So a
+     *      wallet asked to "send USDC here" sends it as value, with no token
+     *      transfer at all, and a contract that cannot receive value simply
+     *      refuses the money. Accepting it is what makes topping the pool up
+     *      an ordinary transfer rather than a trap.
+     */
+    receive() external payable {
+        emit Funded(msg.sender, msg.value / 1e12);   // 18 decimals as value, 6 as a token
+    }
+
     // --- owner --------------------------------------------------------------
 
     /// @notice Take USDC out — for winding the pilot down or moving to a new pool.
