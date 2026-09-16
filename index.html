@@ -887,6 +887,122 @@
             font-family: 'Courier New', monospace;
         }
 
+        /* Reward claim, on the completion screen */
+        .claim-section {
+            border: 2px solid #0ff;
+            border-radius: 8px;
+            padding: 16px;
+            margin: 20px 0;
+            background: rgba(0, 255, 255, 0.05);
+        }
+
+        .claim-headline {
+            font-size: 18px;
+            color: #0ff;
+            text-align: center;
+            text-shadow: 0 0 10px #0ff;
+        }
+
+        .claim-remaining {
+            font-size: 12px;
+            color: #9ab;
+            text-align: center;
+            margin-top: 4px;
+        }
+
+        .claim-steps {
+            margin-top: 14px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .claim-step {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            padding: 8px 12px;
+            border: 1px solid rgba(0, 255, 255, 0.25);
+            border-radius: 6px;
+            /* Steps still ahead stay visible but quiet, so the player can see
+               what the whole thing involves before starting. */
+            opacity: 0.45;
+        }
+
+        .claim-step.active {
+            opacity: 1;
+            border-color: #0ff;
+            box-shadow: 0 0 12px rgba(0, 255, 255, 0.35);
+        }
+
+        .claim-step.done {
+            opacity: 0.8;
+            border-color: #0f8;
+        }
+
+        .claim-step.done .claim-step-text::before {
+            content: '\2713 ';
+            color: #0f8;
+        }
+
+        .claim-step-text {
+            font-size: 13px;
+            color: #cfe;
+            text-align: left;
+        }
+
+        .claim-step-button {
+            font-family: inherit;
+            font-size: 12px;
+            padding: 8px 14px;
+            border: 2px solid #0ff;
+            border-radius: 4px;
+            background: transparent;
+            color: #0ff;
+            cursor: pointer;
+            white-space: nowrap;
+        }
+
+        .claim-step-button:hover:not(:disabled) {
+            background: #0ff;
+            color: #000;
+        }
+
+        .claim-step-button:disabled {
+            cursor: default;
+            border-color: #456;
+            color: #456;
+        }
+
+        .claim-status {
+            margin-top: 12px;
+            font-size: 13px;
+            line-height: 1.5;
+            text-align: center;
+            color: #cfe;
+        }
+
+        .claim-status-ok { color: #0f8; }
+        .claim-status-warn { color: #fc6; }
+
+        .claim-tx-link {
+            display: inline-block;
+            margin-top: 8px;
+            font-size: 12px;
+            color: #0ff;
+        }
+
+        @media (max-width: 600px) {
+            .claim-step {
+                flex-direction: column;
+                align-items: stretch;
+                gap: 8px;
+            }
+
+            .claim-step-text { text-align: center; }
+        }
+
         .completion-buttons {
             display: flex;
             gap: clamp(15px, 3vw, 20px);
@@ -3458,6 +3574,27 @@
                         <div class="completion-stat-value" id="completionGameMode" data-i18n="mode.unknown">Unknown</div>
                     </div>
                 </div>
+                <!-- Reward claim: hidden unless the pool is live and this run qualifies -->
+                <div id="claimSection" class="claim-section" style="display: none;">
+                    <div class="claim-headline" id="claimHeadline"></div>
+                    <div class="claim-remaining" id="claimRemaining"></div>
+                    <div class="claim-steps">
+                        <div class="claim-step" id="claimStepWallet">
+                            <span class="claim-step-text" data-i18n="claim.stepWallet">Prove your wallet</span>
+                            <button id="claimWalletButton" class="claim-step-button" data-i18n="claim.walletButton">Connect &amp; sign</button>
+                        </div>
+                        <div class="claim-step" id="claimStepX">
+                            <span class="claim-step-text" data-i18n="claim.stepX">Verify with X</span>
+                            <button id="claimXButton" class="claim-step-button" data-i18n="claim.xButton">Sign in with X</button>
+                        </div>
+                        <div class="claim-step" id="claimStepSend">
+                            <span class="claim-step-text" data-i18n="claim.stepSend">Receive the reward</span>
+                            <button id="claimSendButton" class="claim-step-button" data-i18n="claim.sendButton">Claim</button>
+                        </div>
+                    </div>
+                    <div class="claim-status" id="claimStatus" style="display: none;"></div>
+                    <a class="claim-tx-link" id="claimTxLink" target="_blank" rel="noopener" style="display: none;"></a>
+                </div>
                 <div class="completion-buttons">
                     <button id="completionFinalizeOnchain" class="completion-button primary" data-i18n="completion.finalizeOnchain">Finalize On-Chain</button>
                     <button id="completionMintNFT" class="completion-button primary" style="background: #ff0; border-color: #ff0; color: #000; box-shadow: 0 0 20px #ff0;" data-i18n="completion.mintNft">Mint NFT</button>
@@ -4001,6 +4138,7 @@
     <script src="js/web3.js"></script>
     <script src="js/leaderboard.js"></script>
     <script src="js/nft.js"></script>
+    <script src="js/claim.js"></script>
     <script src="js/gameFlow.js"></script>
     <!-- Agent Shift is retired. The modules stay in js/ (agent.js, agentShift.js,
          agentWallet.js, agentOnboarding.js, agentMode.js) together with their

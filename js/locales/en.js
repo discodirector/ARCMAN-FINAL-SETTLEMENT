@@ -125,6 +125,48 @@ I18n.register('en', {
         returnToMenu: 'Return to Menu'
     },
 
+    claim: {
+        headline: 'Reward: {amount} USDC',
+        remaining: '{count} rewards left in the pool',
+
+        stepWallet: 'Prove your wallet',
+        walletButton: 'Connect & sign',
+        stepX: 'Verify with X',
+        xButton: 'Sign in with X',
+        stepSend: 'Receive the reward',
+        sendButton: 'Claim',
+
+        walletWaiting: 'Check your wallet: signing costs nothing and moves nothing.',
+        walletRejected: 'You declined the signature. Without it we cannot tell the wallet is yours.',
+        walletFailed: 'The wallet could not be checked. Try again.',
+
+        xWaiting: 'Waiting for the X sign-in…',
+        xVerified: 'X account verified.',
+        xVerifiedAs: 'Verified as @{handle}.',
+        xCancelled: 'Sign-in was cancelled.',
+        xNotPremium: 'Rewards go to X Premium accounts only.',
+        xTooNew: 'This X account is younger than six months.',
+        xAgeUnknown: 'The age of this X account could not be checked.',
+        xClaimed: 'This X account has already claimed a reward.',
+        xFailed: 'X could not be reached. Try again.',
+        popupBlocked: 'Your browser blocked the sign-in window. Allow pop-ups and try again.',
+
+        sending: 'Sending the reward. This takes a few seconds.',
+        paid: '{amount} USDC is on its way to your wallet. No gas needed — we paid it.',
+        sendFailed: 'The reward could not be sent. Nothing was spent; try again.',
+        viewTransaction: 'View the transaction',
+
+        walletClaimed: 'This wallet has already claimed a reward.',
+        alreadyClaimed: 'A reward has already been claimed for this account.',
+        ipLimit: 'Too many rewards have been claimed from this connection.',
+        poolEmpty: 'The reward pool is empty right now. You finished the course all the same.',
+        paused: 'Rewards are paused at the moment.',
+        needWallet: 'Prove your wallet first.',
+        needX: 'Verify with X first.',
+        expired: 'This claim has expired. Finish a run again to claim.',
+        failed: 'The reward could not be claimed.'
+    },
+
     community: {
         title: '🎉 Congratulations! 🎉',
         text: "You've completed all community-created levels. Come back later for new ones, superhero!",

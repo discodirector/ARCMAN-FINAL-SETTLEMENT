@@ -125,6 +125,48 @@ I18n.register('id', {
         returnToMenu: 'Kembali ke Menu'
     },
 
+    claim: {
+        headline: 'Hadiah: {amount} USDC',
+        remaining: 'Tersisa {count} hadiah di pool',
+
+        stepWallet: 'Buktikan dompet',
+        walletButton: 'Hubungkan & tanda tangan',
+        stepX: 'Verifikasi dengan X',
+        xButton: 'Masuk dengan X',
+        stepSend: 'Terima hadiah',
+        sendButton: 'Klaim',
+
+        walletWaiting: 'Periksa dompet Anda: tanda tangan ini tidak dikenakan biaya dan tidak memindahkan apa pun.',
+        walletRejected: 'Anda menolak tanda tangan. Tanpanya, kami tidak dapat memastikan dompet ini milik Anda.',
+        walletFailed: 'Dompet tidak dapat diperiksa. Coba lagi.',
+
+        xWaiting: 'Menunggu proses masuk X…',
+        xVerified: 'Akun X terverifikasi.',
+        xVerifiedAs: 'Terverifikasi sebagai @{handle}.',
+        xCancelled: 'Proses masuk dibatalkan.',
+        xNotPremium: 'Hadiah hanya diberikan untuk akun X Premium.',
+        xTooNew: 'Akun X ini berumur kurang dari enam bulan.',
+        xAgeUnknown: 'Umur akun X ini tidak dapat diperiksa.',
+        xClaimed: 'Akun X ini sudah pernah mengklaim hadiah.',
+        xFailed: 'X tidak dapat dihubungi. Coba lagi.',
+        popupBlocked: 'Browser Anda memblokir jendela masuk. Izinkan pop-up dan coba lagi.',
+
+        sending: 'Mengirim hadiah. Ini membutuhkan beberapa detik.',
+        paid: '{amount} USDC sedang dalam perjalanan ke dompet Anda. Tidak perlu gas — sudah kami bayarkan.',
+        sendFailed: 'Hadiah tidak dapat dikirim. Tidak ada yang dikeluarkan; coba lagi.',
+        viewTransaction: 'Lihat transaksi',
+
+        walletClaimed: 'Dompet ini sudah pernah mengklaim hadiah.',
+        alreadyClaimed: 'Hadiah sudah pernah diklaim untuk akun ini.',
+        ipLimit: 'Terlalu banyak hadiah telah diklaim dari koneksi ini.',
+        poolEmpty: 'Pool hadiah sedang kosong. Anda tetap sudah menyelesaikan kursus ini.',
+        paused: 'Hadiah sedang dijeda untuk saat ini.',
+        needWallet: 'Buktikan dompet Anda terlebih dahulu.',
+        needX: 'Verifikasi dengan X terlebih dahulu.',
+        expired: 'Klaim ini sudah kedaluwarsa. Selesaikan permainan lagi untuk mengklaim.',
+        failed: 'Hadiah tidak dapat diklaim.'
+    },
+
     community: {
         title: '🎉 Selamat! 🎉',
         text: 'Anda telah menyelesaikan semua level buatan komunitas. Datang lagi nanti untuk level baru, pahlawan!',

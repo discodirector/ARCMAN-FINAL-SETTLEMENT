@@ -388,6 +388,13 @@ const GameFlow = {
                 this.showNFTMintingScreen();
             });
         }
+
+        // The reward, if there is one to offer. It asks the server itself and
+        // stays hidden when rewards are off, the pool is dry or this run does
+        // not qualify.
+        if (typeof ClaimManager !== 'undefined') {
+            ClaimManager.show();
+        }
     },
     
     // Hide game completion screen
@@ -395,6 +402,9 @@ const GameFlow = {
         const completionScreen = document.getElementById('gameCompletionScreen');
         if (completionScreen) {
             completionScreen.style.display = 'none';
+        }
+        if (typeof ClaimManager !== 'undefined') {
+            ClaimManager.hide();
         }
     },
     

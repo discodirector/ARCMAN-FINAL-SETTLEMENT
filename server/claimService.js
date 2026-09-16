@@ -119,10 +119,19 @@ function createLedger(filePath, log) {
         fs.renameSync(temporary, filePath);
     };
 
+    // Claims are counted per course, exactly as the contract counts them:
+    // finishing a second course must not be refused because the first was
+    // already rewarded. Entries written before courses existed are course 1.
+    const course = (entry) => Number(entry.courseId || 1);
+
     return {
         all: () => entries,
-        byWallet: (wallet) => entries.find(e => e.wallet === wallet.toLowerCase()),
-        byIdentity: (identityHash) => entries.find(e => e.identityHash === identityHash),
+        byWallet: (courseId, wallet) =>
+            entries.find(e => course(e) === Number(courseId) && e.wallet === wallet.toLowerCase()),
+        byIdentity: (courseId, identityHash) =>
+            entries.find(e => course(e) === Number(courseId) && e.identityHash === identityHash),
+        // The per-address limit is deliberately not per course: it is there to
+        // slow down one person farming rewards, whatever they are for.
         countByIp: (ip) => entries.filter(e => e.ip === ip).length,
         add(entry) {
             entries.push(entry);
@@ -403,7 +412,7 @@ function registerClaimRoutes(app, { sessions, getIp, sessionExpiryMs, minSeconds
         }
 
         const wallet = ethers.getAddress(address);
-        if (ledger.byWallet(wallet)) {
+        if (ledger.byWallet(config.courseId, wallet)) {
             return res.status(409).json({ error: 'This wallet has already claimed', reason: 'wallet_claimed' });
         }
         try {
@@ -469,7 +478,7 @@ function registerClaimRoutes(app, { sessions, getIp, sessionExpiryMs, minSeconds
             const identityHash = ethers.keccak256(
                 ethers.toUtf8Bytes(`${config.identitySalt}:${user.id}`)
             );
-            if (ledger.byIdentity(identityHash)) {
+            if (ledger.byIdentity(config.courseId, identityHash)) {
                 claim.error = 'identity_claimed';
                 return done('error', 'identity_claimed');
             }
@@ -511,7 +520,8 @@ function registerClaimRoutes(app, { sessions, getIp, sessionExpiryMs, minSeconds
             return res.status(409).json({ error: 'Session no longer valid' });
         }
 
-        if (ledger.byWallet(claim.wallet) || ledger.byIdentity(claim.identityHash)) {
+        if (ledger.byWallet(config.courseId, claim.wallet)
+            || ledger.byIdentity(config.courseId, claim.identityHash)) {
             return res.status(409).json({ error: 'Already claimed', reason: 'already_claimed' });
         }
 
@@ -539,6 +549,7 @@ function registerClaimRoutes(app, { sessions, getIp, sessionExpiryMs, minSeconds
             // ledger still shows an attempt, which is the safe way round.
             const entry = ledger.add({
                 claimId: claim.claimId,
+                courseId: Number(config.courseId),
                 wallet: claim.wallet.toLowerCase(),
                 identityHash: claim.identityHash,
                 ip: claim.ip,

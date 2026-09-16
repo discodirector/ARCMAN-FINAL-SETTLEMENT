@@ -125,6 +125,48 @@ I18n.register('zh', {
         returnToMenu: '返回主菜单'
     },
 
+    claim: {
+        headline: '奖励：{amount} USDC',
+        remaining: '奖池中还剩 {count} 份奖励',
+
+        stepWallet: '验证钱包',
+        walletButton: '连接并签名',
+        stepX: '验证 X',
+        xButton: '用 X 登录',
+        stepSend: '领取奖励',
+        sendButton: '领取',
+
+        walletWaiting: '请查看钱包：签名不收费，也不会转移任何资产。',
+        walletRejected: '你拒绝了签名。没有签名，我们无法确认这是你的钱包。',
+        walletFailed: '无法验证该钱包，请重试。',
+
+        xWaiting: '正在等待 X 登录……',
+        xVerified: 'X 账号已验证。',
+        xVerifiedAs: '已验证为 @{handle}。',
+        xCancelled: '登录已取消。',
+        xNotPremium: '奖励仅发放给 X Premium 账号。',
+        xTooNew: '该 X 账号注册不满六个月。',
+        xAgeUnknown: '无法确认该 X 账号的注册时间。',
+        xClaimed: '该 X 账号已领取过奖励。',
+        xFailed: '无法连接到 X，请重试。',
+        popupBlocked: '浏览器拦截了登录窗口，请允许弹出窗口后重试。',
+
+        sending: '正在发送奖励，需要几秒钟。',
+        paid: '{amount} USDC 正在发往你的钱包，无需支付 gas 费，已由我们代付。',
+        sendFailed: '奖励未能发送，未产生任何花费，请重试。',
+        viewTransaction: '查看交易',
+
+        walletClaimed: '该钱包已领取过奖励。',
+        alreadyClaimed: '该账号已领取过奖励。',
+        ipLimit: '此网络下领取的奖励已过多。',
+        poolEmpty: '奖池目前已用完，不过你依然完成了课程。',
+        paused: '奖励目前已暂停发放。',
+        needWallet: '请先验证钱包。',
+        needX: '请先验证 X 账号。',
+        expired: '本次领取已过期，请重新完成一轮课程后再领取。',
+        failed: '奖励领取失败。'
+    },
+
     community: {
         title: '🎉 恭喜！🎉',
         text: '你已通关全部社区创作的关卡。稍后再来挑战新关卡吧，超级英雄！',
