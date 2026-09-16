@@ -42,7 +42,7 @@ I18n.register('en', {
         unknown: 'Unknown',
         title: 'Mode Description',
         close: "I'm in",
-        tournamentText: 'You are <span style="color: #0ff; text-shadow: 0 0 20px #0ff; font-weight: bold;">Arc Man</span>. Your mission: finalize the stablecoin transaction. Launch the token in an arc and hit the Settlement Zone.\n\nScore points, compete with others, climb the Leaderboard, and mint your final NFT.',
+        tournamentText: 'You are <span style="color: #0ff; text-shadow: 0 0 20px #0ff; font-weight: bold;">Arc Man</span>. Your mission: finalize the stablecoin transaction. Launch the token in an arc and hit the Settlement Zone.\n\nScore points, compete with others, and climb the Leaderboard.',
         tournamentHighlight: 'You have 10 lives in this mode. Correct answers in the quiz restore them — and if you lose them all, one last quiz can put you back in.'
     },
 
@@ -377,7 +377,7 @@ I18n.register('en', {
 
     // --- Educational screens (js/infoScreens.js) ---
     info: {
-        1: "Arc is an open Layer-1 blockchain from Circle, the company that issues USDC. It is EVM-compatible and purpose-built for stablecoin finance. Its public mainnet opened on 16 September 2026; this game's scores and certificates still settle on Arc Testnet, where playing costs nothing.",
+        1: "Arc is an open Layer-1 blockchain from Circle, the company that issues USDC. It is EVM-compatible and purpose-built for stablecoin finance. Its public mainnet opened on 16 September 2026, and that is where this game's scores settle: the gas is real USDC, and the game pays it for you.",
         2: 'On Arc, gas is paid in USDC instead of a volatile token. Fees are quoted directly in dollars and average around $0.005 per transaction, so anyone can budget them like a normal cost.',
         3: "Arc pairs Malachite — a Rust implementation of Tendermint BFT — with a Reth execution layer. Finality is deterministic and sub-second: once a block is committed it is final, with no reorgs and no confirmations to wait for. It is one of the properties Arc's public mainnet opened with.",
         4: "ARC is Arc's planned coordination token — not its gas, which stays payable in USDC. By design, protocol fees are converted into ARC and routed to validators and stakers, with a portion burned. Mainnet opened without it: ARC has not launched, and Circle describes any token plans as exploratory.",
@@ -395,7 +395,7 @@ I18n.register('en', {
         16: 'A cross-border wire hops through correspondent banks, each with its own cut-off time, so money can sit idle for days over a weekend. Stablecoin rails do not keep office hours: the same transfer settles in seconds, at any hour, with the fee known before you send.',
         17: "Arc did not open cold. Its testnet ran from October 2025, then a private mainnet with over a hundred institutional and ecosystem builders, before the public launch in September 2026. That is how a payment network should be tested: with other people's real processes, before anyone's real money.",
         18: 'There is no chargeback on a settled transfer. Send to the wrong address and no support desk can pull it back — the same finality that makes settlement fast makes mistakes permanent. That is why spending limits, allowances and test networks exist: you check before, because there is no after.',
-        19: "Arc's public mainnet went live on 16 September 2026: gas in USDC, sub-second finality, and a permissioned set of founding validators. Still ahead are the ARC token and the move from Proof-of-Authority to Proof-of-Stake it is meant to enable. You walked this road on Arc Testnet while the network was being built — and it ends where mainnet begins.",
+        19: "Arc's public mainnet went live on 16 September 2026: gas in USDC, sub-second finality, and a permissioned set of founding validators. Still ahead are the ARC token and the move from Proof-of-Authority to Proof-of-Stake it is meant to enable. You walked this road while the network was being built — and your score is written on the mainnet it became.",
         20: 'This whole game is one idea: a payment is not done when it is sent, it is done when it is final. Settlement is the moment it can no longer be reversed. Stablecoin gas plus sub-second deterministic finality is what lets that moment arrive at machine speed — which is exactly what you have been aiming at.'
     },
 
@@ -418,7 +418,7 @@ I18n.register('en', {
             ]
         },
         '1c': {
-            question: "Where do this game's scores and certificates settle?",
+            question: "Where does this game's score settle?",
             answers: [
                 'On Ethereum mainnet, through a bridge contract',
                 'On Arc Testnet, where playing costs nothing',

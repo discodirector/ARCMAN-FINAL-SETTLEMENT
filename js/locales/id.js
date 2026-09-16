@@ -42,7 +42,7 @@ I18n.register('id', {
         unknown: 'Tidak diketahui',
         title: 'Deskripsi Mode',
         close: 'Saya siap',
-        tournamentText: 'Anda adalah <span style="color: #0ff; text-shadow: 0 0 20px #0ff; font-weight: bold;">Arc Man</span>. Misi Anda: menuntaskan setelmen transaksi stablecoin. Luncurkan token dalam lintasan melengkung dan kenai Zona Setelmen.\n\nKumpulkan poin, bersaing dengan pemain lain, naiki Papan Peringkat, dan cetak NFT akhir Anda.',
+        tournamentText: 'Anda adalah <span style="color: #0ff; text-shadow: 0 0 20px #0ff; font-weight: bold;">Arc Man</span>. Misi Anda: menuntaskan setelmen transaksi stablecoin. Luncurkan token dalam lintasan melengkung dan kenai Zona Setelmen.\n\nKumpulkan poin, bersaing dengan pemain lain, dan naiki Papan Peringkat.',
         tournamentHighlight: 'Di mode ini Anda punya 10 nyawa. Jawaban benar dalam kuis akan memulihkannya — dan jika semuanya habis, satu kuis terakhir masih bisa mengembalikan Anda ke permainan.'
     },
 
@@ -375,7 +375,7 @@ I18n.register('id', {
     },
 
     info: {
-        1: 'Arc adalah blockchain Layer-1 terbuka dari Circle, perusahaan penerbit USDC. Arc kompatibel dengan EVM dan dibangun khusus untuk keuangan berbasis stablecoin. Mainnet publik Arc dibuka pada 16 September 2026; skor dan sertifikat game ini masih diselesaikan di Arc Testnet, tempat bermain tidak memakan biaya.',
+        1: 'Arc adalah blockchain Layer-1 terbuka dari Circle, perusahaan penerbit USDC. Arc kompatibel dengan EVM dan dibangun khusus untuk keuangan berbasis stablecoin. Mainnet publik Arc dibuka pada 16 September 2026, dan di sanalah skor game ini diselesaikan: gasnya USDC sungguhan, dan game yang membayarkannya untuk Anda.',
         2: 'Di Arc, gas dibayar dengan USDC, bukan token yang harganya bergejolak. Biaya dikutip langsung dalam dolar dan rata-rata sekitar $0,005 per transaksi, sehingga siapa pun bisa menganggarkannya seperti biaya biasa.',
         3: 'Arc memadukan Malachite — implementasi Tendermint BFT dalam Rust — dengan lapisan eksekusi Reth. Finalitasnya deterministik dan di bawah satu detik: begitu blok dikomit, blok itu final, tanpa reorg dan tanpa menunggu konfirmasi. Inilah salah satu sifat yang dibawa mainnet publik Arc saat dibuka.',
         4: 'ARC adalah token koordinasi yang direncanakan untuk Arc — bukan token gas, karena gas tetap dibayar dengan USDC. Menurut rancangannya, biaya protokol dikonversi menjadi ARC dan disalurkan ke validator dan staker, dengan sebagian dibakar. Mainnet dibuka tanpanya: ARC belum diluncurkan, dan Circle menyebut rencana token apa pun masih bersifat eksploratif.',
@@ -393,7 +393,7 @@ I18n.register('id', {
         16: 'Transfer lintas negara melompat lewat bank koresponden, masing-masing dengan batas waktu operasionalnya sendiri, sehingga uang bisa menganggur berhari-hari saat akhir pekan. Jalur stablecoin tidak mengenal jam kantor: transfer yang sama selesai dalam hitungan detik, kapan saja, dengan biaya yang sudah diketahui sebelum Anda mengirim.',
         17: 'Arc tidak dibuka begitu saja. Testnet-nya berjalan sejak Oktober 2025, lalu mainnet privat dengan lebih dari seratus pembangun dari institusi dan ekosistem, sebelum peluncuran publik pada September 2026. Begitulah seharusnya sebuah jaringan pembayaran diuji: dengan proses nyata milik orang lain, sebelum uang nyata siapa pun masuk.',
         18: 'Tidak ada chargeback untuk transfer yang sudah tuntas. Salah kirim alamat dan tidak ada meja bantuan yang bisa menariknya kembali — finalitas yang membuat setelmen cepat juga membuat kesalahan menjadi permanen. Karena itulah batas belanja, izin nominal, dan jaringan uji ada: Anda memeriksa sebelumnya, karena tidak ada sesudahnya.',
-        19: 'Mainnet publik Arc aktif pada 16 September 2026: gas dalam USDC, finalitas di bawah satu detik, dan himpunan validator pendiri yang berizin. Yang masih di depan adalah token ARC dan peralihan dari Proof-of-Authority ke Proof-of-Stake yang hendak diwujudkannya. Anda menempuh jalan ini di Arc Testnet selagi jaringannya dibangun — dan jalan itu berakhir tepat di tempat mainnet dimulai.',
+        19: 'Mainnet publik Arc aktif pada 16 September 2026: gas dalam USDC, finalitas di bawah satu detik, dan himpunan validator pendiri yang berizin. Yang masih di depan adalah token ARC dan peralihan dari Proof-of-Authority ke Proof-of-Stake yang hendak diwujudkannya. Anda menempuh jalan ini selagi jaringannya dibangun — dan skor Anda tercatat di mainnet yang kemudian menjadi wujudnya.',
         20: 'Seluruh game ini adalah satu gagasan: sebuah pembayaran belum selesai ketika dikirim, ia selesai ketika sudah final. Setelmen adalah saat ia tidak lagi bisa dibatalkan. Gas berbasis stablecoin ditambah finalitas deterministik di bawah satu detik itulah yang membuat saat tersebut tiba dalam kecepatan mesin — dan persis itulah yang selama ini Anda bidik.'
     },
 
@@ -415,7 +415,7 @@ I18n.register('id', {
             ]
         },
         '1c': {
-            question: 'Di mana skor dan sertifikat game ini diselesaikan?',
+            question: 'Di mana skor game ini diselesaikan?',
             answers: [
                 'Di mainnet Ethereum, lewat kontrak jembatan',
                 'Di Arc Testnet, tempat bermain tidak memakan biaya',
