@@ -25,6 +25,21 @@ I18n.register('en', {
         audio: 'AUDIO OPTIONS'
     },
 
+    // The token address on the menu. Nothing here is shown until
+    // GameConfig.TOKEN.launched is set.
+    token: {
+        label: 'CONTRACT ADDRESS',
+        labelNamed: '{symbol} CONTRACT ADDRESS',
+        copy: 'COPY',
+        copied: 'COPIED',
+        copyManually: 'SELECTED',
+        copyFailed: 'COPY FAILED',
+        explorer: 'View on explorer',
+        trade: 'Trade',
+        verify: 'Check this address on X',
+        warning: 'Compare the whole address, not just the start and the end. We will never ask you to send anything to it.'
+    },
+
     hud: {
         score: 'Score: {score}',
         level: 'Level {current}/{total}',

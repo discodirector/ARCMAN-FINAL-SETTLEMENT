@@ -2026,6 +2026,103 @@
             width: 100%;
         }
 
+        /* The token address on the menu. The address itself is deliberately
+           never truncated: comparing only the first and last characters is
+           exactly what an address-poisoning attack survives, so it wraps
+           instead. */
+        #tokenBar {
+            margin: clamp(18px, 3vw, 28px) auto 0;
+            padding: clamp(10px, 2vw, 16px);
+            border: 1px solid rgba(0, 255, 255, 0.35);
+            border-radius: 6px;
+            background: rgba(0, 20, 30, 0.55);
+            max-width: 520px;
+            box-sizing: border-box;
+        }
+
+        .token-label {
+            color: #0ff;
+            font-family: 'Courier New', monospace;
+            font-size: clamp(10px, 1.4vw, 12px);
+            letter-spacing: 1px;
+            margin-bottom: 8px;
+            text-shadow: 0 0 6px rgba(0, 255, 255, 0.6);
+        }
+
+        .token-address-row {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .token-address {
+            flex: 1 1 260px;
+            min-width: 0;
+            color: #fff;
+            font-family: 'Courier New', monospace;
+            font-size: clamp(10px, 1.5vw, 13px);
+            line-height: 1.5;
+            word-break: break-all;
+            text-align: left;
+            user-select: all;
+        }
+
+        .token-copy {
+            flex: 0 0 auto;
+            padding: 6px 12px;
+            background: rgba(0, 255, 255, 0.15);
+            border: 1px solid #0ff;
+            border-radius: 4px;
+            color: #0ff;
+            font-family: 'Courier New', monospace;
+            font-size: clamp(10px, 1.3vw, 12px);
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.2s;
+            white-space: nowrap;
+        }
+
+        .token-copy:hover {
+            background: rgba(0, 255, 255, 0.3);
+            box-shadow: 0 0 12px rgba(0, 255, 255, 0.5);
+        }
+
+        .token-copy.copied {
+            border-color: #0f0;
+            color: #0f0;
+            background: rgba(0, 255, 0, 0.18);
+        }
+
+        .token-links {
+            display: flex;
+            gap: 14px;
+            flex-wrap: wrap;
+            justify-content: center;
+            margin-top: 10px;
+        }
+
+        .token-link {
+            color: #0ff;
+            font-family: 'Courier New', monospace;
+            font-size: clamp(10px, 1.3vw, 12px);
+            text-decoration: underline;
+        }
+
+        .token-link:hover {
+            color: #fff;
+            text-shadow: 0 0 8px #0ff;
+        }
+
+        .token-warning {
+            margin: 10px 0 0;
+            color: #e8c99a;
+            font-family: 'Courier New', monospace;
+            font-size: clamp(9px, 1.2vw, 11px);
+            line-height: 1.5;
+        }
+
         /* Wallet Button in Main Menu (Top Left) */
         .menu-wallet-button {
             position: absolute;
@@ -3624,6 +3721,21 @@
                 <span data-i18n="menu.audio">AUDIO OPTIONS</span>
             </button>
         </div>
+        <!-- The token address. Hidden until GameConfig.TOKEN.launched is set;
+             everything in it is written by js/token.js. -->
+        <div id="tokenBar" style="display: none;">
+            <div id="tokenLabel" class="token-label"></div>
+            <div class="token-address-row">
+                <code id="tokenAddress" class="token-address"></code>
+                <button type="button" id="tokenCopyButton" class="token-copy" data-i18n="token.copy">COPY</button>
+            </div>
+            <div class="token-links">
+                <a id="tokenExplorerLink" class="token-link" href="#" target="_blank" rel="noopener noreferrer" style="display: none;"></a>
+                <a id="tokenTradeLink" class="token-link" href="#" target="_blank" rel="noopener noreferrer" style="display: none;"></a>
+                <a id="tokenVerifyLink" class="token-link" href="#" target="_blank" rel="noopener noreferrer" style="display: none;"></a>
+            </div>
+            <p id="tokenWarning" class="token-warning"></p>
+        </div>
         </div>
     </div>
 
@@ -3770,6 +3882,7 @@
     <script src="js/web3.js"></script>
     <script src="js/leaderboard.js"></script>
     <script src="js/claim.js"></script>
+    <script src="js/token.js"></script>
     <script src="js/gameFlow.js"></script>
     <!-- Agent Shift is retired. The modules stay in js/ (agent.js, agentShift.js,
          agentWallet.js, agentOnboarding.js, agentMode.js) together with their

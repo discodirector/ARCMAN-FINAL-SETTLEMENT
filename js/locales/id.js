@@ -25,6 +25,21 @@ I18n.register('id', {
         audio: 'PENGATURAN AUDIO'
     },
 
+    // Alamat kontrak di menu. Tidak ada yang ditampilkan sampai
+    // GameConfig.TOKEN.launched disetel.
+    token: {
+        label: 'ALAMAT KONTRAK',
+        labelNamed: 'ALAMAT KONTRAK {symbol}',
+        copy: 'SALIN',
+        copied: 'TERSALIN',
+        copyManually: 'TERPILIH',
+        copyFailed: 'GAGAL MENYALIN',
+        explorer: 'Lihat di explorer',
+        trade: 'Perdagangkan',
+        verify: 'Periksa alamat ini di X',
+        warning: 'Bandingkan seluruh alamat, bukan hanya awal dan akhirnya. Kami tidak akan pernah meminta Anda mengirim apa pun ke alamat itu.'
+    },
+
     hud: {
         score: 'Skor: {score}',
         level: 'Level {current}/{total}',

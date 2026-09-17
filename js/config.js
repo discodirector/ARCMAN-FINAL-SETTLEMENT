@@ -81,6 +81,31 @@ const GameConfig = {
             ? window.location.origin
             : 'https://arcmangame.com'
     },
+
+    // The token, once there is one.
+    //
+    // Nothing about it appears on the site while `launched` is false. That is
+    // deliberate: an address box sitting there empty, or filled with a
+    // placeholder, is a ready-made screenshot for anyone who wants to swap in
+    // their own address and pass it off as ours.
+    //
+    // On launch day: paste the address, set `launched` to true, deploy. The
+    // address is checked against its EIP-55 checksum before anything is drawn,
+    // so a typo shows nothing at all instead of showing the wrong address.
+    //
+    // `verifyUrl` should point somewhere we control that is not this site,
+    // normally the pinned post on X. A visitor who is on a cloned site will see
+    // the clone's copy of this line, so it is not proof on its own; what it
+    // does is give the careful ones a second place to look, and it costs
+    // nothing.
+    TOKEN: {
+        launched: false,
+        address: '',
+        symbol: '',
+        network: 'ArcMainnet',
+        tradeUrl: '',
+        verifyUrl: ''
+    },
     
     // Initialize CONFIG from BASE_CONFIG
     init: function() {

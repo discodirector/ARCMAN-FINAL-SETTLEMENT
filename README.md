@@ -237,6 +237,7 @@ js/
   web3.js             wallet connection, network switching, contract calls
   leaderboard.js      leaderboard fetching and formatting
   claim.js            the reward claim on the completion screen
+  token.js            the token address on the menu, dormant until launch
   levelEditor.js      the level editor
   main.js             game loop and initialisation
   agent*.js           retired Agent Shift mode, not loaded, see Notes
@@ -399,6 +400,47 @@ whoever holds it can write any score they like. Ownership itself moves in two st
 once per wallet and once per X account, released against an EIP-712 signature from the server and
 relayed at our expense. The owner can withdraw and pause. The signer can only authorise money the pool
 already holds.
+
+## The token
+
+There isn't one yet. When there is, the address goes on the menu screen, and the scaffolding for that
+is already in place and switched off.
+
+`GameConfig.TOKEN` in `js/config.js` holds it:
+
+```javascript
+TOKEN: {
+    launched: false,     // nothing appears on the site while this is false
+    address: '',
+    symbol: '',
+    network: 'ArcMainnet',
+    tradeUrl: '',        // optional; the link is dropped when empty
+    verifyUrl: ''        // somewhere else we control, normally the pinned post on X
+}
+```
+
+Launch day is: paste the address, set `launched` to true, deploy. No code changes.
+
+Two things about how `js/token.js` draws it are deliberate and shouldn't be
+"tidied up" later.
+
+**The address is never abbreviated.** `0x54f8…7715` is precisely what an address-poisoning attack
+survives: grind out an address matching the first and last few characters and anyone checking only the
+ends is fooled. The middle is the part that identifies it, so all 42 characters stay on screen and wrap
+on a narrow one. There's a copy button for the same reason, since a retyped address is a chance to make
+a mistake nobody catches.
+
+**A bad address draws nothing.** The EIP-55 checksum is verified before anything renders, and a failure
+hides the whole section and logs why. An address with a typo in it that still looks plausible is worse
+than no address at all: one sends money nowhere, the other sends it to a stranger. All-lowercase
+addresses carry no checksum and are allowed through, since that form is legal and common.
+
+Nothing is shown before launch, deliberately. An empty box or a "coming soon" placeholder is a
+ready-made screenshot for somebody to fill in with their own address.
+
+That covers the site. The site is not the attack: on launch day there will be clones of it with the
+address swapped, and no amount of care here touches them. What helps is publishing the address somewhere
+else you control, which is what `verifyUrl` points at.
 
 ## Running locally
 

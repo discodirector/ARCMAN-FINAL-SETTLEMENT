@@ -25,6 +25,20 @@ I18n.register('zh', {
         audio: '音频设置'
     },
 
+    // 菜单中的合约地址。在设置 GameConfig.TOKEN.launched 之前不会显示任何内容。
+    token: {
+        label: '合约地址',
+        labelNamed: '{symbol} 合约地址',
+        copy: '复制',
+        copied: '已复制',
+        copyManually: '已选中',
+        copyFailed: '复制失败',
+        explorer: '在区块浏览器中查看',
+        trade: '交易',
+        verify: '在 X 上核对此地址',
+        warning: '请核对完整地址，而不仅仅是开头和结尾。我们绝不会要求您向该地址转账。'
+    },
+
     hud: {
         score: '得分：{score}',
         level: '第 {current}/{total} 关',
