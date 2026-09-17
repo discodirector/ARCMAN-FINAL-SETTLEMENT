@@ -84,7 +84,7 @@ function readConfig(env) {
         // but one address funnelling claim after claim does.
         maxClaimsPerIp: Number(env.CLAIM_MAX_PER_IP || 3),
         // How many level quizzes must be answered correctly. 0 means finishing
-        // the game is enough, which is the current rule.
+        // the game is enough; production asks for 15 of the 20.
         minQuizCorrect: Number(env.CLAIM_MIN_QUIZ_CORRECT || 0),
         ledgerPath: env.CLAIM_LEDGER_PATH || DEFAULT_LEDGER,
         // Overridable so tests can point at a stub instead of X.

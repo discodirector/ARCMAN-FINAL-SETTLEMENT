@@ -1,15 +1,20 @@
 {
-  "name": "usdc-space-launch",
+  "name": "arcman",
   "version": "1.0.0",
-  "description": "Retro pixel-art space game with blockchain integration",
+  "description": "ARCMAN: Final Settlement — a neon arcade game that teaches Arc, USDC and on-chain settlement",
   "main": "server.js",
   "scripts": {
     "start": "node server.js",
     "dev": "nodemon server.js",
-    "get-address": "node get-server-address.js"
+    "get-address": "node get-server-address.js",
+    "test:finalize": "node server/finalize-flow-test.mjs",
+    "test:claim": "node server/claim-flow-test.mjs",
+    "test:pace": "node server/pace-test.mjs"
   },
   "keywords": [
     "game",
+    "arc",
+    "usdc",
     "blockchain",
     "web3",
     "arcade"
