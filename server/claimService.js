@@ -454,6 +454,14 @@ function registerClaimRoutes(app, { sessions, getIp, sessionExpiryMs, minSeconds
         const done = (status, detail) => res.status(status === 'ok' ? 200 : 400).send(closingPage(status, detail));
 
         if (!claim || !claim.state || claim.state !== state) return done('error', 'unknown_claim');
+
+        // The sign-in can come back twice: a window that looked stuck but had
+        // already finished, then the same link opened somewhere else. X spends
+        // an authorisation code on first use, so the second attempt fails — and
+        // used to report that as a failure, over a verification that had in fact
+        // succeeded. Nothing more is needed here, so say so and change nothing.
+        if (claim.identityHash) return done('ok', 'already_verified');
+
         if (req.query.error) return done('error', 'declined');
         if (!req.query.code) return done('error', 'no_code');
 
@@ -489,7 +497,7 @@ function registerClaimRoutes(app, { sessions, getIp, sessionExpiryMs, minSeconds
             done('ok');
         } catch (error) {
             log.error('X verification failed:', error.message);
-            claim.error = 'x_failed';
+            if (!claim.identityHash) claim.error = 'x_failed';   // never undo a success
             done('error', 'x_failed');
         }
     });
@@ -596,7 +604,9 @@ function registerClaimRoutes(app, { sessions, getIp, sessionExpiryMs, minSeconds
 // The window X opens lands back here; it tells the player what happened and
 // hands the result to the game window that opened it.
 function closingPage(status, detail) {
-    const message = status === 'ok' ? 'X account verified. You can close this window.' : {
+    const message = status === 'ok' ? (detail === 'already_verified'
+        ? 'This X account was already verified for this reward. You can close this window and go back to the game.'
+        : 'X account verified. You can close this window.') : {
         not_premium: 'This X account is not Premium, so it cannot claim.',
         too_new: 'This X account is too new to claim.',
         age_unknown: 'The age of this X account could not be checked.',
