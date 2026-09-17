@@ -10,7 +10,7 @@
 // If the server cannot be reached the quiz does not count: no life is given,
 // and the player simply continues.
 const QuizManager = {
-    currentQuiz: null,    // { level } — which level's quiz is on screen
+    currentQuiz: null,    // { level }: which level's quiz is on screen
     question: null,       // the variant the server picked: { id, level, question, answers }
     quizAnswered: false,
     order: null,          // server order: order[position] = index into the source answers
@@ -110,7 +110,7 @@ const QuizManager = {
 
     // What answering is worth, said while there are still questions to answer.
     // The reward asks for a number of correct answers, and a player who only
-    // learns that on the completion screen has already lost it — the Skip
+    // learns that on the completion screen has already lost it. The Skip
     // button is right there, and nothing used to argue with it.
     showRewardProgress: function (levelId, correctSoFar) {
         const note = document.getElementById('quizRewardNote');
@@ -179,7 +179,7 @@ const QuizManager = {
         }
     },
 
-    // Handle quiz answer selection — position is the button as shown on screen
+    // Handle quiz answer selection. Position is the button as shown on screen
     handleQuizAnswer: async function(position) {
         if (this.quizAnswered || !this.currentQuiz || !this.question || !this.order) return;
 
@@ -226,7 +226,7 @@ const QuizManager = {
         if (resultMessage) {
             resultMessage.style.display = 'block';
             if (isCorrect) {
-                // With a quiz after every level, full lives are common — don't promise a life we can't give
+                // With a quiz after every level, full lives are common, so don't promise one we can't give
                 const gainedLife = GameState.tournamentLives < GameConfig.MAX_TOURNAMENT_LIVES;
                 resultMessage.textContent = gainedLife ? t('quizUi.correctLife') : t('quizUi.correct');
                 resultMessage.className = 'quiz-result correct-result';

@@ -85,7 +85,7 @@ try {
     process.exit(1);
 }
 
-// A made-up key looks like it works — the server signs happily, and every
+// A made-up key looks like it works. The server signs happily, and every
 // score is then rejected on-chain as "Invalid signature", a long way from here
 // and with nothing in the logs. Say it at startup instead, and check against
 // the contract itself when it can be reached.
@@ -131,7 +131,7 @@ if (process.env.SCORE_CONTRACT_ADDRESS && process.env.ARC_RPC_URL) {
 //
 // The chain and the board's own address are part of what is signed: without
 // them, a score signed for one board would count on every other board this key
-// signs for — and play on a test network is free and endless.
+// signs for, and play on a test network is free and endless.
 async function signMessage(player, score, levelId, nonce, gameMode) {
     try {
         const packedData = ethers.solidityPacked(
@@ -242,7 +242,7 @@ app.post('/api/session/start', (req, res) => {
             while (mine.length >= MAX_ANONYMOUS_SESSIONS_PER_IP) {
                 const dropped = mine.shift();
                 sessions.delete(dropped.sessionId);
-                // The oldest run is not always an abandoned one — a player who
+                // The oldest run is not always an abandoned one. A player who
                 // reloads in a second tab, or a whole office behind one address,
                 // can push out a run still being played. Worth seeing.
                 console.log(`Dropped session ${dropped.sessionId} from ${ip}: `
@@ -448,7 +448,7 @@ app.post('/api/session/event', (req, res) => {
             // A level finished in under three seconds used to be thrown away,
             // and the player was never told: their course quietly became
             // nineteen levels of twenty, and at the end there was no reward and
-            // no explanation. It also stopped nobody — a script simply waits.
+            // no explanation. It also stopped nobody, since a script can wait.
             // So the level counts, and a suspiciously quick one is marked. What
             // matters is the run as a whole, judged in runLooksScripted below.
             currentLevel.completedAt = now;
@@ -745,8 +745,8 @@ const scoreService = require('./server/scoreService.js').registerScoreRoutes(app
 /**
  * Put a finished run on the chain at our expense.
  *
- * Sending twice is safe — the contract spends a signature on use, so a second
- * attempt cannot double-count — which is what lets a failed send be retried.
+ * Sending twice is safe. The contract spends a signature on use, so a second
+ * attempt cannot double-count, which is what lets a failed send be retried.
  */
 async function sendScore(session) {
     const record = session.finalization;

@@ -1,6 +1,6 @@
 // Educational Info Screens Data
 // One screen after every level. The screen for level N sets up the quiz that
-// follows it immediately (see quizzes.js — same id, same level).
+// follows it immediately (see quizzes.js: same id, same level).
 // Content verified against Arc / Circle / x402 public materials as of September 2026
 
 const INFO_SCREENS = [

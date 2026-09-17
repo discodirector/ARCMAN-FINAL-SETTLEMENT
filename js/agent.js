@@ -8,7 +8,7 @@
 // Runs in the browser and in Node (for level-solvability tests).
 
 const AgentSolver = {
-    // Base constants — mirrored from GameConfig.BASE_CONFIG
+    // Base constants, mirrored from GameConfig.BASE_CONFIG
     DEFAULTS: {
         width: 800,
         height: 600,
@@ -39,7 +39,7 @@ const AgentSolver = {
         const scale = W / this.DEFAULTS.width;
         const ps = cfg.playerScale;
 
-        // Launch point — see GameFlow.launchCoin + GameObjects.loadLevel
+        // Launch point; see GameFlow.launchCoin + GameObjects.loadLevel
         const playerW = W * 0.04 * ps;
         const playerH = H * 0.08 * ps;
         const playerX = W * ((level.player && level.player.x) || 0.12);
@@ -97,10 +97,10 @@ const AgentSolver = {
             velX: Math.cos(rad) * speed,
             velY: Math.sin(rad) * speed
         };
-        // GameState.initialCoinVelocity — drives bounce strength
+        // GameState.initialCoinVelocity, which drives bounce strength
         const initialSpeed = Math.sqrt(coin.velX * coin.velX + coin.velY * coin.velY);
 
-        // Local mutable copies — the simulation must not touch the level
+        // Local mutable copies: the simulation must not touch the level
         const gates = world.gates.map(g => ({ x: g.x, y: g.y, width: g.width, height: g.height, active: g.active }));
         const clouds = world.clouds.map(c => ({ x: c.x, y: c.y, radius: c.radius, passed: false }));
         const barriers = world.barriers.map(b => Object.assign({ triggered: false }, b));
@@ -111,13 +111,13 @@ const AgentSolver = {
         let barrierHits = 0;
 
         for (let frame = 0; frame < this.MAX_FRAMES; frame++) {
-            // 1. gravity, 2. position — Physics.updateCoin order
+            // 1. gravity, 2. position, in Physics.updateCoin order
             coin.velY += world.gravityPerFrame;
             coin.x += coin.velX * world.timeScale;
             coin.y += coin.velY * world.timeScale;
             if (path) path.push({ x: coin.x, y: coin.y, vx: coin.velX, vy: coin.velY });
 
-            // 3. arc gates — pass gives a boost
+            // 3. arc gates: passing one gives a boost
             for (const gate of gates) {
                 if (gate.active &&
                     coin.x > gate.x && coin.x < gate.x + gate.width &&
@@ -129,7 +129,7 @@ const AgentSolver = {
                 }
             }
 
-            // 4. slippage clouds — drag on first entry
+            // 4. slippage clouds: drag on first entry
             for (const cloud of clouds) {
                 const dx = coin.x - cloud.x;
                 const dy = coin.y - cloud.y;
@@ -141,7 +141,7 @@ const AgentSolver = {
                 }
             }
 
-            // 5. barriers — reflect once per barrier, mirroring Physics.updateCoin
+            // 5. barriers: reflect once per barrier, mirroring Physics.updateCoin
             for (const b of barriers) {
                 const rot = b.rotation * Math.PI / 180;
                 const cos = Math.cos(rot);
@@ -177,7 +177,7 @@ const AgentSolver = {
                 const normalX = normalLocalX * cos - normalLocalY * sin;
                 const normalY = normalLocalX * sin + normalLocalY * cos;
 
-                // Velocity at the moment of contact — before this frame's gravity
+                // Velocity at the moment of contact, before this frame's gravity
                 const oldVelX = coin.velX;
                 const oldVelY = coin.velY - world.gravityPerFrame;
                 const incomingSpeed = Math.sqrt(oldVelX * oldVelX + oldVelY * oldVelY);
@@ -205,7 +205,7 @@ const AgentSolver = {
                 coin.velY += world.gravityPerFrame;
 
                 // The engine re-applies the move with the bounced velocity in the
-                // same frame — the arc starts immediately (physics.js:262).
+                // same frame: the arc starts immediately (physics.js:262).
                 coin.x += coin.velX * world.timeScale;
                 coin.y += coin.velY * world.timeScale;
 
@@ -236,12 +236,12 @@ const AgentSolver = {
     },
 
     // Search the (angle, power) space for a shot that settles.
-    // policy.maxPower is the agent's per-shot ceiling — the hook the
+    // policy.maxPower is the agent's per-shot ceiling, the hook the
     // agent-mode budget rules plug into.
     solve: function (world, policy) {
         policy = policy || {};
         const maxPower = Math.min(policy.maxPower || 3, 3);
-        // Full sweep — levels are mirrored (player on either side), so both
+        // Full sweep: levels are mirrored (player on either side), so both
         // hemispheres have to be searched.
         const angleFrom = policy.angleFrom !== undefined ? policy.angleFrom : -180;
         const angleTo = policy.angleTo !== undefined ? policy.angleTo : 180;

@@ -7,10 +7,10 @@
 //
 // A claim passes four gates, in this order:
 //
-//   1. the course was actually finished — every level completed in one
+//   1. the course was actually finished: every level completed in one
 //      anti-cheat session, no faster than the session rules allow;
-//   2. the wallet belongs to the player — they sign a one-off message with it;
-//   3. the X account is real — signed in through X, must be Premium and at
+//   2. the wallet belongs to the player: they sign a one-off message with it;
+//   3. the X account is real: signed in through X, must be Premium and at
 //      least six months old;
 //   4. neither the wallet nor the X account has claimed before.
 //
@@ -19,7 +19,7 @@
 //
 // What is stored: a ledger of claims in private/claims.json, holding the
 // wallet, a salted hash of the X account id, the IP and the transaction. The X
-// account id itself is never written down and never reaches the chain — the
+// account id itself is never written down and never reaches the chain. The
 // salt lives in the environment, so even a leaked ledger does not reveal which
 // accounts took part.
 //
@@ -461,7 +461,7 @@ function registerClaimRoutes(app, { sessions, getIp, sessionExpiryMs, minSeconds
 
         // The sign-in can come back twice: a window that looked stuck but had
         // already finished, then the same link opened somewhere else. X spends
-        // an authorisation code on first use, so the second attempt fails — and
+        // an authorisation code on first use, so the second attempt fails, and
         // used to report that as a failure, over a verification that had in fact
         // succeeded. Nothing more is needed here, so say so and change nothing.
         if (claim.identityHash) return done('ok', 'already_verified');

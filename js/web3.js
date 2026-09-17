@@ -511,7 +511,7 @@ const Web3Manager = {
     // Get leaderboard from contract
     // The ranking comes from our server, which reads it out of the contract's
     // events. Sorting a hundred players in contract storage cost ten times the
-    // price of a score, and it was the best players who paid it — so the chain
+    // price of a score, and it was the best players who paid it, so the chain
     // keeps the scores and the order is worked out from them.
     getLeaderboard: async function(count = 100, gameMode = 'Tournament') {
         const url = `${GameConfig.BLOCKCHAIN.API_URL}/api/leaderboard`
@@ -589,7 +589,7 @@ const Web3Manager = {
                 });
                 
                 // A changed chain used to reload the page. That was harmless
-                // when the page held nothing worth keeping — but connecting a
+                // when the page held nothing worth keeping, but connecting a
                 // wallet at the end of a run switches the chain, and the reload
                 // then threw the finished run away along with the reward. The
                 // provider is rebuilt in place instead: it caches the network,

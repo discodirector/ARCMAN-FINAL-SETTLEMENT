@@ -6,7 +6,7 @@ const InfoManager = {
         return GameState.tournamentMode && this.getInfoForLevel(levelId) !== null;
     },
 
-    // One screen per level — the screen's id is the level it follows
+    // One screen per level; the screen's id is the level it follows
     getInfoForLevel: function(levelId) {
         if (typeof INFO_SCREENS === 'undefined') return null;
         return INFO_SCREENS.find(screen => screen.id === levelId) || null;

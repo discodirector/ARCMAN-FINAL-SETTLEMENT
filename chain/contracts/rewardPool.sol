@@ -15,9 +15,9 @@ pragma solidity ^0.8.20;
  * this contract verifies.
  *
  * The claim is relayed: the backend sends the transaction and pays the gas, so
- * a player needs no gas of their own. Anyone may relay a signed claim — the
+ * a player needs no gas of their own. Anyone may relay a signed claim. The
  * reward always goes to the `player` named inside the signature, never to the
- * sender — so a leaked relayer key cannot redirect money.
+ * sender, so a leaked relayer key cannot redirect money.
  *
  * What is stored on chain
  * -----------------------
@@ -37,7 +37,7 @@ pragma solidity ^0.8.20;
  * lets the game say so honestly before a player gets their hopes up.
  *
  * Note for Arc: USDC has 6 decimals here, so a $3 reward is 3_000_000. USDC is
- * also the gas token, and Circle can block addresses — a transfer to a blocked
+ * also the gas token, and Circle can block addresses. A transfer to a blocked
  * address reverts, which rolls the whole claim back and leaves it claimable.
  */
 
@@ -154,7 +154,7 @@ contract ARCMANRewardPool {
      * @notice Pay a signed reward to `player`. Callable by anyone; in practice
      *         the backend relays it so the player needs no gas.
      * @param courseId     Which course was finished. One claim per course.
-     * @param player       Who receives the reward — taken from the signature,
+     * @param player       Who receives the reward, taken from the signature,
      *                     not from msg.sender.
      * @param identityHash Salted hash of the verified X account id.
      * @param amount       Reward in USDC units, signed by the backend.
@@ -222,7 +222,7 @@ contract ARCMANRewardPool {
     }
 
     /// @notice Whether this course is still claimable for this wallet and
-    ///         identity — one call for the whole eligibility question the UI asks.
+    ///         identity, in one call for the whole question the UI needs answered.
     function claimable(uint256 courseId, address player, bytes32 identityHash)
         external
         view
@@ -248,7 +248,7 @@ contract ARCMANRewardPool {
 
     /**
      * @notice Take USDC sent the plain way.
-     * @dev On Arc the gas token *is* USDC — one balance, seen either as the
+     * @dev On Arc the gas token *is* USDC: one balance, seen either as the
      *      chain's own currency or through the ERC-20 at 0x3600…0000. So a
      *      wallet asked to "send USDC here" sends it as value, with no token
      *      transfer at all, and a contract that cannot receive value simply
@@ -261,7 +261,7 @@ contract ARCMANRewardPool {
 
     // --- owner --------------------------------------------------------------
 
-    /// @notice Take USDC out — for winding the pilot down or moving to a new pool.
+    /// @notice Take USDC out, for winding the pilot down or moving to a new pool.
     function withdraw(address to, uint256 amount) external onlyOwner {
         if (to == address(0)) revert ZeroAddress();
         if (!usdc.transfer(to, amount)) revert TransferFailed();

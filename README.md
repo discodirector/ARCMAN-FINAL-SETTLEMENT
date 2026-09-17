@@ -1,113 +1,101 @@
 # ARCMAN: Final Settlement
 
-A neon pixel-art arcade game about the one thing a payment network has to get right: **settlement**.
-You play Arc Man, launching a USDC coin along a ballistic arc into the Settlement Zone — and between
-levels, the game teaches you how Arc, USDC and on-chain payments actually work.
+You launch a USDC coin on a ballistic arc, thread it past barriers and slippage clouds, and put it
+down in the Settlement Zone. Twenty levels of that. In between, the game explains how Arc, USDC and
+on-chain payments actually work, then asks you a question about what it just said.
 
-**Play it at [arcmangame.com](https://arcmangame.com)** · English · Русский · 中文 · Bahasa Indonesia
+It's an arcade game with a syllabus hidden inside it.
 
-Scores are computed and signed by the server, put on **Arc** at the server's expense, and ranked by
-reading the contract's own events. Finish a course and you can claim a USDC reward.
+**[arcmangame.com](https://arcmangame.com)** · English · Русский · 中文 · Bahasa Indonesia
 
----
+Arc's public mainnet opened on 16 September 2026. The contracts here went up the day after, which
+explains some of what follows better than any amount of architecture talk would.
 
-## Contents
-
-- [How a run works](#how-a-run-works)
-- [Scoring](#scoring)
-- [Levels](#levels)
-- [Learning content](#learning-content)
-- [Languages](#languages)
-- [Architecture](#architecture)
-- [Anti-cheat and score signing](#anti-cheat-and-score-signing)
-- [The reward](#the-reward)
-- [Smart contracts](#smart-contracts)
-- [Running locally](#running-locally)
-- [Deploying](#deploying)
-- [Project notes](#project-notes)
-
----
+Scores are computed and signed by the server, then written to Arc at the server's expense. Finish a
+course and there's a USDC reward waiting.
 
 ## How a run works
 
-The main mode is **Tournament**: 20 levels, 10 lives, one run.
+Tournament is the main mode: 20 levels, 10 lives, one run.
 
-1. **Aim and launch.** Drag to set direction and power — a glowing line traces the arc the coin
-   will fly — and release to launch.
-2. **Reach the Settlement Zone.** Fly out of bounds and you lose a life and replay the level.
-3. **Learn, then answer.** Every completed level is followed by a short info screen, then a quiz on
-   what that screen just said. A correct answer restores a life (up to 10), and the count of correct
-   answers is what a reward is judged on — see [The reward](#the-reward).
-4. **Rescue quiz — once per run.** Lose your last life and you get one way back: a hint on a topic,
-   then three questions on it.
+Drag to aim. A glowing line traces the arc the coin will fly, and power scales with how far you pull
+back. Release and the physics takes over. Fly out of bounds, lose a life, replay the level.
 
-   | Correct answers | Result |
-   |---|---|
-   | 3 of 3 | Carry on from the same level with 3 lives |
-   | 2 of 3 | Carry on from the same level with 1 life |
-   | 0–1 | The run restarts from level 1 |
+Every level you clear is followed by a short info screen and then one question about it. Answer
+correctly and you get a life back, up to 10. Those answers also decide whether you qualify for the
+reward, so it pays to read the screen instead of clicking past it.
 
-   The score, the level and the server session carry on through a rescue. A second loss in the same
-   run goes straight to a restart.
-5. **Finish.** After level 20: claim the reward, finalize the score on-chain and check the
-   leaderboard.
+Lose your last life and the game gives you one way back in. It shows a hint on some topic, then asks
+three questions about it:
 
-A wallet (MetaMask, Rabby) is only needed for the on-chain steps — the game itself plays without one,
-and the wallet needs nothing in it: the server pays the gas for both the score and the reward.
+| Correct | What happens |
+|---|---|
+| 3 of 3 | Same level, 3 lives |
+| 2 of 3 | Same level, 1 life |
+| 0 or 1 | Back to level 1 |
 
-**Other menu entries**
+Everything else survives a rescue: your score, the level you were on, the server session. Lose your
+lives a second time in the same run and it's a restart. There's no second rescue.
 
-- **Community Levels** — levels submitted by players and approved by the maintainers.
-- **Level Editor** — build a level, test it in place, export it, or submit it for review.
-- **Statistics** — games played and completed, best scores, times and totals, stored in the browser.
-- **Leaderboard** — top 10 / 25 / 50 / 100, read from the chain by the server, with your own rank.
+After level 20 you can claim the reward, write the score to the chain, and see where you landed on the
+leaderboard.
 
----
+A wallet (MetaMask, Rabby) is only needed for the on-chain parts. The game plays fine without one, and
+when you do connect it, it needs nothing in it. We pay the gas for both the score and the reward.
+
+**The rest of the menu.** Community Levels holds player-submitted levels that have been approved. The
+Level Editor builds one, tests it in place, and exports it or sends it in for review. Statistics live
+in your browser. The Leaderboard shows the top 10 through 100, read off the chain, with your own rank
+marked.
 
 ## Scoring
 
-Each level scores:
+Each level is worth:
 
 ```
 level score = floor( (100 + 10 × clouds passed + 10 × barrier hits) × (1 + 0.5 × gates passed) )
 ```
 
-The run score is the sum of its level scores.
+The run score is the sum of the levels.
 
 | Object | What it does | Score effect |
 |---|---|---|
 | **Arc Gate** | Speeds the coin up horizontally as it passes | +0.5× multiplier |
 | **Slippage Cloud** | Slows the coin (×0.85) on entry | +10 |
-| **Barrier** | Bounces the coin — large at full speed, medium at half, small at a quarter | +10, once per barrier per shot |
-| **Life Restore** | Tournament only: +1 life, up to 10 | — |
+| **Barrier** | Bounces the coin: large at full speed, medium at half, small at a quarter | +10, once per barrier per shot |
+| **Life Restore** | Tournament only: +1 life, up to 10 | none |
 | **Settlement Zone** | Ends the level | Base 100 |
 
-The number on screen is for the player. The score that reaches the chain is recomputed by the server
-from validated in-game events — see [Anti-cheat and score signing](#anti-cheat-and-score-signing).
-
----
+The number on screen is for the player. The score that reaches the chain gets recomputed by the server
+from events it validated itself, which is the subject of
+[Anti-cheat and score signing](#anti-cheat-and-score-signing).
 
 ## Levels
 
-Twenty levels in `levels.js`, in two acts. Levels 1–9 and 20 ("Final Settlement") are hand-built;
-levels 10–19 are the second act, each named after the info screen that follows it.
+Twenty levels in `levels.js`, in two acts. Levels 1–9 and 20 ("Final Settlement") were placed by hand.
+Levels 10–19 are the second act, each named after the info screen that follows it.
 
 ### Design rules for the second act
 
-Levels 10–19 were built and checked against a headless re-implementation of the shot physics
-(`js/agent.js`, see [Project notes](#project-notes)). Every one of them meets these rules at 1440×900,
-1280×800, 1024×768, 844×390 and 390×844:
+The second act was built against a headless copy of the shot physics (`js/agent.js`, see
+[Notes](#notes)), which made it cheap to ask whether a level was actually any good. Each one satisfies
+the following at 1440×900, 1280×800, 1024×768, 844×390 and 390×844.
 
-- **No free shot.** No winning shot reaches the Settlement Zone without touching an object — the
-  player has to fly the intended line.
-- **No decoration.** Every object is either met by at least a fifth of the winning shots, or removing
-  it opens a free lane or visibly changes the shot window.
-- **Everything on the field.** Rotated barriers are checked corner by corner; cloud extents account
-  for the aspect ratio.
-- **Every gate in one run.** Some single shot collects all the gates, so the top score is reachable.
-- **Life restores are a choice.** They sit off the straight line, on roughly a third of winning shots.
+No free shot: nothing reaches the Settlement Zone without touching an object first, so the player has
+to fly the intended line rather than lob the coin and hope.
 
-New levels should meet the same bar.
+No decoration: every object is either met by at least a fifth of winning shots, or removing it opens a
+free lane or visibly changes the window you have to hit.
+
+Everything stays on the field, with rotated barriers checked corner by corner and cloud extents
+adjusted for aspect ratio.
+
+Some single shot collects every gate, so the top score is actually gettable.
+
+Life restores sit off the straight line, on roughly a third of winning shots, so taking one is a
+decision.
+
+New levels should clear the same bar.
 
 ### Level format
 
@@ -142,106 +130,103 @@ All coordinates are relative (0–1) and scaled to the canvas at load time.
 
 ### Adding a level
 
-1. Append the level to `DEFAULT_LEVELS` in `levels.js` with the next `id`.
-2. Add an info screen to `js/infoScreens.js` with **the same `id`**, and three question variants to
+1. Append it to `DEFAULT_LEVELS` in `levels.js` with the next `id`.
+2. Add an info screen to `js/infoScreens.js` under **the same `id`**, plus three question variants in
    `js/quizzes.js` with `level` set to that id and ids `<level>a`, `<level>b`, `<level>c`.
-3. Add each variant's correct answer to `private/answer-key.json` on the server — see
+3. Put each variant's correct answer in `private/answer-key.json` on the server. See
    [Learning content](#learning-content).
-4. Add the wording to every pack in `js/locales/` (English is the fallback until then).
-5. **Restart the backend.** `server.js` reads `levels.js` at startup to know how many levels a run has
-   and how many objects each level can report; a stale process rejects finalization of the new run.
+4. Translate the wording in every pack under `js/locales/`. English shows until you do.
+5. Restart the backend. `server.js` reads `levels.js` once at startup to learn how many levels a run
+   has and how many objects each level can legitimately report, so a stale process will reject every
+   finalization of the new course.
 
-The Level Editor's **Export** writes out `DEFAULT_LEVELS` in this same format, so a level can be built
-visually and pasted in.
-
----
+The Level Editor exports `DEFAULT_LEVELS` in exactly this format, so you can build a level visually and
+paste it in.
 
 ## Learning content
 
-Everything the game teaches lives in three data files. They hold the English source, the ids and the
-answer order; translations carry wording only. **Which answer is right is not in any of them** — those
-files ship to every browser. The server grades answers, see [Server-side quizzes](#server-side-quizzes).
+Everything the game teaches sits in three data files. They hold the English source, the ids and the
+answer order. Translations carry wording only. **None of them says which answer is right**, because all
+three ship to the browser. Grading happens on the server.
 
 | File | Shown | Contents |
 |---|---|---|
-| `js/infoScreens.js` | After every level | 20 short explainers — Arc, USDC as gas, finality, the ARC token, x402, agent wallets, CCTP, reserves, minting, EURC, FX settlement, confidential transfers, validators, cross-border payments, irreversibility, the mainnet launch |
-| `js/quizzes.js` | Right after that level's info screen | 60 questions: three variants per level, one picked by the server per run, each answerable from the screen just read |
-| `js/rescueTopics.js` | When the last life is lost | 8 topics, each with a hint and five questions — the server asks three. None repeat the level quizzes |
+| `js/infoScreens.js` | After every level | 20 short explainers: Arc, USDC as gas, finality, the ARC token, x402, agent wallets, CCTP, reserves, minting, EURC, FX settlement, confidential transfers, validators, cross-border payments, irreversibility, the mainnet launch |
+| `js/quizzes.js` | Right after that level's info screen | 60 questions, three variants per level, one drawn by the server per run, each answerable from the screen just read |
+| `js/rescueTopics.js` | When the last life is lost | 8 topics, each with a hint and five questions, of which the server asks three. None repeat the level quizzes |
 
-Rules that keep this consistent:
+A level quiz looks like `{ id: '7b', level: 7, question, answers: [ …3… ] }`. Every variant has to be
+answerable from that level's info screen, and its correct answer belongs in `private/answer-key.json`
+under the same id.
 
-- A level quiz is `{ id: '7b', level: 7, question, answers: [ …3… ] }`. Every variant of a level must be
-  answerable from that level's info screen, and its correct answer is listed in
-  `private/answer-key.json` under its id.
-- Every rescue answer must be findable in its own hint — the rescue is meant to be won by reading.
-- A rescue topic is `{ id, title, hint, questions: [ …at least 3… ] }`. Adding one to the array puts it
-  in the draw; add its wording to the packs in `js/locales/`, or it shows in English.
-- **Nothing about an answer's shape may give it away.** The right answer is not the longest, the
-  shortest, the most hedged or the only one naming a product; its position in the source array varies.
-  The source order is public even though the key is not, and the same rule applies to every
-  translation.
-- **Correct answers never enter git.** Questions whose answers were ever committed are burned and
-  should be replaced, not reused.
+Rescue answers must be findable in the hint above them. The rescue is meant to be winnable by reading
+carefully under pressure, not by already knowing the material.
+
+A rescue topic is `{ id, title, hint, questions: [ …at least 3… ] }`, and adding one to the array puts
+it in the draw. Translate it or it shows in English.
+
+Nothing about an answer's shape may give it away. The right answer shouldn't be the longest, the
+shortest, the most hedged, or the only one that names a real product, and its position in the source
+array varies from question to question. The source order is public even though the key isn't, and the
+same discipline applies to every translation.
+
+Correct answers never enter git. Any question whose answer was committed at some point is burned and
+should be replaced.
 
 Content was checked against Arc, Circle and x402 public materials as of September 2026. Arc's public
-mainnet opened on 16 September 2026; claims about the ARC token and the move to Proof-of-Stake
-describe announced plans — ARC has not launched.
-
----
+mainnet opened on 16 September 2026. Claims about the ARC token and the move to Proof-of-Stake describe
+announced plans; ARC has not launched.
 
 ## Languages
 
-English, Russian, Simplified Chinese and Indonesian. A dropdown in the top-right corner of the menu
-switches language without a reload. The choice is stored in `localStorage` (`arcman_language`); on a
-first visit the browser language decides.
+English, Russian, Simplified Chinese and Indonesian. The dropdown in the top-right of the menu switches
+between them without a reload, and the choice is remembered in `localStorage` under `arcman_language`.
+On a first visit the browser decides.
 
-`js/i18n.js` loads before every other module:
+`js/i18n.js` loads before every other module. `I18n.t(key, params)`, exposed globally as `t()`, looks a
+key up in the current pack, falls back to English, then to the key itself, so a half-finished pack
+shows English instead of blank UI. Game content comes through `I18n.levelName()`, `I18n.infoText()`,
+`I18n.quiz()` and `I18n.rescueTopic()`, which return wording only and always in source order, since the
+server's shuffled order refers to those positions.
 
-- `I18n.t(key, params)` — also the global `t()` — looks the key up in the current pack, falls back to
-  English, then to the key itself, so an unfinished pack shows English rather than blank UI.
-- `I18n.levelName()`, `I18n.infoText()`, `I18n.quiz()`, `I18n.rescueTopic()` return translated game
-  content — wording only, always in source order, since the server's shuffled order refers to those
-  positions.
-- Static markup uses `data-i18n` (plus `-html`, `-placeholder`, `-value`, `-title`) and is rewritten by
-  `I18n.apply()`; screens built in JavaScript re-render through `I18n.onChange()`.
-- `'Tournament'` and `'Community'` are contract values and are never translated.
+Static markup carries `data-i18n` attributes (plus `-html`, `-placeholder`, `-value`, `-title`) and gets
+rewritten by `I18n.apply()`. Screens built in JavaScript re-render through `I18n.onChange()`. The
+strings `'Tournament'` and `'Community'` are contract values and never get translated.
 
-**Adding a language:** copy `js/locales/en.js` to `js/locales/<code>.js` and translate every value
-(English is the canonical key set), add `{ code, label, short }` to `I18n.LANGUAGES`, and add its
-`<script>` tag in `index.html` next to the others. The dropdown builds itself.
-
----
+To add a language, copy `js/locales/en.js` to `js/locales/<code>.js` and translate every value, add
+`{ code, label, short }` to `I18n.LANGUAGES`, and drop a `<script>` tag into `index.html` beside the
+others. The dropdown builds itself from there.
 
 ## Architecture
 
-Plain JavaScript, no framework and no build step. Modules are loaded by `<script>` tags in
-`index.html`, in dependency order, and talk through global namespace objects (`GameState`,
-`GameConfig`, `Physics`, `Renderer`, …). The one external script is ethers.js from a CDN.
+Plain JavaScript. No framework, no build step. Modules load through `<script>` tags in `index.html` in
+dependency order and talk to each other through global namespace objects (`GameState`, `GameConfig`,
+`Physics`, `Renderer`, and so on). The only external script is ethers.js from a CDN.
 
 ```
 index.html            markup, styles, canvas, every overlay and screen
-levels.js             DEFAULT_LEVELS and LevelManager (also read by server.js)
+levels.js             DEFAULT_LEVELS and LevelManager (server.js reads this too)
 communityLevels.js    approved community levels
-server.js             Express: public files, anti-cheat sessions, score signing, level submissions
+server.js             Express: static files, anti-cheat sessions, score signing, level submissions
 server/
-  quizService.js      server-side quiz grading
-  scoreService.js     sends the score, and builds the ranking from the board's events
+  quizService.js      quiz grading
+  scoreService.js     sends the score, builds the ranking from the board's events
   claimService.js     the reward: X sign-in, the ledger, the EIP-712 release
   relay.js            one queue per wallet, so two transactions never share a nonce
-  *-test.mjs          flow tests, run against a live server
-private/              answer-key.json and claims.json — never committed, kept on the server
+  *-test.mjs          flow tests that run against a live server
+private/              answer-key.json and claims.json, kept on the server, never committed
 contract.sol          the retired score contract, kept for the record
-chain/                ARCMANScoreBoard and ARCMANRewardPool, with their tests and deploy scripts
+chain/                ARCMANScoreBoard and ARCMANRewardPool, with tests and deploy scripts
 js/
   i18n.js             translation runtime            locales/   en, ru, zh, id packs
   config.js           constants, chain and contract settings
   canvas.js           canvas sizing and responsiveness
   audio.js            music and sound effects
-  state.js            GameState — the single source of runtime state
+  state.js            GameState, the single source of runtime state
   gameObjects.js      level loading, sprites, player animation
   physics.js          coin flight, collisions, life loss
   renderer.js         all canvas drawing
-  scoring.js          level scoring and the level summary screen
+  scoring.js          level scoring and the summary screen
   ui.js               HUD updates
   input.js            mouse and touch aiming
   gameFlow.js         modes, level progression, completion and leaderboard screens
@@ -254,17 +239,15 @@ js/
   claim.js            the reward claim on the completion screen
   levelEditor.js      the level editor
   main.js             game loop and initialisation
-  agent*.js           retired Agent Shift mode — not loaded, see Project notes
+  agent*.js           retired Agent Shift mode, not loaded, see Notes
 ```
 
-Browser storage keys: `arcman_language`, `arcman_player_stats`, `usdc_launch_custom_levels`
-(levels saved from the editor).
-
----
+Browser storage keys: `arcman_language`, `arcman_player_stats`, `usdc_launch_custom_levels` (levels
+saved out of the editor).
 
 ## Anti-cheat and score signing
 
-The client never submits a score. It reports what happened; the server decides what it was worth.
+The client never submits a score. It reports what happened and the server decides what that was worth.
 
 ```
 POST /api/session/start     { gameMode, player? }            -> { sessionId, totalLevels,
@@ -285,60 +268,61 @@ GET  /api/health                                             -> { status: "ok", 
 ```
 
 The reward claim adds `/api/claim/pool`, `/api/claim/start`, `/api/claim/wallet`, `/api/claim/x/start`,
-`/api/claim/x/callback`, `/api/claim/status` and `/api/claim/submit` — see [The reward](#the-reward).
+`/api/claim/x/callback`, `/api/claim/status` and `/api/claim/submit`, covered under
+[The reward](#the-reward).
 
-Every tournament run gets a session. **The wallet comes at the end, not the beginning**: a player
-plays without one, and names it only when there is something to put on chain, by signing the
-`walletMessage` the session was opened with. Asking up front cost runs — a wallet that failed to
-connect threw away twenty levels of play.
+Every tournament run gets a session. The wallet comes at the end rather than the beginning: you play
+without one and name it only when there's something to put on chain, by signing the `walletMessage`
+handed out when the session opened. Asking up front used to cost people whole runs whenever the wallet
+failed to connect.
 
-Checks the server applies:
+What the server checks:
 
-- one active session per wallet; walletless runs are capped at 20 per IP, the oldest dropped first
-- every session is bound to the IP that started it and expires after an hour. The server trusts
-  `X-Forwarded-For` only from a loopback proxy, so behind the reverse proxy `req.ip` is the player's
-  address and cannot be spoofed by a direct request
+- one active session per wallet, with walletless runs capped at 20 per IP and the oldest dropped first
+- every session is bound to the IP that opened it and expires after an hour. `X-Forwarded-For` is
+  trusted only from a loopback proxy, so behind the reverse proxy `req.ip` is the player's real address
+  and a direct request can't spoof it
 - events are capped per level by that level's real object counts in `levels.js`
-- no event within 0.5 s of a level starting
-- a level finished in under 3 s is **recorded and marked**, not thrown away. The run is judged whole:
-  if more than half its levels were that fast, neither the score nor the reward goes through. The old
-  rule discarded the level silently, which stopped no script — a script simply waits three seconds —
-  and quietly cost a quick player a level of their course
-- finalization needs every level completed, a total time of at least 3 s per level, and a 60 s
-  cooldown between finalizations per player
-- the score is recomputed from the recorded events with the formula in [Scoring](#scoring)
+- nothing counts within 0.5 s of a level starting
+- a level finished in under 3 s gets recorded and flagged, never dropped. The run is then judged
+  as a whole: if more than half of it went that fast, neither the score nor the reward goes through
+- finalization requires every level completed, a total time of at least 3 s per level, and a 60 s
+  cooldown per player
+- the score is recomputed from the recorded events using the formula in [Scoring](#scoring)
 
-The server then signs
+The server signs
 `keccak256(abi.encodePacked(chainId, board, player, score, levelId, nonce, gameMode))` with the
 Ethereum signed-message prefix, where `levelId` is the number of levels completed. The contract
-recovers the signer and accepts the score only if it matches its configured server signer. The chain
-id and the board's own address are in the hash so that a signature cannot be carried from the testnet
-board to the mainnet one, or to any future deployment.
+recovers the signer and accepts the score only if it matches the server signer it was configured with.
+The chain id and the board's own address are in there so a signature can't travel between deployments.
 
-Finalization then **sends the transaction itself** and returns its hash: the player's wallet signs
-nothing and needs no balance. If the relayer is not configured the signature is handed back instead,
-for the wallet to send. A run is signed once; asking again resends the same signature, because the
-contract spends a signature on use and losing a finished run is the worse failure.
+Finalization then sends the transaction itself and returns the hash. The player's wallet signs nothing
+and needs no balance. Without a relayer configured, the signature comes back instead for the wallet to
+send. A run only gets signed once; asking again resends the same signature, since the contract spends
+signatures on use and a duplicate is cheaper than a lost run.
 
-Only the game itself is served publicly — `index.html`, `levels.js`, `communityLevels.js`, `js/`,
-`images/` and `audio/`. `server.js`, the package files, `server/` and `private/` return 404.
+Only the game is served publicly: `index.html`, `levels.js`, `communityLevels.js`, `js/`, `images/` and
+`audio/`. Requests for `server.js`, the package files, `server/` or `private/` get a 404.
 
 ### Server-side quizzes
 
-The browser knows every question and the wording of every answer, never which one is right.
+The browser knows every question and the exact wording of every answer. It never learns which one is
+correct.
 
-- **Level quiz.** `level/start` opens the quiz only for a level this session has completed on the
-  server, picks one of that level's variants and returns its `questionId` with the order to show its
-  answers in. `level/answer` grades the chosen on-screen position, once, and says which position was
-  right. A correct answer restores a life.
-- **Rescue quiz.** The server draws the topic (never the same one twice in a row from an IP), picks
-  three of its questions, shuffles each, grades the three answers in order and returns the verdict:
-  3 of 3 → 3 lives, 2 of 3 → 1, otherwise none. Once per session.
-- **Shuffled per session**, so "the right answer is the second one" does not travel between players.
-- **If the server is unreachable**, the level quiz does not count and the run continues; the rescue
-  cannot be graded and the run restarts from level 1.
+`level/start` opens a quiz only for a level this session has actually completed on the server, draws
+one of that level's three variants, and returns its `questionId` along with the order to display the
+answers in. `level/answer` grades the on-screen position you picked, once, and replies with the
+position that was right. Correct answers restore a life.
 
-The answers live in `private/answer-key.json`, as the **exact English text** of each correct answer:
+The rescue quiz draws a topic (never the same one twice in a row from one IP), picks three of its
+questions, shuffles each, grades all three in order and returns the verdict: 3 of 3 for three lives,
+2 of 3 for one, otherwise nothing. Once per session.
+
+Answer order is shuffled per session, so "it's the second one" doesn't travel between players. If the
+server is unreachable the level quiz simply doesn't count and the run continues; a rescue that can't be
+graded sends the run back to level 1.
+
+Answers live in `private/answer-key.json` as the **exact English text** of the correct option:
 
 ```json
 {
@@ -347,194 +331,215 @@ The answers live in `private/answer-key.json`, as the **exact English text** of 
 }
 ```
 
-Text rather than positions means reordering answers in the content keeps working. If the key and the
-content disagree — a quiz without an answer, or a correct answer reworded in `js/quizzes.js` but not in
-the key — the server logs `QUIZZES UNAVAILABLE`, `/api/health` reports `"quizzes": "unavailable"`,
-and the rest of the backend keeps running. The file is never committed: the repository is public.
-`ANSWER_KEY_PATH` overrides its location.
-
----
+Storing text rather than positions means you can reorder answers in the content without breaking
+anything. When the key and the content disagree, which usually means a quiz with no answer or an answer
+reworded in `js/quizzes.js` but not in the key, the server logs `QUIZZES UNAVAILABLE`, `/api/health`
+starts reporting `"quizzes": "unavailable"`, and everything else keeps running. The file never gets
+committed, since this repository is public. `ANSWER_KEY_PATH` overrides where it lives.
 
 ## The reward
 
-A player who finishes the course can claim a fixed USDC reward, once. The claim is three steps on the
-completion screen, and the server checks every one of them again on its own:
+Finish the course and you can claim a fixed USDC reward, once. Three steps on the completion screen,
+each re-checked server-side:
 
-1. **The wallet.** Connect it and sign a short message. No transaction, no balance needed.
-2. **The X account.** Sign in through X. It must be Premium and at least six months old — the cheapest
-   honest signal we could ask for, and the one that costs a farm the most.
-3. **The reward.** We sign an EIP-712 release and send it ourselves, so the player's wallet needs
-   nothing in it at all.
+1. **Wallet.** Connect it and sign a short message. No transaction, no balance needed.
+2. **X account.** Sign in through X. It has to be Premium and at least six months old.
+3. **Reward.** We sign an EIP-712 release and send it, so your wallet needs nothing in it.
 
-Once per wallet and once per X account, both kept in a ledger on disk and enforced again by the
-contract. The X handle is never stored — only a salted hash of the account id, so the same account
-cannot claim twice and nothing about who claimed survives in a readable form.
+The Premium-and-six-months requirement isn't a judgement about anyone. It's just the cheapest signal we
+could ask for that costs a farm real money and costs an ordinary player nothing.
 
-To be eligible, a run must also **answer 15 of the 20 level quizzes correctly** and survive the pace
-check above. The quiz screen says how many are right so far, and says plainly when a reward has become
-unreachable rather than letting the player finish for nothing.
+One claim per wallet and one per X account, tracked in a ledger on disk and enforced again by the
+contract. The handle itself is never stored, only a salted hash of the account id, which is enough to
+catch a second attempt and not enough to tell anyone who claimed.
 
-The section hides itself when the pool is empty or paused, and says which it is. Every refusal it can
-explain, it explains: an exhausted pool, a shared connection at its limit, a wallet or an account that
-has already claimed.
+A run also has to answer **15 of the 20 level quizzes** correctly and pass the pace check above. The
+quiz screen shows how many you have so far, and tells you outright once the reward has become
+unreachable, so nobody plays out the rest of the course for nothing.
+
+The whole section hides itself when the pool is empty or paused, and says which of the two it is.
+Refusals it can explain, it explains: an exhausted pool, a shared connection that has hit its limit, a
+wallet or an account that already claimed.
 
 | Setting | Default | What it does |
 |---|---|---|
-| `CLAIM_MIN_QUIZ_CORRECT` | `0` | Correct level quizzes required; production asks 15 |
-| `CLAIM_MIN_ACCOUNT_AGE_DAYS` | `183` | How old the X account must be |
-| `CLAIM_MAX_PER_IP` | `3` | Claims from one address before it is refused |
-| `CLAIM_COURSE_ID` | `1` | Bumping it opens a fresh round of claims |
-| `CLAIM_LEDGER_PATH` | `private/claims.json` | Who has claimed; never committed |
-
----
+| `CLAIM_MIN_QUIZ_CORRECT` | `0` | Correct level quizzes required. Production asks 15 |
+| `CLAIM_MIN_ACCOUNT_AGE_DAYS` | `183` | How old the X account has to be |
+| `CLAIM_MAX_PER_IP` | `3` | Claims from one address before it starts refusing |
+| `CLAIM_COURSE_ID` | `1` | Bump it to open a fresh round of claims |
+| `CLAIM_LEDGER_PATH` | `private/claims.json` | Who has claimed. Never committed |
 
 ## Smart contracts
 
-Arc mainnet is chain id `5042`, RPC `https://rpc.mainnet.arc.io`; the testnet is `5042002` at
-`https://rpc.testnet.arc.io`. On both, the gas is USDC.
+Arc mainnet is chain id `5042` at `https://rpc.mainnet.arc.io`. The testnet is `5042002` at
+`https://rpc.testnet.arc.io`. Gas is USDC on both.
 
 | Contract | Address on Arc mainnet |
 |---|---|
 | `ARCMANScoreBoard` | `0x54f8D69E62d1E83c4616792c1D95508c539F7715` |
 | `ARCMANRewardPool` | `0xC00575601174BC0551E07378E8c0a91097940F10` |
 
-Both were deployed on 17 September 2026. The owner is a wallet held by the maintainer, separate from
-every key on the server; the two signing keys and the relayer are separate from each other again, so
-no single key can both authorise a reward and take the money.
+Both deployed 17 September 2026. The owner is a wallet the maintainer holds, separate from every key on
+the server, and the two signing keys and the relayer are separate from each other again. No single key
+can both authorise a reward and walk off with the money.
 
-**ARCMANScoreBoard** (`chain/contracts/scoreBoard.sol`)
+**ARCMANScoreBoard** (`chain/contracts/scoreBoard.sol`) verifies the server signature in
+`finalizeScore(scoreData, signature)` and keeps each player's best score per game mode. Anyone can send
+it, because the signature names the player, so a stranger paying the gas can neither steal the score nor
+misplace it. That property is what lets the server pay on behalf of an empty wallet. Signatures are
+spent on use and the upper half of the curve is refused, so nothing replays or mirrors.
 
-- `finalizeScore(scoreData, signature)` — verifies the server signature and keeps the player's best
-  score per game mode. Anyone may send it: the signature names the player, so a stranger paying the
-  gas can neither steal a score nor misplace it. That is what lets the server pay for a player whose
-  wallet is empty.
-- Signatures are spent on use and the upper half of the curve is refused, so one cannot be replayed
-  or mirrored.
-- No leaderboard in storage. Sorting a hundred players cost up to 1.3M gas and charged the best
-  players the most; the ranking is built from `NewBestScore` instead, by the server, and served at
-  `/api/leaderboard`.
-- `setServerSigner` (owner only) replaces the signing key without redeploying — it matters, because
-  whoever holds that key can write any score. Ownership moves in two steps.
+There's no leaderboard in storage, for reasons under [Things that went wrong](#things-that-went-wrong).
+The board emits `NewBestScore` and the server ranks from the events.
 
-**ARCMANRewardPool** (`chain/contracts/rewardPool.sol`)
+`setServerSigner` lets the owner swap the signing key without redeploying, which matters, because
+whoever holds it can write any score they like. Ownership itself moves in two steps.
 
-- A fixed USDC reward per finished course, once per wallet and once per X account, released against
-  an EIP-712 signature from the server and relayed at our expense.
-- The owner can withdraw and pause; the signer can only authorise a reward it already holds.
-
----
+**ARCMANRewardPool** (`chain/contracts/rewardPool.sol`) pays a fixed USDC reward per finished course,
+once per wallet and once per X account, released against an EIP-712 signature from the server and
+relayed at our expense. The owner can withdraw and pause. The signer can only authorise money the pool
+already holds.
 
 ## Running locally
 
-Requires Node.js (production runs v20).
+Needs Node.js. Production runs v20.
 
 ```bash
 npm install
 npm start               # http://localhost:3000
 ```
 
-Create a `.env` next to `server.js`:
+Then a `.env` next to `server.js`:
 
 ```bash
 # Scores
-PRIVATE_KEY=0x...              # score signer; must match the board's serverSigner
+PRIVATE_KEY=0x...              # score signer; has to match the board's serverSigner
 SCORE_CONTRACT_ADDRESS=0x...   # the board the signature is bound to
 SCORE_CHAIN_ID=5042            # the chain it is bound to
 SCORE_FIRST_BLOCK=...          # where the ranking starts reading; the deploy script prints it
 ARC_RPC_URL=https://rpc.mainnet.arc.io
-RELAYER_KEY=0x...              # pays the gas for scores and rewards alike
+RELAYER_KEY=0x...              # pays gas for scores and rewards alike
 
-# The reward (leave unset and the claim simply does not appear)
+# The reward. Leave it all unset and the claim just doesn't appear.
 REWARD_POOL_ADDRESS=0x...
 CLAIM_SIGNER_KEY=0x...         # authorises a release; never the relayer, never the owner
 IDENTITY_SALT=...              # salts the X account hash in the ledger
 X_CLIENT_ID=... X_CLIENT_SECRET=... X_REDIRECT_URI=https://…/api/claim/x/callback
-CLAIM_MIN_QUIZ_CORRECT=15      # and the rest of the table above
+CLAIM_MIN_QUIZ_CORRECT=15      # plus the rest of the table above
 
-# Everything else is optional
+# Optional
 TELEGRAM_BOT_TOKEN=...         # notifications for community level submissions
 TELEGRAM_CHAT_ID=...
 PORT=3000
 ```
 
-Without `PRIVATE_KEY` the server generates a throwaway key on each start and says so at startup — the
-game runs, but the deployed board will refuse every score. At startup it also compares its own address
-with the board's `serverSigner()` and its `SCORE_CHAIN_ID` with the node's, and complains if either
-disagrees; that check exists because a wrong key looks exactly like a working one until a player
-finishes a run. `npm run get-address` prints the signer address for the key in `.env`.
+Without `PRIVATE_KEY` the server invents a throwaway key at startup and says so in the log. The game
+runs, but the deployed board will refuse every score it signs. Startup also compares that key's address
+against the board's `serverSigner()` and `SCORE_CHAIN_ID` against the node, and complains about either
+mismatch, because a wrong key looks exactly like a working one right up until someone finishes a run.
+`npm run get-address` prints the address for whatever key is in `.env`.
 
-**Keep the three keys apart.** The score signer, the claim signer and the relayer are separate, so no
-single key can both authorise money and hold it. The owner key belongs in a wallet, not on the server.
+Keep the three keys apart. Score signer, claim signer and relayer are separate on purpose, so that no
+one key can both authorise money and hold it. The owner key belongs in a wallet, not on a server.
 
-**Quizzes need the answer key.** Put `answer-key.json` in `private/` (ask a maintainer for it). Without
-it the game runs, but every quiz reports that the server did not answer.
+**Quizzes need the answer key.** Drop `answer-key.json` into `private/` (ask a maintainer). Without it
+the game still runs, but every quiz reports that the server didn't answer.
 
-**The client talks to the backend that served it.** `API_URL` in `js/config.js` resolves to the page's
-own origin, so `npm start` on `http://localhost:3000` just works. Opened from a file, it falls back to
-production.
+**The client talks to whatever backend served it.** `API_URL` in `js/config.js` resolves to the page's
+own origin, so `npm start` on `http://localhost:3000` works with no configuration. Opened from a file,
+it falls back to production.
 
-**Serve over HTTP, not `file://`.** Wallet extensions do not inject into local files. A plain static
-server (`python3 -m http.server 8000`) runs the game, but without the backend there are no sessions,
-no quizzes and no on-chain finalization.
+**Serve over HTTP, not `file://`.** Wallet extensions don't inject into local files. A plain static
+server (`python3 -m http.server 8000`) will run the game, but with no backend there are no sessions, no
+quizzes and no finalization.
 
-`npm run dev` runs the server under nodemon.
+`npm run dev` runs it under nodemon.
 
 ### Tests
 
 ```bash
 cd chain && npm install && npx hardhat test   # the two contracts, 52 tests
 npm run test:claim                            # the whole reward claim, start to finish
-npm run test:finalize                         # score finalization, with a server already running
+npm run test:finalize                         # score finalization, against a running server
 npm run test:pace                             # how fast a run may be played, likewise
 ```
 
-`test:claim` builds everything it needs — a local chain, a funded pool, a stand-in for X — and touches
-neither the real network nor the production ledger. The other two play real courses against
-`localhost:3000`, so they take a few minutes each: the anti-cheat rules ask a course to be played at
-human speed, and the tests play by them.
-
----
+`test:claim` stands up everything it needs by itself, including a local chain, a funded pool and a
+stand-in for X, and touches neither the real network nor the production ledger. The other two play real
+courses against `localhost:3000` and take a few minutes each, because the anti-cheat rules expect a
+course to be played at human speed and the tests play by them.
 
 ## Deploying
 
-The production site is `server.js` behind a reverse proxy: it serves the static files and the API from
-the same process.
+Production is `server.js` behind a reverse proxy, serving the static files and the API out of one
+process.
 
-1. Copy the repository files to the server, **excluding** `.git/`, `node_modules/` and `.env`. The
-   server keeps its own `.env` with the signing key — never overwrite it and never commit it.
-   `private/answer-key.json` is deployed the same way: kept on the server, never in git. Update it
-   whenever a quiz is added or a correct answer is reworded.
-2. Run `npm install` if `package.json` changed.
-3. **Restart the Node process** (for example `systemctl restart <service>`). Static files are picked up
-   immediately, but `levels.js` is read once at startup — a process that still believes the run has a
-   different number of levels rejects every finalization.
-4. Check `/api/health` — it must say `"quizzes": "ok"` — then load the site and confirm the new files
-   are served. Browsers cache `js/*.js` aggressively; test with a hard reload.
+1. Copy the repository to the server, leaving out `.git/`, `node_modules/` and `.env`. The server keeps
+   its own `.env` with the signing keys. Never overwrite it, never commit it.
+   `private/answer-key.json` works the same way, and needs updating whenever a quiz is added or a
+   correct answer gets reworded.
+2. `npm install` if `package.json` changed.
+3. Restart the Node process (`systemctl restart <service>`, or whatever runs it). Static files are
+   picked up immediately, but `levels.js` is read once at startup, and a process that still believes
+   the course is a different length will reject every finalization.
+4. Check `/api/health` for `"quizzes": "ok"`, then load the site and confirm the new files are actually
+   being served. Browsers cache `js/*.js` hard, so test with a hard reload.
 
----
+Sessions live in memory, so a restart ends every run in progress. Deploy when nobody is playing.
 
-## Project notes
+## Things that went wrong
 
-- **Which chain.** `GameConfig.BLOCKCHAIN.NETWORK` decides. The game runs on **Arc mainnet**, where
-  the rewards are real USDC; `ArcTestnet` still works and uses test USDC with no value. Arc's public
-  mainnet opened on 16 September 2026.
-- **On Arc, USDC is both the gas token and an ERC-20** at `0x3600…0000` — one balance seen two ways,
-  18 decimals natively and 6 through the token interface. A contract that should receive USDC
-  therefore needs a `receive()`, which the pool learned the expensive way.
-- **Sessions live in memory.** Restarting the server ends every run in flight. Deploy when nobody is
-  playing.
-- **Retired modes.** Immortal mode was removed; Tournament is the only scored mode. The Agent Shift
-  mode was retired from the game, but `js/agent.js`, `agentShift.js`, `agentWallet.js`,
-  `agentOnboarding.js` and `agentMode.js` stay in the tree with their markup and styles. No script tag
-  loads them, and their markup is not translated.
-- **`js/agent.js` is a useful tool.** `AgentSolver` is a deterministic, headless copy of the shot
-  physics that runs in Node and the browser. `buildWorld(level)`, `simulate(world, shot)` and
-  `solve(world)` answer "is this level winnable, and how?" — it is how the second act was validated.
-  In the browser, inject it and hand its aim to `GameFlow.launchCoin()` to finish a level without
-  playing. Note that the live player bobs (`player.floatOffset`), which the solver ignores.
-- **Community levels** are played locally and are not finalized on-chain.
-- **This file is the description.** A second, longer one used to sit beside it, written before the
-  game had quizzes, rewards or a chain to talk to; it has been removed rather than left to be believed.
+Worth writing down, if only to avoid a repeat.
+
+**The leaderboard used to live on the chain.** Keeping the top hundred sorted meant re-sorting on every
+new entry, which cost up to 1.3M gas, and the worst case landed on whoever had just played best.
+Charging your strongest players the most is a strange way to run a game. The board now emits
+`NewBestScore` and nothing else, and the server reads the events back and ranks them. Gas per score
+dropped by roughly a factor of ten.
+
+**Score finalization never worked for anyone.** The server would only sign for a wallet named when the
+session started, but the game didn't ask for a wallet until the run was over, so every signature was
+for nobody. It failed quietly until someone actually finished a run and went looking. There's a
+`/api/session/wallet` endpoint now: finish the run, then prove the wallet by signing the message the
+session was opened with.
+
+**300 USDC went nowhere.** Funding the reward pool from a wallet is an ordinary native transfer, and the
+pool had no `receive()`, so the transaction reverted and the money stayed put
+([`0xe59a8cf6…`](https://explorer.arc.io/tx/0xe59a8cf6275e5eee16bb023434090011dbe48c553d5914e4d5e9d88f90177976)).
+Easier to trip over on Arc than it sounds, because USDC there is both the gas token and an ERC-20 at
+`0x3600…0000`: one balance, two views, 18 decimals natively and 6 through the token interface. The pool
+has a `receive()` now.
+
+**The three-second rule punished the wrong people.** Any level finished in under three seconds used to
+be silently discarded. That does nothing to a script, which can happily wait three seconds, and it
+quietly cost a good player a level off their course, with no message at the time and no reward at the
+end. Now the level counts and gets flagged, and the run is judged all at once: more than half of it
+that fast and nothing goes through.
+
+**A signature for the testnet board would have worked on the mainnet one.** Caught while re-reading the
+contract before deploying. The signed hash didn't include the chain id or the contract address, so one
+signature was good on any deployment sharing a signer. Both are in the hash now, and there's a test
+that signs for one board and checks that another refuses it.
+
+**Arc silently drops transactions priced under 20 Gwei.** No error, no receipt, no trace that you ever
+sent anything. Everything we send bids 25.
+
+## Notes
+
+`GameConfig.BLOCKCHAIN.NETWORK` picks the chain. The game runs on Arc mainnet, where the rewards are
+real USDC. `ArcTestnet` still works and uses test USDC worth nothing.
+
+Immortal mode is gone; Tournament is the only scored mode. Agent Shift was retired too, but
+`js/agent.js`, `agentShift.js`, `agentWallet.js`, `agentOnboarding.js` and `agentMode.js` are still in
+the tree along with their markup and styles. Nothing loads them and their markup isn't translated.
+
+`js/agent.js` earns its place anyway. `AgentSolver` is a deterministic headless copy of the shot
+physics that runs in Node and in the browser, and `buildWorld(level)`, `simulate(world, shot)` and
+`solve(world)` answer "is this level winnable, and how?" It's how the second act got validated. In the
+browser you can inject it and hand its aim to `GameFlow.launchCoin()` to clear a level without playing.
+One caveat: the live player bobs up and down (`player.floatOffset`) and the solver ignores that.
+
+Community levels are played locally and never finalized on-chain.
 
 ## License
 

@@ -39,7 +39,7 @@ const CanvasManager = {
             // Level geometry is relative to the play area, but shot speed and gravity
             // scale with WIDTH only. On a playfield taller than the 800x600 design
             // ratio the coin can no longer reach the top, which makes some levels
-            // physically unwinnable — so letterbox instead of stretching.
+            // physically unwinnable, so letterbox instead of stretching.
             const designAspect = GameConfig.BASE_CONFIG.width / GameConfig.BASE_CONFIG.height;
             let playWidth = containerWidth;
             let playHeight = containerHeight;

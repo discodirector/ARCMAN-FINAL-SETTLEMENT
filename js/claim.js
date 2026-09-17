@@ -3,11 +3,11 @@
 // A player who finishes the course can claim a USDC reward once. Three steps,
 // each of which the server checks again on its own:
 //
-//   1. the wallet — connect it and sign a short message, which proves it is
+//   1. the wallet: connect it and sign a short message, which proves it is
 //      theirs and costs nothing;
-//   2. the X account — sign in through X, which must be Premium and at least
+//   2. the X account: sign in through X, which must be Premium and at least
 //      six months old;
-//   3. the reward itself — we send the transaction and pay the gas, so the
+//   3. the reward itself: we send the transaction and pay the gas, so the
 //      player needs nothing on the wallet at all.
 //
 // The whole section stays hidden unless the pool is live and has money in it.
@@ -70,7 +70,7 @@ const ClaimManager = {
                 return;
             }
             if (started.data && started.data.reason === 'ip_limit') {
-                // Shared connections are ordinary — an office, a campus, a phone
+                // Shared connections are ordinary: an office, a campus, a phone
                 // network. Saying so beats vanishing without a word.
                 this.setStage('closed');
                 this.say(t('claim.ipLimit'), 'warn');
@@ -311,7 +311,7 @@ const ClaimManager = {
             step.classList.toggle('done', done);
             step.classList.toggle('active', active);
             // Only the stage decides: a step reached while a request is still
-            // settling must not be left disabled. A second click is harmless —
+            // settling must not be left disabled. A second click is harmless,
             // every handler returns early while one is in flight.
             if (button) button.disabled = !active;
         });

@@ -8,7 +8,7 @@ pragma solidity 0.8.24;
  *
  * The server watches a run, computes the score itself and signs it. This
  * contract checks that signature and nothing else: it has no idea what a level
- * is. Three consequences worth stating plainly —
+ * is. Three consequences worth stating plainly:
  *
  *   - whoever holds the signing key can write any score for any player, which
  *     is why the key can be replaced without redeploying;
@@ -19,7 +19,7 @@ pragma solidity 0.8.24;
  *   - there is no leaderboard here. Keeping a sorted hundred in storage cost
  *     about six times the price of the score itself, because a new leader
  *     shifts everyone below them. The ranking is built by reading NewBestScore
- *     instead — the chain still holds every score, just not the order.
+ *     instead. The chain still holds every score, just not the order.
  */
 contract ARCMANScoreBoard {
     struct ScoreData {
@@ -92,7 +92,7 @@ contract ARCMANScoreBoard {
 
         // The chain and this contract are part of what is signed. Without them
         // a score signed for one board would count on every other board the
-        // same key signs for — and play on a test network is free and endless.
+        // same key signs for, and play on a test network is free and endless.
         bytes32 messageHash = keccak256(
             abi.encodePacked(
                 block.chainid,
@@ -170,7 +170,7 @@ contract ARCMANScoreBoard {
         }
 
         // Every signature has a mirror image with the same meaning. Refusing
-        // the upper half keeps one signature from wearing two faces — which
+        // the upper half keeps one signature from wearing two faces, which
         // would otherwise slip past the replay check above.
         if (uint256(s) > 0x7FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF5D576E7357A4501DDFE92F46681B20A0) revert BadSignature();
         if (v != 27 && v != 28) revert BadSignature();

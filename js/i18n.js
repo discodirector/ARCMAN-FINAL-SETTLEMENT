@@ -84,7 +84,7 @@ const I18n = {
         try {
             localStorage.setItem(this.STORAGE_KEY, code);
         } catch (e) {
-            // Private browsing — the choice simply does not survive a reload.
+            // Private browsing: the choice simply does not survive a reload.
         }
 
         this.applyDocumentLanguage();
@@ -128,7 +128,7 @@ const I18n = {
         return typeof value === 'undefined' ? undefined : value;
     },
 
-    // t('quizUi.incorrect', { answer: '…' }) — {name} placeholders are filled
+    // t('quizUi.incorrect', { answer: '…' }): {name} placeholders are filled
     // from params. Missing keys return the key so a gap is visible, not silent.
     t: function (key, params) {
         let value = this.lookup(key, this.current);
@@ -145,7 +145,7 @@ const I18n = {
     // --- game content -----------------------------------------------------
     //
     // Levels, info screens and quizzes keep their English source in levels.js /
-    // infoScreens.js / quizzes.js / rescueTopics.js — only the wording is
+    // infoScreens.js / quizzes.js / rescueTopics.js: only the wording is
     // translated here, so ids, answer order and level geometry stay in one
     // place. Which answer is right lives only on the server.
 
@@ -161,7 +161,7 @@ const I18n = {
         return typeof translated === 'string' ? translated : (info.text || '');
     },
 
-    // Returns { question, answers } — always three answers, in source order,
+    // Returns { question, answers }, always three answers, in source order,
     // because the server's shuffled order refers to these positions.
     quiz: function (quiz) {
         if (!quiz) return null;
@@ -177,7 +177,7 @@ const I18n = {
         };
     },
 
-    // Returns { title, hint, questions: [{ question, answers }] } — wording only;
+    // Returns { title, hint, questions: [{ question, answers }] }; wording only,
     // grading happens on the server
     rescueTopic: function (topic) {
         if (!topic) return null;
@@ -199,7 +199,7 @@ const I18n = {
         };
     },
 
-    // 'Tournament' / 'Community' are contract values — translate the label only.
+    // 'Tournament' / 'Community' are contract values; translate the label only.
     gameModeLabel: function (mode) {
         if (!mode) return this.t('mode.unknown');
         const key = 'mode.' + String(mode).toLowerCase();

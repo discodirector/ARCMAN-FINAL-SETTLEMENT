@@ -7,7 +7,7 @@
 //      contract checks that signature and does not care who pays. A player
 //      needs a wallet and nothing in it.
 //   2. We keep the ranking. The contract no longer sorts a hundred players in
-//      storage — that cost ten times the price of the score itself — so the
+//      storage, which cost ten times the price of the score itself, so the
 //      order is worked out here, by reading what the contract announced.
 //
 // The ranking is rebuilt from the chain, never from our own database: if this
@@ -27,7 +27,7 @@ const SCORE_ABI = [
 ];
 
 // How long a cached ranking is served before the chain is read again, and how
-// many blocks are asked for at a time — public nodes refuse very wide ranges.
+// many blocks are asked for at a time. Public nodes refuse very wide ranges.
 const RANKING_TTL_MS = 60 * 1000;
 const LOG_WINDOW = 9_000;
 
@@ -77,7 +77,7 @@ async function logsBetween(contract, from, to, log) {
  * Keeps every player's best score, read from the chain and kept up to date.
  *
  * NewBestScore is only emitted when a player beats their own record, so the
- * last one for a player is their best — there is nothing to compare, only the
+ * last one for a player is their best. There is nothing to compare, only the
  * latest to keep. That is also why this can read forward from where it left
  * off instead of walking the whole chain again.
  */

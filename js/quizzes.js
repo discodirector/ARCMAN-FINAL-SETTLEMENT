@@ -4,7 +4,7 @@
 // variant checks the info screen shown just before it (infoScreens.js), so any of
 // the three is answerable by reading that screen.
 //
-// Which answer is right is NOT in this file — it ships to every browser. The
+// Which answer is right is NOT in this file, which ships to every browser. The
 // server grades answers against private/answer-key.json, which is deployed like
 // .env and never committed. Adding a question means adding its correct answer
 // there, as the exact English answer text, under the question's id.

@@ -1,12 +1,12 @@
-// Rescue Quiz — the one second chance a tournament run gets.
+// Rescue Quiz: the one second chance a tournament run gets.
 //
 // When the last life is gone the run would normally restart from level 1.
 // Instead the player is shown a hint and then three questions on that hint's
 // topic, and buys their way back in with attention rather than another hour:
 //
-//   3 of 3 correct — continue from this level with 3 lives
-//   2 of 3 correct — continue from this level with 1 life
-//   fewer         — the run restarts from the first level
+//   3 of 3 correct: continue from this level with 3 lives
+//   2 of 3 correct: continue from this level with 1 life
+//   fewer         : the run restarts from the first level
 //
 // Once per run. The topics live in js/rescueTopics.js and are deliberately
 // not the ones asked between levels.

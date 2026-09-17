@@ -1,6 +1,6 @@
 // Transactions we pay for.
 //
-// The game sends two kinds on the player's behalf — a reward and a score — and
+// The game sends two kinds on the player's behalf, a reward and a score, and
 // both go out from the same wallet. That is the whole reason this is a module
 // rather than a few lines inside each service: two transactions built at the
 // same moment would be handed the same nonce, and one of them would be thrown
@@ -12,7 +12,7 @@
 
 const { ethers } = require('ethers');
 
-// Arc silently drops anything below a 20 Gwei base fee — no error, no receipt,
+// Arc silently drops anything below a 20 Gwei base fee. No error, no receipt,
 // the transaction simply never appears. We never bid below 25.
 const MIN_GAS_PRICE = 25_000_000_000n;
 

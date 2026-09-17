@@ -1,4 +1,4 @@
-// Rescue Quiz Topics — the second chance a player gets after losing every life.
+// Rescue Quiz Topics: the second chance a player gets after losing every life.
 //
 // One topic is drawn per rescue. The player reads the hint first, then answers
 // three of that topic's five questions, picked by the server; the hint contains
@@ -6,7 +6,7 @@
 // back into the run.
 //
 // These questions are deliberately separate from the per-level quizzes in
-// js/quizzes.js — a player who has just failed should not be re-asked what
+// js/quizzes.js, since a player who has just failed should not be re-asked what
 // they already answered on the way here.
 //
 // The correct answers are not in this file: the server draws the topic, picks

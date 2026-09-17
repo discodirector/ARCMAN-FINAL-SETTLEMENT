@@ -25,7 +25,7 @@ const GameFlow = {
         }
     },
 
-    // Every tournament run gets a session — the quizzes are graded against it.
+    // Every tournament run gets a session; the quizzes are graded against it.
     // A wallet is optional here: a run that starts without one can name it at
     // the end, by signing, which is what nearly every player actually does.
     startSession: async function(player, gameMode) {
