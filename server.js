@@ -178,6 +178,21 @@ async function signMessage(player, score, levelId, nonce, gameMode) {
 // Session endpoints (anti-cheat protected)
 // ------------------------------------------------------------
 
+/**
+ * Does this run look played rather than typed?
+ *
+ * One or two very quick levels are a good player who saw the angle at once.
+ * Most of the course finished that way is something else. The total time of the
+ * run is checked separately and catches the blunt cases; this catches a run
+ * that paused between levels but never actually played them.
+ */
+function runLooksScripted(session) {
+    const played = session.levels.filter(level => level && level.completedAt);
+    if (played.length === 0) return false;
+    const fast = played.filter(level => level.fast).length;
+    return fast > played.length / 2;
+}
+
 // Almost nobody connects a wallet before pressing Play, so a run that wants its
 // score on-chain has to be able to name a wallet once it is over. The signature
 // over this message is what makes that safe: it is tied to the one session, it
@@ -430,10 +445,15 @@ app.post('/api/session/event', (req, res) => {
             }
             currentLevel.barrierHits++;
         } else if (eventType === 'levelComplete') {
-            if (timeSinceLevelStart < MIN_SECONDS_PER_LEVEL) {
-                return res.status(400).json({ error: 'Level completed too quickly' });
-            }
+            // A level finished in under three seconds used to be thrown away,
+            // and the player was never told: their course quietly became
+            // nineteen levels of twenty, and at the end there was no reward and
+            // no explanation. It also stopped nobody — a script simply waits.
+            // So the level counts, and a suspiciously quick one is marked. What
+            // matters is the run as a whole, judged in runLooksScripted below.
             currentLevel.completedAt = now;
+            currentLevel.seconds = timeSinceLevelStart;
+            currentLevel.fast = timeSinceLevelStart < MIN_SECONDS_PER_LEVEL;
         }
 
         return res.json({ success: true });
@@ -508,6 +528,10 @@ app.post('/api/session/finalize', async (req, res) => {
         const minTotalTime = session.totalLevels * MIN_SECONDS_PER_LEVEL;
         if (totalGameTime < minTotalTime) {
             return res.status(400).json({ error: 'Game completed too quickly' });
+        }
+
+        if (runLooksScripted(session)) {
+            return res.status(400).json({ error: 'Most levels were finished too quickly to have been played' });
         }
 
         // --- Server-side score computation ---
@@ -707,6 +731,7 @@ const claimService = require('./server/claimService.js').registerClaimRoutes(app
     getIp,
     sessionExpiryMs: SESSION_EXPIRY_MS,
     minSecondsPerLevel: MIN_SECONDS_PER_LEVEL,
+    runLooksScripted,
 });
 
 // Scores on the chain and the ranking read back out of them. Unconfigured, the

@@ -82,7 +82,9 @@ I18n.register('en', {
         correct: 'Correct!',
         correctLife: 'Correct! +1 Life',
         incorrect: 'Incorrect. Correct answer: {answer}',
-        unavailable: 'The quiz server did not answer, so this question does not count. Continue to the next level.'
+        unavailable: 'The quiz server did not answer, so this question does not count. Continue to the next level.',
+        rewardProgress: 'The reward asks for {needed} correct answers. You have {correct}.',
+        rewardLost: 'Too few questions are left for this run to reach the reward, but answering still earns lives.'
     },
 
     rescue: {

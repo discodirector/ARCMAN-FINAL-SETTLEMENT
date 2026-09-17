@@ -44,6 +44,19 @@ const GameFlow = {
         return null;
     },
 
+    // What the reward asks of this run, read once when it starts.
+    loadRewardTerms: async function() {
+        GameState.rewardQuizNeeded = 0;
+        try {
+            const response = await fetch(GameConfig.BLOCKCHAIN.API_URL + '/api/claim/pool', { cache: 'no-store' });
+            if (!response.ok) return;
+            const pool = await response.json();
+            GameState.rewardQuizNeeded = pool.open ? Number(pool.quizNeeded || 0) : 0;
+        } catch (error) {
+            // Rewards are simply not on offer today; the game does not care.
+        }
+    },
+
     sendSessionEvent: function(eventType) {
         if (!GameState.sessionId) return;
         const apiUrl = this._getApiUrl();
@@ -1813,6 +1826,11 @@ const GameFlow = {
 
         // Start anti-cheat session (must await so sessionId is set before first levelStart)
         await this.startSession(Web3Manager.currentAccount || null, 'Tournament');
+
+        // How many quiz answers the reward asks for, so the quiz screen can say
+        // so while there are still questions left. Nothing depends on it: no
+        // rewards, no answer, no notice.
+        this.loadRewardTerms();
         
         this.hideMainMenu();
         

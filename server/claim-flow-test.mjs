@@ -194,12 +194,18 @@ function startGameServer(poolAddress, ledgerPath) {
             X_TOKEN_URL: `http://127.0.0.1:${X_PORT}/token`,
             X_USER_URL: `http://127.0.0.1:${X_PORT}/users/me`,
             CLAIM_LEDGER_PATH: ledgerPath,
+            // This test is about the claim, not the questions: it plays levels
+            // and answers nothing, so the quiz threshold is pinned off here
+            // rather than inherited from whatever the machine has set.
+            CLAIM_MIN_QUIZ_CORRECT: '0',
+            CLAIM_MAX_PER_IP: '20',
         },
     });
 }
 
 /// Play a whole course the way the game does, respecting the timing rules:
-/// the server refuses a level finished in under three seconds, so the test
+/// a level finished in under three seconds is marked as suspiciously quick, and
+/// a run made mostly of those does not qualify — so the test
 /// really does take a minute per course.
 async function playCourse() {
     const { data: started } = await post('/api/session/start', { gameMode: 'Tournament' });

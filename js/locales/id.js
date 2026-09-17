@@ -82,7 +82,9 @@ I18n.register('id', {
         correct: 'Benar!',
         correctLife: 'Benar! +1 Nyawa',
         incorrect: 'Salah. Jawaban yang benar: {answer}',
-        unavailable: 'Server kuis tidak merespons, jadi soal ini tidak dihitung. Lanjutkan ke level berikutnya.'
+        unavailable: 'Server kuis tidak merespons, jadi soal ini tidak dihitung. Lanjutkan ke level berikutnya.',
+        rewardProgress: 'Hadiah memerlukan {needed} jawaban benar. Anda punya {correct}.',
+        rewardLost: 'Sisa pertanyaan tidak cukup bagi sesi ini untuk meraih hadiah, tetapi menjawab tetap memberi nyawa.'
     },
 
     rescue: {

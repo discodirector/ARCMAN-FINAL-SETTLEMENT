@@ -206,7 +206,7 @@ function accountProblem(user, config) {
 
 // --- routes ----------------------------------------------------------------
 
-function registerClaimRoutes(app, { sessions, getIp, sessionExpiryMs, minSecondsPerLevel, log = console }) {
+function registerClaimRoutes(app, { sessions, getIp, sessionExpiryMs, minSecondsPerLevel, runLooksScripted, log = console }) {
     const config = readConfig(process.env);
 
     if (config.missing.length) {
@@ -271,6 +271,10 @@ function registerClaimRoutes(app, { sessions, getIp, sessionExpiryMs, minSeconds
         const seconds = (Date.now() - session.startTime) / 1000;
         if (seconds < session.totalLevels * minSecondsPerLevel) {
             res.status(409).json({ error: 'Course finished too quickly' });
+            return null;
+        }
+        if (runLooksScripted && runLooksScripted(session)) {
+            res.status(409).json({ error: 'Most levels were finished too quickly to have been played' });
             return null;
         }
         if (config.minQuizCorrect > 0) {

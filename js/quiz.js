@@ -87,6 +87,8 @@ const QuizManager = {
         const opened = await this.openOnServer(quizData.level);
         if (request !== this.request) return;   // the screen was closed meanwhile
 
+        this.showRewardProgress(quizData.level, opened && opened.correctSoFar);
+
         const question = opened && QUIZZES.find(q => q.id === opened.questionId);
         if (!question) {
             this.showUnavailable();
@@ -104,6 +106,32 @@ const QuizManager = {
             btn.classList.remove('disabled');
             btn.disabled = false;
         });
+    },
+
+    // What answering is worth, said while there are still questions to answer.
+    // The reward asks for a number of correct answers, and a player who only
+    // learns that on the completion screen has already lost it — the Skip
+    // button is right there, and nothing used to argue with it.
+    showRewardProgress: function (levelId, correctSoFar) {
+        const note = document.getElementById('quizRewardNote');
+        if (!note) return;
+
+        const needed = Number(GameState.rewardQuizNeeded || 0);
+        if (!needed || typeof correctSoFar !== 'number') {
+            note.style.display = 'none';
+            return;
+        }
+
+        const correct = correctSoFar;
+        // This question and the ones after it: the run is on level levelId, so
+        // levelId - 1 questions are behind it.
+        const left = Math.max(0, (GameState.levelManager ? GameState.levelManager.levels.length : 20) - (levelId - 1));
+
+        note.classList.toggle('unreachable', correct + left < needed);
+        note.textContent = correct + left < needed
+            ? t('quizUi.rewardLost')
+            : t('quizUi.rewardProgress', { correct, needed });
+        note.style.display = 'block';
     },
 
     // Open the quiz on the server. The level-complete event is sent a moment
@@ -183,6 +211,8 @@ const QuizManager = {
         }
 
         const isCorrect = data.correct;
+        this.showRewardProgress(question.level + 1, data.correctSoFar);
+
         buttons.forEach((btn, index) => {
             if (!btn) return;
             if (index === data.correctPosition) {

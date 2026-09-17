@@ -82,7 +82,9 @@ I18n.register('zh', {
         correct: '答对了！',
         correctLife: '答对了！+1 生命',
         incorrect: '答错了。正确答案：{answer}',
-        unavailable: '测验服务器没有响应，本题不计分。请继续下一关。'
+        unavailable: '测验服务器没有响应，本题不计分。请继续下一关。',
+        rewardProgress: '领取奖励需要答对 {needed} 道，你已答对 {correct} 道。',
+        rewardLost: '剩下的题目已不足以让这一局拿到奖励，但答题仍然可以换取生命。'
     },
 
     rescue: {

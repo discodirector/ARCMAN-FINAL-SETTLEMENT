@@ -148,6 +148,12 @@ function registerQuizRoutes(app, { sessions, getIp, sessionExpiryMs, log = conso
 
     const isChoice = (value, count) => Number.isInteger(value) && value >= 0 && value < count;
 
+    // How many level questions this run has answered correctly. The game shows
+    // it while there are still questions left, so nobody learns what skipping
+    // cost them only after the last level.
+    const correctSoFar = (session) =>
+        Object.values(session.quizzes || {}).filter(quiz => quiz.answered && quiz.correct).length;
+
     // --- level quizzes ------------------------------------------------------
 
     app.post('/api/quiz/level/start', (req, res) => {
@@ -181,7 +187,7 @@ function registerQuizRoutes(app, { sessions, getIp, sessionExpiryMs, log = conso
             quiz = { questionId, order: shuffledOrder(answers.answerCount[questionId]), openedAt: Date.now(), answered: false };
             session.quizzes[levelId] = quiz;
         }
-        res.json({ questionId: quiz.questionId, order: quiz.order });
+        res.json({ questionId: quiz.questionId, order: quiz.order, correctSoFar: correctSoFar(session) });
     });
 
     app.post('/api/quiz/level/answer', (req, res) => {
@@ -202,7 +208,7 @@ function registerQuizRoutes(app, { sessions, getIp, sessionExpiryMs, log = conso
         const correct = quiz.order[choice] === correctIndex;
         Object.assign(quiz, { answered: true, correct, answeredAt: Date.now() });
 
-        res.json({ correct, correctPosition: quiz.order.indexOf(correctIndex) });
+        res.json({ correct, correctPosition: quiz.order.indexOf(correctIndex), correctSoFar: correctSoFar(session) });
     });
 
     // --- rescue quiz --------------------------------------------------------

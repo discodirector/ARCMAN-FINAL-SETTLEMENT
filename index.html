@@ -436,6 +436,22 @@
             text-shadow: 0 0 10px #f00;
         }
 
+        /* What answering is worth, said while there are still questions left */
+        .quiz-reward-note {
+            margin: 10px auto 4px;
+            max-width: 90%;
+            font-family: 'Courier New', monospace;
+            font-size: clamp(11px, 2vh, 14px);
+            line-height: 1.5;
+            color: #ffd479;
+            text-shadow: 0 0 10px rgba(255, 212, 121, 0.45);
+        }
+
+        .quiz-reward-note.unreachable {
+            color: #ff8a8a;
+            text-shadow: 0 0 10px rgba(255, 138, 138, 0.45);
+        }
+
         #quizSkip, #quizContinue {
             background: rgba(255, 255, 0, 0.2);
             color: #ff0;
@@ -3141,6 +3157,7 @@
                     <button id="quizAnswer3" class="quiz-answer-button" data-i18n="quizUi.answer3">Answer 3</button>
                 </div>
                 <div id="quizResultMessage" class="quiz-result"></div>
+                <div id="quizRewardNote" class="quiz-reward-note" style="display: none;"></div>
                 <div style="display: flex; justify-content: center; gap: 10px; flex-wrap: wrap;">
                     <button id="quizSkip" data-i18n="quizUi.skip">Skip</button>
                     <button id="quizContinue" data-i18n="quizUi.continue">Continue</button>

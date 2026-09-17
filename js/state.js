@@ -63,6 +63,7 @@ const GameState = {
     sessionId: null,            // Server-issued session ID for score verification
     sessionPlayer: null,        // Wallet this run belongs to; null until one is named
     sessionWalletMessage: null, // What the player signs to name that wallet at the end
+    rewardQuizNeeded: 0,        // Correct quiz answers the reward asks for; 0 when it asks none
 
     // Game completion tracking
     gameStartTime: null,        // Timestamp when game started
@@ -129,6 +130,7 @@ const GameState = {
         this.sessionId = null;
         this.sessionPlayer = null;
         this.sessionWalletMessage = null;
+        this.rewardQuizNeeded = 0;
         this.gameStartTime = null;
         this.gameEndTime = null;
         this.finalScore = 0;
